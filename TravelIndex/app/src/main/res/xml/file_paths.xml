@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo la carpeta de archivos de los viajes y el ZIP temporal de compartir se pueden abrir o compartir con otras apps (permiso temporal por archivo). -->
+<paths>
+    <files-path name="attachments" path="attachments/" />
+    <!-- ZIP temporal del viaje que el usuario va a compartir (se reemplaza en cada compartición). -->
+    <cache-path name="shared" path="shared/" />
+</paths>
