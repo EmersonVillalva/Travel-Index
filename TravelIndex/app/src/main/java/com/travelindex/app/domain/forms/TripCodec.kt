@@ -2,6 +2,7 @@ package com.travelindex.app.domain.forms
 
 import com.travelindex.app.data.db.TripEntity
 import com.travelindex.app.domain.Money
+import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.formatPlain
 
 /** Formulario del propio viaje (crear y editar). Mismas reglas de validación que el resto de módulos. */
@@ -14,9 +15,22 @@ object TripCodec {
         "travelers" to t.travelers.toString(),
         "budget" to t.budgetMinor?.let { Money.formatPlain(it, t.currency) }.orEmpty(),
         "currency" to t.currency, "description" to t.description, "notes" to t.notes,
+        "travelModes" to TravelModes.normalize(t.travelModes),
     )
 
     fun defaults(currency: String): FormValues = mapOf("travelers" to "1", "currency" to currency)
+
+    /**
+     * Cambia un campo del formulario. Si la ida pasa a ser posterior a la vuelta, la vuelta se mueve a esa misma
+     * fecha, así nunca queda un viaje que termine antes de empezar.
+     */
+    fun withValue(values: FormValues, key: String, value: String): FormValues {
+        val next = values + (key to value)
+        if (key != "startDate") return next
+        val start = next.date("startDate") ?: return next
+        val end = next.date("endDate") ?: return next
+        return if (end.isBefore(start)) next + ("endDate" to start.toString()) else next
+    }
 
     /** Reglas que dependen de varios campos a la vez. */
     fun cross(v: FormValues): Map<String, FieldError> {
@@ -36,6 +50,6 @@ object TripCodec {
         travelers = v.int("travelers", 1).coerceIn(1, MAX_TRAVELERS),
         coverPath = coverPath, description = v.str("description"),
         budgetMinor = v.minor("budget"), currency = v.currency(), notes = v.str("notes"),
-        cancelled = cancelled, createdAt = createdAt,
+        cancelled = cancelled, createdAt = createdAt, travelModes = TravelModes.normalize(v["travelModes"]),
     )
 }

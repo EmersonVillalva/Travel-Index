@@ -49,7 +49,7 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             defaultCurrency = p[K.CURRENCY] ?: d.defaultCurrency,
             dateFormat = p[K.DATE]?.let { runCatching { DateFormatOption.valueOf(it) }.getOrNull() } ?: d.dateFormat,
             themeMode = (p[K.THEME]?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: d.themeMode)
-                .let { if (it == ThemeMode.SYSTEM) ThemeMode.LIGHT else it },
+                .let { if (it == ThemeMode.SYSTEM) ThemeMode.DARK else it },
             notificationsEnabled = p[K.NOTIF] ?: d.notificationsEnabled,
             flightLeadHours = p[K.FLIGHT_H] ?: d.flightLeadHours,
             eventLeadMinutes = p[K.EVENT_M] ?: d.eventLeadMinutes,

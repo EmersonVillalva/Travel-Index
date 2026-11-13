@@ -53,7 +53,7 @@ class ProfileViewModel @Inject constructor(
     fun setName(name: String) = update { it.copy(userName = name.trim().take(40)) }
     fun setCurrency(code: String) { if (Money.isValidCurrency(code)) update { it.copy(defaultCurrency = code.trim().uppercase()) } }
     fun setDateFormat(o: DateFormatOption) = update { it.copy(dateFormat = o) }
-    fun setTheme(m: ThemeMode) = update { it.copy(themeMode = if (m == ThemeMode.SYSTEM) ThemeMode.LIGHT else m) }
+    fun setTheme(m: ThemeMode) = update { it.copy(themeMode = if (m == ThemeMode.SYSTEM) ThemeMode.DARK else m) }
     fun setNotifications(on: Boolean) = update { it.copy(notificationsEnabled = on) }
     fun setBlockScreenshots(on: Boolean) = update { it.copy(blockScreenshots = on) }
 

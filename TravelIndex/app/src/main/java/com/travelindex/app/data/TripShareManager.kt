@@ -42,9 +42,10 @@ sealed interface ImportResult {
 }
 
 /**
- * Compartir un viaje = un ZIP (`trip.json` + `files/<n>`) con una copia exacta de sus datos y archivos.
- * No hay servidor: el archivo viaja por la app de mensajería, correo, etc. que elija el usuario.
- * El ZIP NO está cifrado y puede contener números de documentos: se avisa antes de compartir.
+ * Compartir un viaje = un archivo `.travelindex` con una copia exacta de sus datos y archivos (por dentro va
+ * comprimido: `trip.json` + `files/<n>`). No hay servidor: el archivo viaja por la app de mensajería, correo, etc.
+ * que elija el usuario, y quien tiene Travel Index lo abre con un toque. NO está cifrado y puede contener números
+ * de documentos: se avisa antes de compartir.
  */
 @Singleton
 class TripShareManager @Inject constructor(
@@ -60,7 +61,7 @@ class TripShareManager @Inject constructor(
 
     // ---- Exportar -------------------------------------------------------------------------------
 
-    /** Crea el ZIP del viaje en la caché y lo devuelve; null si no existe o es demasiado grande. */
+    /** Crea el archivo del viaje en la caché y lo devuelve; null si no existe o es demasiado grande. */
     suspend fun export(tripId: Long): File? = withContext(Dispatchers.IO) {
         val bundle = trips.bundles.filterNotNull().first().firstOrNull { it.trip.id == tripId } ?: return@withContext null
         sharedDir.listFiles()?.forEach { it.delete() }   // solo se conserva el último
@@ -77,8 +78,7 @@ class TripShareManager @Inject constructor(
         val total = bundle.attachments.sumOf { files.resolve(it.relativePath).takeIf { f -> f.isFile }?.length() ?: 0L }
         if (total > TripShareFormat.MAX_TOTAL_BYTES) return@withContext null
 
-        val safeName = bundle.trip.name.replace(Regex("[^A-Za-z0-9 _-]"), "").trim().replace(' ', '_').take(40).ifEmpty { "viaje" }
-        val out = File(sharedDir, "TravelIndex-$safeName.zip")
+        val out = File(sharedDir, TripShareFormat.fileNameFor(bundle.trip.name))
         try {
             ZipOutputStream(out.outputStream().buffered()).use { zip ->
                 zip.putNextEntry(ZipEntry(TripShareFormat.ENTRY_JSON))

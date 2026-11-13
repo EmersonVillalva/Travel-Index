@@ -52,6 +52,7 @@ import com.travelindex.app.ui.components.FormField
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.PendingFileRow
 import com.travelindex.app.ui.components.SectionCard
+import java.time.LocalDate
 import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.Spacing
 
@@ -125,6 +126,9 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
                             FormField(
                                 def = def, value = state.values[def.key].orEmpty(), error = state.errors[def.key],
                                 onChange = { vm.setValue(def.key, it) },
+                                minDate = def.notBeforeKey?.let { k ->
+                                    state.values[k]?.takeIf { it.isNotBlank() }?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                                },
                             )
                         }
                     }

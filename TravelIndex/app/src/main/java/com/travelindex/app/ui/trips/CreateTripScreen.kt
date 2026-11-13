@@ -52,14 +52,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.travelindex.app.R
 import com.travelindex.app.data.FileStorage
+import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.FormField
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.SectionCard
+import com.travelindex.app.ui.components.TravelModePicker
 import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.Spacing
 import java.io.File
+import java.time.LocalDate
 
 /** Crear o editar un viaje. Al guardar un viaje nuevo se abre su panel para poder agregar cosas enseguida. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,6 +132,13 @@ fun CreateTripScreen(
                         Column(Modifier.weight(1f)) { TripField(TripSpec.endDate, state, vm) }
                     }
                 }
+                SectionCard(stringResource(R.string.sec_trip_transport)) {
+                    Text(
+                        stringResource(R.string.trip_modes_hint), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TravelModePicker(selected = TravelModes.parse(state.values["travelModes"]), onToggle = vm::toggleMode)
+                }
                 SectionCard(stringResource(R.string.sec_trip_budget)) {
                     Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
                         // El presupuesto y las notas del viaje ya no se piden (si un viaje los tenía, se conservan).
@@ -166,7 +176,11 @@ fun CreateTripScreen(
 
 @Composable
 private fun TripField(def: FieldDef, state: TripFormState, vm: CreateTripViewModel) {
-    FormField(def, state.values[def.key].orEmpty(), state.errors[def.key], onChange = { vm.setValue(def.key, it) })
+    // La vuelta no puede ser anterior a la ida: el calendario de la vuelta no deja elegir esos días.
+    val minDate = if (def.key == TripSpec.endDate.key)
+        state.values[TripSpec.startDate.key]?.takeIf { it.isNotBlank() }?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    else null
+    FormField(def, state.values[def.key].orEmpty(), state.errors[def.key], onChange = { vm.setValue(def.key, it) }, minDate = minDate)
 }
 
 @Composable

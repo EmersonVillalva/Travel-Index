@@ -5,30 +5,30 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.3.1)
-> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa.
-> - **La 0.3.1 quita la búsqueda de vuelos y el estado del vuelo, y no se ha vuelto a compilar tras quitarlos.** Se escribió en un entorno sin Android SDK ni red. Lo que sí se ejecutó aquí:
->   - lógica de dominio (validaciones, itinerario, costes por categoría, nombres de aeropuerto, formato de «compartir viaje», calendario, recordatorios…) compilada con `kotlinc` y **73 tests JUnit en verde**;
+> ## Estado real de esta versión (0.3.2)
+> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 y la 0.3.2 aún no se han compilado en CI.
+> - **La 0.3.2 añade medios de transporte en el viaje (con una actualización de la base de datos local a la versión 3), impide una vuelta anterior a la ida, quita la pantalla «Mapa de vuelos», pone el tema oscuro por defecto y comparte los viajes como archivo `.travelindex`.** Se escribió en un entorno sin Android SDK ni red. Lo que sí se ejecutó aquí:
+>   - lógica de dominio (validaciones, itinerario, costes por categoría, nombres de aeropuerto, formato de «compartir viaje», calendario, recordatorios…) compilada con `kotlinc` y **tests JUnit en verde**;
 >   - revisiones estáticas: `tools/check_resources.py`, `check_forms.py`, `check_imports.py`, `check_migration.py` y `check_project.py`.
 > - Es posible que el primer build muestre algún error de compilación. Pega las líneas `e: file:///...` y se corrige; no es un fallo de diseño.
 
 ## Qué incluye
 | Área | Contenido |
 |---|---|
-| Viajes | Crear/editar con portada, fechas y viajeros. Listado con búsqueda, filtros **Todos / Próximos / Pasados / Cancelados**. En los viajes pasados se ve lo que pagaste, separado en vuelos, alojamiento y el resto |
+| Viajes | Crear/editar con portada, fechas (la vuelta nunca puede ser anterior a la ida), **medios de transporte (avión, barco, tren, autobús, coche; se puede elegir más de uno)** y viajeros. Listado con búsqueda, filtros **Todos / Próximos / Pasados / Cancelados**. En los viajes pasados se ve lo que pagaste, separado en vuelos, alojamiento y el resto |
 | Dentro de cada viaje | **Agregar**: vuelo, alojamiento, actividad/tour, transporte/coche de alquiler, restaurante, visado o documento de viaje, y **archivo**. Los documentos y archivos solo se alcanzan desde dentro de un viaje |
 | Vuelos | Se escriben a mano: número, fechas, horas, aerolínea, de dónde a dónde (por **nombre** de aeropuerto, con sugerencias) y precio. La **duración se calcula sola** a partir de las horas y las zonas horarias (la llegada es opcional). Cada vuelo muestra una ruta «A → B» y un botón «Abrir en el mapa» |
 | Archivos | Copia privada en el almacenamiento de la app. **Vista previa visible sin tocar** (imágenes y PDF). Abrir, compartir, renombrar, asociar a una reserva y borrar |
-| Compartir viaje | Se crea un archivo `.zip` con una **copia exacta** (datos + adjuntos). La otra persona lo abre con Travel Index (o con «Importar viaje» en Mis viajes) y el viaje se añade a su móvil. El mensaje incluye el enlace de Google Play para instalar la app (solo funcionará cuando esté publicada) |
+| Compartir viaje | Se crea un archivo `.travelindex` (propio de la app, no un `.zip` visible) con una **copia exacta** (datos + adjuntos). La otra persona lo toca y se abre en Travel Index (o usa «Importar viaje» en Mis viajes) y el viaje se añade a su móvil. El mensaje incluye el enlace de Google Play para instalar la app (solo funcionará cuando esté publicada) |
 | Itinerario y calendario | Derivados de las reservas, con zonas horarias respetadas |
 | Notificaciones | Un único interruptor en Perfil: si está activado, avisos locales (vuelo 24 h antes, check-in, actividades, caducidades) |
-| Perfil | Nombre y foto, tema **claro u oscuro**, moneda por defecto, formato de fecha, avisos, bloqueo de capturas, copia de seguridad y restauración, privacidad, acerca de |
+| Perfil | Nombre y foto, tema **oscuro (por defecto) o claro**, moneda por defecto, formato de fecha, avisos, bloqueo de capturas, copia de seguridad y restauración, privacidad, acerca de |
 
 Se retiraron en la 0.3.0: la consulta de vuelos por internet (en la 0.3.1), pestaña Documentos, presupuesto y gastos, destinos, notas y listas, equipaje, datos de reserva del vuelo (localizador, billete…), tema «sistema», viaje de ejemplo y los selectores de antelación de avisos. El código de algunas pantallas retiradas permanece en el repositorio sin usarse (`ui/documents`, `ui/budget`, `ui/notes`, `data/DemoData.kt`) y puede borrarse a mano.
 
 ## Limitaciones conocidas
 - Solo en español.
-- **No hay mapa de calles**: «Abrir en el mapa» dibuja la ruta del vuelo y abre Google Maps.
+- **No hay mapa de calles**: dentro de cada vuelo se dibuja su ruta «A → B» y «Abrir en el mapa» abre Google Maps. Ya no existe la pantalla aparte «Mapa de vuelos».
 - No existe un widget en la pantalla de inicio del móvil: el «aviso 24 h antes» es una notificación local.
 - **No consulta retrasos, cancelaciones ni busca vuelos por su número**: ningún servicio gratuito y sin clave ofrece esos datos de forma fiable. Los datos del vuelo los escribe el usuario.
 - El archivo de «Compartir viaje» y la copia de seguridad **no están cifrados** (pueden incluir números de pasaporte o billete): envíalos solo a personas de confianza.

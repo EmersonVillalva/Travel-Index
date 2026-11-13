@@ -41,8 +41,16 @@ object TripShareFormat {
     const val FORMAT = "travelindex-trip"
     const val VERSION = 1
     const val ENTRY_JSON = "trip.json"
-    const val MIME = "application/zip"
+    /** Tipo propio del archivo de un viaje: así Android sabe que lo abre Travel Index (por dentro va comprimido, pero se ve como ".travelindex"). */
+    const val MIME = "application/vnd.travelindex.trip"
     const val EXTENSION = "travelindex"
+
+    /** Nombre del archivo que se comparte: "Roma.travelindex" (sin acentos ni símbolos que den problemas al enviarlo). */
+    fun fileNameFor(tripName: String): String {
+        val plain = java.text.Normalizer.normalize(tripName, java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+        val safe = plain.replace(Regex("[^A-Za-z0-9 _-]"), "").trim().replace(' ', '_').take(40).ifEmpty { "viaje" }
+        return "$safe.$EXTENSION"
+    }
 
     // Límites contra paquetes malformados o hostiles.
     const val MAX_ITEMS = 2_000

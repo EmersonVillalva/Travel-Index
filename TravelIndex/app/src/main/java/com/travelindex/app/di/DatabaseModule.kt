@@ -3,6 +3,7 @@ package com.travelindex.app.di
 import android.content.Context
 import androidx.room.Room
 import com.travelindex.app.data.db.MIGRATION_1_2
+import com.travelindex.app.data.db.MIGRATION_2_3
 import com.travelindex.app.data.db.TravelIndexDatabase
 import dagger.Module
 import dagger.Provides
@@ -18,7 +19,7 @@ object DatabaseModule {
     @Provides @Singleton
     fun database(@ApplicationContext ctx: Context): TravelIndexDatabase =
         Room.databaseBuilder(ctx, TravelIndexDatabase::class.java, TravelIndexDatabase.NAME)
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
 
     @Provides fun tripDao(db: TravelIndexDatabase) = db.tripDao()

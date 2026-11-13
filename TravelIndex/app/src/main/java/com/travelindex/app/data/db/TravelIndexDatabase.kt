@@ -29,6 +29,6 @@ abstract class TravelIndexDatabase : RoomDatabase() {
 
     companion object {
         const val NAME = "travelindex.db"
-        const val VERSION = 2
+        const val VERSION = 3
     }
 }

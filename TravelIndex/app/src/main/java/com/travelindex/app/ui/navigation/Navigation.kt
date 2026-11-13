@@ -51,7 +51,6 @@ import com.travelindex.app.ui.itinerary.ItineraryScreen
 import com.travelindex.app.ui.modules.ModuleDetailScreen
 import com.travelindex.app.ui.modules.ModuleFormScreen
 import com.travelindex.app.ui.modules.ModuleListScreen
-import com.travelindex.app.ui.places.PlacesScreen
 import com.travelindex.app.ui.profile.AboutScreen
 import com.travelindex.app.ui.profile.PrivacyPolicyScreen
 import com.travelindex.app.ui.profile.ProfileScreen
@@ -80,7 +79,6 @@ object Routes {
     const val TRIP_EDIT_PATTERN = "trip/{tripId}/edit"
     const val ITINERARY_PATTERN = "trip/{tripId}/itinerary"
     const val FILES_PATTERN = "trip/{tripId}/files"
-    const val PLACES_PATTERN = "trip/{tripId}/places"
     const val LIST_PATTERN = "trip/{tripId}/m/{module}"
     const val FORM_PATTERN = "trip/{tripId}/m/{module}/form?itemId={itemId}"
     const val ITEM_PATTERN = "trip/{tripId}/m/{module}/item/{itemId}"
@@ -89,7 +87,6 @@ object Routes {
     fun tripEdit(id: Long) = "trip/$id/edit"
     fun itinerary(id: Long) = "trip/$id/itinerary"
     fun files(id: Long) = "trip/$id/files"
-    fun places(id: Long) = "trip/$id/places"
     fun list(id: Long, type: ModuleType) = "trip/$id/m/${type.name}"
     fun form(id: Long, type: ModuleType, itemId: Long = 0) = "trip/$id/m/${type.name}/form?itemId=$itemId"
     fun item(id: Long, type: ModuleType, itemId: Long) = "trip/$id/m/${type.name}/item/$itemId"
@@ -208,7 +205,6 @@ fun TravelIndexNavHost() {
                             openList = { nav.navigate(Routes.list(id, it)) },
                             addItem = { nav.navigate(Routes.form(id, it)) },
                             openFiles = { nav.navigate(Routes.files(id)) },
-                            openPlaces = { nav.navigate(Routes.places(id)) },
                             openEvent = { openEvent(id, it) },
                         )
                     )
@@ -220,10 +216,6 @@ fun TravelIndexNavHost() {
                     ItineraryScreen(onBack = { nav.popBackStack() }, onOpenEvent = { openEvent(id, it) })
                 }
                 composable(Routes.FILES_PATTERN, arguments = listOf(longArg("tripId"))) { FilesScreen(onBack = { nav.popBackStack() }) }
-                composable(Routes.PLACES_PATTERN, arguments = listOf(longArg("tripId"))) { entry ->
-                    val id = entry.tripId()
-                    PlacesScreen(onBack = { nav.popBackStack() }, onOpenItem = { itemId -> nav.navigate(Routes.item(id, ModuleType.FLIGHT, itemId)) })
-                }
 
                 // ---- Módulos (vuelos, alojamientos...) ----
                 val moduleArgs = listOf(longArg("tripId"), navArgument("module") { type = NavType.StringType })

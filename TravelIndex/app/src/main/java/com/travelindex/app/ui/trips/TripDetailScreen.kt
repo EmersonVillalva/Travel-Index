@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
@@ -100,7 +99,6 @@ class TripActions(
     val openList: (ModuleType) -> Unit,
     val addItem: (ModuleType) -> Unit,
     val openFiles: () -> Unit,
-    val openPlaces: () -> Unit,
     val openEvent: (ItineraryEvent) -> Unit,
 )
 
@@ -329,9 +327,6 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
             }
             item { Tile(Icons.Outlined.Badge, stringResource(R.string.mod_docs), countText(b.docs.size), { a.openList(ModuleType.TRAVEL_DOC) }) }
             item { Tile(Icons.Outlined.Folder, stringResource(R.string.mod_files), countText(b.attachments.size), a.openFiles) }
-            if (b.flights.isNotEmpty()) item {
-                Tile(Icons.Outlined.Place, stringResource(R.string.mod_places), stringResource(R.string.tile_places_hint), a.openPlaces)
-            }
         }
     }
 }

@@ -133,6 +133,7 @@ fun TripCard(trip: TripEntity, onClick: (() -> Unit)?, modifier: Modifier = Modi
                         pluralText(R.plurals.duration_days, tripDurationDays(trip.startDate, trip.endDate)),
                     color = Color(0xFFDDE6F2), style = MaterialTheme.typography.labelMedium,
                 )
+                TravelModeIcons(trip.travelModes, Color(0xFFDDE6F2), Modifier.padding(top = 4.dp))
                 // Viajes pasados: lo que se pagó en total (por moneda).
                 if (!paidText.isNullOrBlank()) Text(
                     stringResource(R.string.trip_paid, paidText), color = Color.White, style = MaterialTheme.typography.labelLarge,

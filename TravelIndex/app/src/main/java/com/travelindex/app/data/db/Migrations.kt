@@ -50,3 +50,13 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_items_tripId` ON `note_items` (`tripId`)")
     }
 }
+
+/**
+ * v2 -> v3: el viaje guarda sus medios de transporte (avión, barco, tren, autobús, coche).
+ * Solo AÑADE una columna con valor por defecto vacío; los viajes que ya existen quedan igual.
+ */
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `trips` ADD COLUMN `travelModes` TEXT NOT NULL DEFAULT ''")
+    }
+}

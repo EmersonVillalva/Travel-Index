@@ -16,6 +16,7 @@ object TripSpec {
     val currency = FieldDef("currency", R.string.field_currency, FieldType.CURRENCY, required = true)
     val description = FieldDef("description", R.string.field_description, FieldType.MULTILINE)
     val notes = FieldDef("notes", R.string.field_notes, FieldType.MULTILINE)
+    val travelModes = FieldDef("travelModes", R.string.field_travel_modes, FieldType.TEXT)
 
-    val all = listOf(name, city, country, startDate, endDate, travelers, budget, currency, description, notes)
+    val all = listOf(name, city, country, startDate, endDate, travelers, budget, currency, description, notes, travelModes)
 }

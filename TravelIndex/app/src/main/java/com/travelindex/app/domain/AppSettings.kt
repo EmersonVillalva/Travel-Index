@@ -20,7 +20,7 @@ data class AppSettings(
     val photoPath: String? = null,
     val defaultCurrency: String = "EUR",
     val dateFormat: DateFormatOption = DateFormatOption.SYSTEM,
-    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val themeMode: ThemeMode = ThemeMode.DARK,
     val notificationsEnabled: Boolean = true,
     /** Aviso de vuelos: horas de antelación. */
     val flightLeadHours: Int = 24,

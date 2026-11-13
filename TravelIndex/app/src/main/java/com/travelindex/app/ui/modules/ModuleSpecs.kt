@@ -41,8 +41,8 @@ data class ModuleSpec(
 }
 
 private fun f(key: String, @StringRes label: Int, type: FieldType = FieldType.TEXT, required: Boolean = false,
-              choices: List<Choice> = emptyList(), sensitive: Boolean = false) =
-    FieldDef(key, label, type, required, choices, sensitive)
+              choices: List<Choice> = emptyList(), sensitive: Boolean = false, notBeforeKey: String? = null) =
+    FieldDef(key, label, type, required, choices, sensitive, notBeforeKey)
 
 object Choices {
     val cabin = listOf(
@@ -134,7 +134,7 @@ object ModuleSpecs {
             f("country", R.string.field_country),
             f("checkInDate", R.string.f_checkin_date, FieldType.DATE, required = true),
             f("checkInTime", R.string.f_checkin_time, FieldType.TIME),
-            f("checkOutDate", R.string.f_checkout_date, FieldType.DATE, required = true),
+            f("checkOutDate", R.string.f_checkout_date, FieldType.DATE, required = true, notBeforeKey = "checkInDate"),
             f("checkOutTime", R.string.f_checkout_time, FieldType.TIME),
             f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
             f("guests", R.string.f_guests, FieldType.INT),
@@ -195,7 +195,7 @@ object ModuleSpecs {
             f("plate", R.string.f_plate),
             f("startDate", R.string.f_pickup_date, FieldType.DATE, required = true),
             f("startTime", R.string.f_pickup_time, FieldType.TIME),
-            f("endDate", R.string.f_return_date, FieldType.DATE),
+            f("endDate", R.string.f_return_date, FieldType.DATE, notBeforeKey = "startDate"),
             f("endTime", R.string.f_return_time, FieldType.TIME),
             f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
             f("originPlace", R.string.f_origin),
@@ -256,7 +256,7 @@ object ModuleSpecs {
             f("title", R.string.f_doc_title),
             f("issuingCountry", R.string.f_issuing_country),
             f("issueDate", R.string.f_issue_date, FieldType.DATE),
-            f("expiryDate", R.string.f_expiry_date, FieldType.DATE),
+            f("expiryDate", R.string.f_expiry_date, FieldType.DATE, notBeforeKey = "issueDate"),
             f("reference", R.string.f_reference, sensitive = true),
             f("approvalDate", R.string.f_approval_date, FieldType.DATE),
             f("status", R.string.f_doc_status, FieldType.CHOICE, required = true, choices = Choices.docStatus),

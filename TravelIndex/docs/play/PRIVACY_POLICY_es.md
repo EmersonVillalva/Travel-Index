@@ -8,7 +8,7 @@ Responsable: Emerson Villalva Labrador (o la entidad con la que publiques) · Co
 
 **Conexión a internet.** La app no se conecta a internet: no tiene ese permiso. Solo si abres un enlace o una ubicación, lo gestiona el navegador o la aplicación que tú elijas, con su propia política.
 
-**Compartir un viaje.** Si compartes un viaje, la app crea un archivo `.zip` con una copia exacta del viaje (incluye los datos y los archivos adjuntos, y puede incluir números de documentos o billetes). Ese archivo **no está cifrado** y lo entregas tú, con la aplicación que elijas, a la persona que elijas. Travel Index no lo sube a ningún servidor.
+**Compartir un viaje.** Si compartes un viaje, la app crea un archivo `.travelindex` con una copia exacta del viaje (incluye los datos y los archivos adjuntos, y puede incluir números de documentos o billetes). Ese archivo **no está cifrado** y lo entregas tú, con la aplicación que elijas, a la persona que elijas. Travel Index no lo sube a ningún servidor.
 
 **Copias de seguridad.** La copia automática de Android está desactivada para esta app. Solo existen las copias que tú exportes manualmente desde Perfil (un archivo .zip, **sin cifrar**); su custodia es tuya.
 

@@ -18,6 +18,8 @@ data class FieldDef(
     val choices: List<Choice> = emptyList(),
     /** Datos sensibles (números de documento): enmascarados en el detalle. */
     val sensitive: Boolean = false,
+    /** Solo para fechas: clave de otra fecha del formulario; este campo no puede ser anterior a ella (p. ej. salida del hotel). */
+    val notBeforeKey: String? = null,
 )
 
 enum class FieldError {

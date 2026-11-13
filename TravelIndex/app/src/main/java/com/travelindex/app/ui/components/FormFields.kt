@@ -73,6 +73,8 @@ fun FormField(
     error: FieldError?,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    /** Solo para fechas: el selector no deja elegir un día anterior a este. */
+    minDate: LocalDate? = null,
 ) {
     val label = stringResource(def.labelRes) + if (def.required) " *" else ""
     val errMsg = error?.let { errorText(it) }
@@ -111,7 +113,7 @@ fun FormField(
                 onClick = { open = true },
                 onClear = if (!def.required && value.isNotBlank()) ({ onChange("") }) else null,
             )
-            if (open) DatePickerDialogHost(parsed, onDismiss = { open = false }, onPick = { onChange(it.toString()); open = false })
+            if (open) DatePickerDialogHost(parsed, onDismiss = { open = false }, onPick = { onChange(it.toString()); open = false }, minDate = minDate)
         }
 
         FieldType.TIME -> {

@@ -122,6 +122,14 @@
     <string name="sec_trip_basic">Datos del viaje</string>
     <string name="sec_trip_dates">Fechas</string>
     <string name="sec_trip_budget">Viajeros y moneda</string>
+    <string name="sec_trip_transport">Medios de transporte</string>
+    <string name="trip_modes_hint">Elige uno o varios. Es opcional.</string>
+    <string name="field_travel_modes">Medios de transporte</string>
+    <string name="mode_plane">Avión</string>
+    <string name="mode_ship">Barco</string>
+    <string name="mode_train">Tren</string>
+    <string name="mode_bus">Autobús</string>
+    <string name="mode_car">Coche</string>
     <string name="sec_trip_cover">Portada</string>
     <string name="sec_trip_more">Descripción y notas</string>
     <string name="cover_none">Sin portada</string>
@@ -149,7 +157,6 @@
     <string name="next_event">Siguiente en el viaje</string>
     <string name="sections_title">Secciones del viaje</string>
     <string name="tile_empty">Vacío</string>
-    <string name="tile_places_hint">Rutas de tus vuelos</string>
 
     <!-- Secciones (módulos) -->
     <string name="mod_itinerary">Itinerario</string>
@@ -164,7 +171,6 @@
     <string name="mod_destinations">Destinos</string>
     <string name="mod_files">Archivos</string>
     <string name="mod_notes">Notas y listas</string>
-    <string name="mod_places">Mapa de vuelos</string>
 
     <string name="new_flight">Nuevo vuelo</string>
     <string name="new_lodging">Nuevo alojamiento</string>
@@ -431,8 +437,6 @@
     <string name="delete_note_body">Se borrará de forma definitiva.</string>
 
     <!-- Lugares -->
-    <string name="places_empty_title">Sin vuelos todavía</string>
-    <string name="places_empty_body">Añade un vuelo y aquí verás su ruta, de dónde a dónde, con una flecha.</string>
 
     <!-- Calendario -->
     <string name="calendar_today">Hoy</string>

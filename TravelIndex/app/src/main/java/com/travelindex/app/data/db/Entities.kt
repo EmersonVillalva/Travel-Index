@@ -25,6 +25,8 @@ data class TripEntity(
     val notes: String = "",
     val cancelled: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
+    /** Medios de transporte del viaje, claves separadas por comas ("PLANE,CAR"); vacío si no se eligió ninguno. */
+    val travelModes: String = "",
 )
 
 @Entity(

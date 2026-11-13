@@ -27,19 +27,41 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Abrir un viaje compartido (archivo ZIP de Travel Index) desde el gestor de archivos, el correo o la mensajería. -->
+            <!-- Abrir un viaje compartido (archivo .travelindex) desde el gestor de archivos, el correo o la mensajería.
+                 1) Con el tipo propio de Travel Index. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/zip" />
-                <data android:mimeType="application/x-zip-compressed" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/vnd.travelindex.trip" />
+            </intent-filter>
+            <!-- 2) Por el nombre del archivo (cuando la otra app no manda el tipo): acaba en .travelindex. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.travelindex" />
+                <data android:pathPattern=".*\\..*\\.travelindex" />
+                <data android:pathPattern=".*\\..*\\..*\\.travelindex" />
+            </intent-filter>
+            <!-- 3) Tipo genérico: algunas apps (p. ej. mensajería) entregan los archivos desconocidos así.
+                 Si el archivo no es un viaje, la app lo dice y no importa nada. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/octet-stream" />
             </intent-filter>
             <!-- Compartir el archivo de un viaje "hacia" Travel Index desde otra app. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/zip" />
-                <data android:mimeType="application/x-zip-compressed" />
+                <data android:mimeType="application/vnd.travelindex.trip" />
             </intent-filter>
         </activity>
 

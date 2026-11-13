@@ -65,8 +65,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val loaded by appViewModel.settings.collectAsStateWithLifecycle()
             val settings = loaded ?: AppSettings()
-            // Solo hay tema claro y oscuro (el valor antiguo "sistema" se trata como claro).
-            val dark = settings.themeMode == ThemeMode.DARK
+            // Solo hay tema claro y oscuro; por defecto es oscuro (el valor antiguo "sistema" también se trata como oscuro).
+            val dark = settings.themeMode != ThemeMode.LIGHT
             // Barras del sistema transparentes con iconos legibles según el tema elegido (no solo el del sistema).
             DisposableEffect(dark) {
                 enableEdgeToEdge(

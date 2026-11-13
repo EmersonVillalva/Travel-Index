@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -86,9 +87,18 @@ fun PickerField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogHost(initial: LocalDate?, onDismiss: () -> Unit, onPick: (LocalDate) -> Unit) {
+fun DatePickerDialogHost(initial: LocalDate?, onDismiss: () -> Unit, onPick: (LocalDate) -> Unit, minDate: LocalDate? = null) {
+    val minMillis = minDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+    // Una fecha anterior al mínimo no puede quedar marcada de entrada (el calendario no la admitiría): se parte sin selección.
+    val start = initial?.takeIf { minDate == null || !it.isBefore(minDate) }
     val state = rememberDatePickerState(
-        initialSelectedDateMillis = initial?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+        initialSelectedDateMillis = start?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+        // Sin fecha elegida, el calendario se abre en el mes de la fecha mínima (p. ej. el mes de la ida).
+        initialDisplayedMonthMillis = (start ?: minDate)?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean = minMillis == null || utcTimeMillis >= minMillis
+            override fun isSelectableYear(year: Int): Boolean = minDate == null || year >= minDate.year
+        },
     )
     DatePickerDialog(
         onDismissRequest = onDismiss,

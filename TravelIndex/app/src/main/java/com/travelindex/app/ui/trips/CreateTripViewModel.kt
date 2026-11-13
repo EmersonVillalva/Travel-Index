@@ -8,6 +8,8 @@ import com.travelindex.app.data.FileStorage
 import com.travelindex.app.data.SettingsRepository
 import com.travelindex.app.data.db.TripEntity
 import com.travelindex.app.data.repo.TripRepository
+import com.travelindex.app.domain.TravelMode
+import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.forms.FieldError
 import com.travelindex.app.domain.forms.FormValidator
 import com.travelindex.app.domain.forms.TripCodec
@@ -79,7 +81,18 @@ class CreateTripViewModel @Inject constructor(
     }
 
     fun setValue(key: String, value: String) {
-        _state.update { s -> s.copy(values = s.values + (key to value), errors = s.errors - key, dirty = true) }
+        _state.update { s ->
+            // Al mover la ida, la vuelta puede cambiar sola (nunca queda antes que la ida): se limpia también su aviso.
+            val clearedErrors = if (key == "startDate") s.errors - key - "endDate" else s.errors - key
+            s.copy(values = TripCodec.withValue(s.values, key, value), errors = clearedErrors, dirty = true)
+        }
+    }
+
+    /** Marca o desmarca un medio de transporte; se pueden elegir varios. */
+    fun toggleMode(mode: TravelMode) {
+        _state.update { s ->
+            s.copy(values = s.values + ("travelModes" to TravelModes.toggle(s.values["travelModes"], mode)), dirty = true)
+        }
     }
 
     fun setCover(uri: Uri) = _state.update { it.copy(newCover = uri, removeCover = false, dirty = true) }
