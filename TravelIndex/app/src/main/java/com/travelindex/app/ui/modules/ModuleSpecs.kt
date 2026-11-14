@@ -3,6 +3,8 @@ package com.travelindex.app.ui.modules
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Badge
+import androidx.compose.material.icons.outlined.DirectionsBoat
+import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Flight
@@ -10,10 +12,12 @@ import androidx.compose.material.icons.outlined.Hotel
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Restaurant
+import androidx.compose.material.icons.outlined.Train
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.travelindex.app.R
 import com.travelindex.app.domain.Airports
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.forms.Choice
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.domain.forms.FieldType
@@ -222,6 +226,134 @@ object ModuleSpecs {
         phoneKey = "phone",
     )
 
+    // ---- Apartados por medio de transporte -----------------------------------------------------------------------
+    // Todos usan el mismo módulo y la misma tabla que "transport" (mismas claves); solo cambian los campos que se
+    // piden y cómo se llaman. El tipo ("type") lo fija el apartado desde el que se abre, así que no se pregunta.
+
+    private val transportTrain = ModuleSpec(
+        type = ModuleType.TRANSPORT, titleRes = R.string.mod_trains, newTitleRes = R.string.new_train, editTitleRes = R.string.edit_train,
+        emptyTitleRes = R.string.empty_trains_title, emptyBodyRes = R.string.empty_trains_body, icon = Icons.Outlined.Train,
+        fields = listOf(
+            f("type", R.string.f_transport_type, FieldType.CHOICE, required = true, choices = Choices.transportType),
+            f("company", R.string.f_carrier),
+            f("model", R.string.f_train_number),
+            f("plate", R.string.f_coach_seat),
+            f("originPlace", R.string.f_station_origin, required = true),
+            f("startDate", R.string.f_dep_date, FieldType.DATE, required = true),
+            f("startTime", R.string.f_dep_time, FieldType.TIME),
+            f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
+            f("destinationPlace", R.string.f_station_dest, required = true),
+            f("endDate", R.string.f_arr_date, FieldType.DATE, notBeforeKey = "startDate"),
+            f("endTime", R.string.f_arr_time, FieldType.TIME),
+            f("reservationNumber", R.string.f_locator),
+            f("price", R.string.f_price, FieldType.MONEY),
+            f("currency", R.string.f_currency, FieldType.CURRENCY, required = true),
+            f("notes", R.string.f_notes, FieldType.MULTILINE),
+        ),
+        sections = listOf(
+            FormSection(R.string.sec_train, listOf("company", "model", "plate")),
+            FormSection(R.string.sec_departure, listOf("originPlace", "startDate", "startTime", "timeZone")),
+            FormSection(R.string.sec_arrival_to, listOf("destinationPlace", "endDate", "endTime")),
+            FormSection(R.string.sec_booking, listOf("reservationNumber", "price", "currency")),
+            FormSection(R.string.sec_notes, listOf("notes")),
+        ),
+    )
+
+    private val transportBus = ModuleSpec(
+        type = ModuleType.TRANSPORT, titleRes = R.string.mod_buses, newTitleRes = R.string.new_bus, editTitleRes = R.string.edit_bus,
+        emptyTitleRes = R.string.empty_buses_title, emptyBodyRes = R.string.empty_buses_body, icon = Icons.Outlined.DirectionsBus,
+        fields = listOf(
+            f("type", R.string.f_transport_type, FieldType.CHOICE, required = true, choices = Choices.transportType),
+            f("company", R.string.f_carrier),
+            f("model", R.string.f_bus_line),
+            f("plate", R.string.f_bus_seat),
+            f("originPlace", R.string.f_stop_origin, required = true),
+            f("startDate", R.string.f_dep_date, FieldType.DATE, required = true),
+            f("startTime", R.string.f_dep_time, FieldType.TIME),
+            f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
+            f("destinationPlace", R.string.f_stop_dest, required = true),
+            f("endDate", R.string.f_arr_date, FieldType.DATE, notBeforeKey = "startDate"),
+            f("endTime", R.string.f_arr_time, FieldType.TIME),
+            f("reservationNumber", R.string.f_locator),
+            f("price", R.string.f_price, FieldType.MONEY),
+            f("currency", R.string.f_currency, FieldType.CURRENCY, required = true),
+            f("notes", R.string.f_notes, FieldType.MULTILINE),
+        ),
+        sections = listOf(
+            FormSection(R.string.sec_bus, listOf("company", "model", "plate")),
+            FormSection(R.string.sec_departure, listOf("originPlace", "startDate", "startTime", "timeZone")),
+            FormSection(R.string.sec_arrival_to, listOf("destinationPlace", "endDate", "endTime")),
+            FormSection(R.string.sec_booking, listOf("reservationNumber", "price", "currency")),
+            FormSection(R.string.sec_notes, listOf("notes")),
+        ),
+    )
+
+    private val transportShip = ModuleSpec(
+        type = ModuleType.TRANSPORT, titleRes = R.string.mod_ships, newTitleRes = R.string.new_ship, editTitleRes = R.string.edit_ship,
+        emptyTitleRes = R.string.empty_ships_title, emptyBodyRes = R.string.empty_ships_body, icon = Icons.Outlined.DirectionsBoat,
+        fields = listOf(
+            f("type", R.string.f_transport_type, FieldType.CHOICE, required = true, choices = Choices.transportType),
+            f("company", R.string.f_shipping_line),
+            f("model", R.string.f_ship_name),
+            f("plate", R.string.f_cabin_seat),
+            f("originPlace", R.string.f_port_origin, required = true),
+            f("startDate", R.string.f_dep_date, FieldType.DATE, required = true),
+            f("startTime", R.string.f_dep_time, FieldType.TIME),
+            f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
+            f("destinationPlace", R.string.f_port_dest, required = true),
+            f("endDate", R.string.f_arr_date, FieldType.DATE, notBeforeKey = "startDate"),
+            f("endTime", R.string.f_arr_time, FieldType.TIME),
+            f("reservationNumber", R.string.f_locator),
+            f("price", R.string.f_price, FieldType.MONEY),
+            f("currency", R.string.f_currency, FieldType.CURRENCY, required = true),
+            f("notes", R.string.f_notes, FieldType.MULTILINE),
+        ),
+        sections = listOf(
+            FormSection(R.string.sec_ship, listOf("company", "model", "plate")),
+            FormSection(R.string.sec_departure, listOf("originPlace", "startDate", "startTime", "timeZone")),
+            FormSection(R.string.sec_arrival_to, listOf("destinationPlace", "endDate", "endTime")),
+            FormSection(R.string.sec_booking, listOf("reservationNumber", "price", "currency")),
+            FormSection(R.string.sec_notes, listOf("notes")),
+        ),
+    )
+
+    private val transportCar = ModuleSpec(
+        type = ModuleType.TRANSPORT, titleRes = R.string.mod_cars, newTitleRes = R.string.new_car, editTitleRes = R.string.edit_car,
+        emptyTitleRes = R.string.empty_cars_title, emptyBodyRes = R.string.empty_cars_body, icon = Icons.Outlined.DirectionsCar,
+        fields = listOf(
+            f("type", R.string.f_transport_type, FieldType.CHOICE, required = true, choices = Choices.transportType),
+            f("company", R.string.f_car_company),
+            f("model", R.string.f_vehicle_model),
+            f("plate", R.string.f_plate),
+            f("startDate", R.string.f_pickup_date, FieldType.DATE, required = true),
+            f("startTime", R.string.f_pickup_time, FieldType.TIME),
+            f("endDate", R.string.f_return_date, FieldType.DATE, notBeforeKey = "startDate"),
+            f("endTime", R.string.f_return_time, FieldType.TIME),
+            f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
+            f("originPlace", R.string.f_pickup_place),
+            f("destinationPlace", R.string.f_return_place),
+            f("address", R.string.f_address),
+            f("reservationNumber", R.string.f_reservation),
+            f("price", R.string.f_price, FieldType.MONEY),
+            f("currency", R.string.f_currency, FieldType.CURRENCY, required = true),
+            f("phone", R.string.f_phone, FieldType.PHONE),
+            f("insurance", R.string.f_insurance),
+            f("mileage", R.string.f_mileage),
+            f("fuel", R.string.f_fuel),
+            f("conditions", R.string.f_conditions, FieldType.MULTILINE),
+            f("notes", R.string.f_notes, FieldType.MULTILINE),
+        ),
+        sections = listOf(
+            FormSection(R.string.sec_car, listOf("company", "model", "plate")),
+            FormSection(R.string.sec_schedule, listOf("startDate", "startTime", "endDate", "endTime", "timeZone")),
+            FormSection(R.string.sec_places, listOf("originPlace", "destinationPlace", "address")),
+            FormSection(R.string.sec_booking, listOf("reservationNumber", "price", "currency", "phone")),
+            FormSection(R.string.sec_car_rental, listOf("insurance", "mileage", "fuel", "conditions")),
+            FormSection(R.string.sec_notes, listOf("notes")),
+        ),
+        phoneKey = "phone",
+    )
+
     private val restaurant = ModuleSpec(
         type = ModuleType.RESTAURANT, titleRes = R.string.mod_restaurants, newTitleRes = R.string.new_restaurant, editTitleRes = R.string.edit_restaurant,
         emptyTitleRes = R.string.empty_restaurants_title, emptyBodyRes = R.string.empty_restaurants_body, icon = Icons.Outlined.Restaurant,
@@ -301,11 +433,18 @@ object ModuleSpecs {
         sections = listOf(FormSection(R.string.sec_destination, listOf("city", "country", "startDate", "endDate", "timeZone"))),
     )
 
-    fun of(type: ModuleType): ModuleSpec = when (type) {
+    /** [section] solo importa en transporte: tren, autobús, barco y coche tienen sus propios campos. */
+    fun of(type: ModuleType, section: TransportSection? = null): ModuleSpec = when (type) {
         ModuleType.FLIGHT -> flight
         ModuleType.LODGING -> lodging
         ModuleType.ACTIVITY -> activity
-        ModuleType.TRANSPORT -> transport
+        ModuleType.TRANSPORT -> when (section) {
+            TransportSection.TRAINS -> transportTrain
+            TransportSection.BUSES -> transportBus
+            TransportSection.SHIPS -> transportShip
+            TransportSection.CARS -> transportCar
+            else -> transport
+        }
         ModuleType.RESTAURANT -> restaurant
         ModuleType.TRAVEL_DOC -> travelDoc
         ModuleType.EXPENSE -> expense

@@ -5,8 +5,9 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.3.2)
-> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 y la 0.3.2 aún no se han compilado en CI.
+> ## Estado real de esta versión (0.3.3)
+> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1, la 0.3.2 y la 0.3.3 aún no se han compilado en CI.
+> - **La 0.3.3 hace que los apartados del viaje sigan los medios elegidos:** solo sale «Vuelos» si marcaste avión, y tren, autobús, barco y coche tienen su propio apartado con sus campos (estación, vagón y asiento, puerto, camarote…); con dos medios salen los dos, y sin ninguno elegido salen «Vuelos» y «Transporte» como antes.
 > - **La 0.3.2 añade medios de transporte en el viaje (con una actualización de la base de datos local a la versión 3), impide una vuelta anterior a la ida, quita la pantalla «Mapa de vuelos», pone el tema oscuro por defecto y comparte los viajes como archivo `.travelindex`.** Se escribió en un entorno sin Android SDK ni red. Lo que sí se ejecutó aquí:
 >   - lógica de dominio (validaciones, itinerario, costes por categoría, nombres de aeropuerto, formato de «compartir viaje», calendario, recordatorios…) compilada con `kotlinc` y **tests JUnit en verde**;
 >   - revisiones estáticas: `tools/check_resources.py`, `check_forms.py`, `check_imports.py`, `check_migration.py` y `check_project.py`.
@@ -17,6 +18,7 @@ Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · D
 |---|---|
 | Viajes | Crear/editar con portada, fechas (la vuelta nunca puede ser anterior a la ida), **medios de transporte (avión, barco, tren, autobús, coche; se puede elegir más de uno)** y viajeros. Listado con búsqueda, filtros **Todos / Próximos / Pasados / Cancelados**. En los viajes pasados se ve lo que pagaste, separado en vuelos, alojamiento y el resto |
 | Dentro de cada viaje | **Agregar**: vuelo, alojamiento, actividad/tour, transporte/coche de alquiler, restaurante, visado o documento de viaje, y **archivo**. Los documentos y archivos solo se alcanzan desde dentro de un viaje |
+| Transporte | El viaje tiene los apartados de los medios que elegiste al crearlo: **Vuelos, Trenes, Autobuses, Barcos y Coche**. Cada uno pide lo suyo (el tren no pide número de vuelo). Los trenes, autobuses y barcos usan el mismo almacén de datos que «Transporte»; si no eliges ningún medio salen «Vuelos» y «Transporte» como antes |
 | Vuelos | Se escriben a mano: número, fechas, horas, aerolínea, de dónde a dónde (por **nombre** de aeropuerto, con sugerencias) y precio. La **duración se calcula sola** a partir de las horas y las zonas horarias (la llegada es opcional). Cada vuelo muestra una ruta «A → B» y un botón «Abrir en el mapa» |
 | Archivos | Copia privada en el almacenamiento de la app. **Vista previa visible sin tocar** (imágenes y PDF). Abrir, compartir, renombrar, asociar a una reserva y borrar |
 | Compartir viaje | Se crea un archivo `.travelindex` (propio de la app, no un `.zip` visible) con una **copia exacta** (datos + adjuntos). La otra persona lo toca y se abre en Travel Index (o usa «Importar viaje» en Mis viajes) y el viaje se añade a su móvil. El mensaje incluye el enlace de Google Play para instalar la app (solo funcionará cuando esté publicada) |

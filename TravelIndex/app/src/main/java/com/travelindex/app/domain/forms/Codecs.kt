@@ -170,7 +170,9 @@ object TransportCodec {
     fun build(tripId: Long, id: Long, v: FormValues): TransportEntity = TransportEntity(
         id = id, tripId = tripId, type = v.str("type").ifEmpty { "OTHER" }, company = v.str("company"),
         model = v.str("model"), plate = v.str("plate"), startDate = v.date("startDate")!!,
-        startTime = v.time("startTime"), endDate = v.date("endDate"), endTime = v.time("endTime"),
+        startTime = v.time("startTime"),
+        // Un tren de 10:00 a 13:30: si solo se escribe la hora de llegada, llega el mismo día.
+        endDate = v.date("endDate") ?: v.time("endTime")?.let { v.date("startDate") }, endTime = v.time("endTime"),
         timeZoneId = v.zone("timeZone").id, originPlace = v.str("originPlace"), destinationPlace = v.str("destinationPlace"),
         address = v.str("address"), reservationNumber = v.str("reservationNumber"),
         priceMinor = v.minor("price"), currency = v.currency(), insurance = v.str("insurance"),

@@ -69,6 +69,9 @@ import com.travelindex.app.domain.DocWarnings
 import com.travelindex.app.domain.ItineraryEvent
 import com.travelindex.app.domain.forms.TravelDocCodec
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.TravelModes
+import com.travelindex.app.domain.TransportSection
+import com.travelindex.app.domain.TransportSections
 import com.travelindex.app.domain.TripBundle
 import com.travelindex.app.domain.tripDurationDays
 import com.travelindex.app.ui.components.ConfirmDialog
@@ -98,6 +101,9 @@ class TripActions(
     val openItinerary: () -> Unit,
     val openList: (ModuleType) -> Unit,
     val addItem: (ModuleType) -> Unit,
+    /** Abrir / agregar en un apartado de transporte (vuelos, trenes, autobuses, barcos, coche). */
+    val openSection: (TransportSection) -> Unit,
+    val addSection: (TransportSection) -> Unit,
     val openFiles: () -> Unit,
     val openEvent: (ItineraryEvent) -> Unit,
 )
@@ -174,10 +180,12 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
 
     if (showAdd && bundle != null) {
         AddSheet(
+            sections = TransportSections.offered(TravelModes.parse(bundle.trip.travelModes)),
             onDismiss = { showAdd = false },
             onPick = { choice ->
                 showAdd = false
                 when (choice) {
+                    is AddChoice.Section -> actions.addSection(choice.section)
                     is AddChoice.Module -> actions.addItem(choice.type)
                     AddChoice.File -> picker.launch(arrayOf("*/*"))
                 }
@@ -207,13 +215,14 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
 }
 
 private sealed interface AddChoice {
+    data class Section(val section: TransportSection) : AddChoice
     data class Module(val type: ModuleType) : AddChoice
     data object File : AddChoice
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddSheet(onDismiss: () -> Unit, onPick: (AddChoice) -> Unit) {
+private fun AddSheet(sections: List<TransportSection>, onDismiss: () -> Unit, onPick: (AddChoice) -> Unit) {
     val sheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     fun pick(c: AddChoice) { scope.launch { sheet.hide() }.invokeOnCompletion { onPick(c) } }
@@ -221,9 +230,13 @@ private fun AddSheet(onDismiss: () -> Unit, onPick: (AddChoice) -> Unit) {
         Column(Modifier.verticalScroll(rememberScrollState()).padding(bottom = Spacing.l)) {
             Text(stringResource(R.string.add_sheet_title), Modifier.padding(horizontal = Spacing.m, vertical = Spacing.s),
                 style = MaterialTheme.typography.titleMedium)
+            // Primero los medios de transporte del viaje (solo los que se eligieron), después lo demás.
+            sections.forEach { s ->
+                val spec = ModuleSpecs.of(s.module, s)
+                SheetRow(spec.icon, stringResource(spec.newTitleRes)) { pick(AddChoice.Section(s)) }
+            }
             listOf(
-                ModuleType.FLIGHT, ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.TRANSPORT,
-                ModuleType.RESTAURANT, ModuleType.TRAVEL_DOC,
+                ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT, ModuleType.TRAVEL_DOC,
             ).forEach { t ->
                 val spec = ModuleSpecs.of(t)
                 SheetRow(spec.icon, stringResource(spec.newTitleRes)) { pick(AddChoice.Module(t)) }
@@ -319,9 +332,16 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
 
             item { Tile(Icons.Outlined.Timeline, stringResource(R.string.mod_itinerary),
                 pluralText(R.plurals.tile_events, b.events.size), a.openItinerary) }
-            listOf(
-                ModuleType.FLIGHT, ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.TRANSPORT, ModuleType.RESTAURANT,
-            ).forEach { t ->
+            // Transporte: solo los apartados de los medios que se eligieron al crear el viaje.
+            val transportTypes = b.transports.map { it.type }
+            TransportSections.shown(TravelModes.parse(trip.travelModes), b.flights.size, transportTypes).forEach { s ->
+                val spec = ModuleSpecs.of(s.module, s)
+                item {
+                    Tile(spec.icon, stringResource(spec.titleRes),
+                        countText(TransportSections.count(s, b.flights.size, transportTypes)), { a.openSection(s) })
+                }
+            }
+            listOf(ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT).forEach { t ->
                 val spec = ModuleSpecs.of(t)
                 item { Tile(spec.icon, stringResource(spec.titleRes), countText(b.count(t)), { a.openList(t) }) }
             }

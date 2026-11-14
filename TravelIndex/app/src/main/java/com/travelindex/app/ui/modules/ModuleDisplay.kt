@@ -107,7 +107,7 @@ fun displayValue(def: FieldDef, v: Map<String, String>, reveal: Boolean): String
 @Composable
 fun moduleTitle(spec: ModuleSpec, v: Map<String, String>): String = when (spec.type) {
     ModuleType.FLIGHT -> joinNonBlank(" ", v.v("airline"), v.v("flightNumber"))
-    ModuleType.TRANSPORT -> v.v("company").ifEmpty { choiceText(spec.field("type"), v.v("type")) }
+    ModuleType.TRANSPORT -> joinNonBlank(" ", v.v("company"), v.v("model")).ifEmpty { choiceText(spec.field("type"), v.v("type")) }
     ModuleType.TRAVEL_DOC -> v.v("title").ifEmpty { choiceText(spec.field("docType"), v.v("docType")) }
     ModuleType.EXPENSE -> v.v("concept")
     ModuleType.DESTINATION -> joinNonBlank(", ", v.v("city"), v.v("country"))

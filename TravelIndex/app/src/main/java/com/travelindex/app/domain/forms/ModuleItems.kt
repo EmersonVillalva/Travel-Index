@@ -23,7 +23,11 @@ object ModuleItems {
 
 /** Valores iniciales de un formulario nuevo, adaptados al viaje (fechas del viaje, moneda del viaje...). */
 object FormDefaults {
-    fun forNew(type: ModuleType, b: TripBundle, today: LocalDate, zone: ZoneId = ZoneId.systemDefault()): FormValues {
+    fun forNew(
+        type: ModuleType, b: TripBundle, today: LocalDate, zone: ZoneId = ZoneId.systemDefault(),
+        /** Solo transporte: el tipo con el que se abre el formulario (tren, autobús, ferry, coche); sin él, coche de alquiler. */
+        transportType: String? = null,
+    ): FormValues {
         val start = b.trip.startDate.toString()
         val end = b.trip.endDate.toString()
         val cur = b.trip.currency
@@ -40,7 +44,7 @@ object FormDefaults {
             ModuleType.ACTIVITY -> mapOf(
                 "date" to start, "timeZone" to z, "participants" to b.trip.travelers.toString(), "currency" to cur,
             )
-            ModuleType.TRANSPORT -> mapOf("type" to "CAR_RENTAL", "startDate" to start, "timeZone" to z, "currency" to cur)
+            ModuleType.TRANSPORT -> mapOf("type" to (transportType ?: "CAR_RENTAL"), "startDate" to start, "timeZone" to z, "currency" to cur)
             ModuleType.RESTAURANT -> mapOf(
                 "date" to start, "timeZone" to z, "people" to b.trip.travelers.toString(), "currency" to cur,
             )

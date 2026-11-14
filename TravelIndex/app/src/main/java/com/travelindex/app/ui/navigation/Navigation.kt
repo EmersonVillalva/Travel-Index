@@ -42,7 +42,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.travelindex.app.R
 import com.travelindex.app.domain.ItineraryEvent
+import com.travelindex.app.domain.ModuleTarget
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.moduleType
 import com.travelindex.app.ui.calendar.CalendarScreen
 import com.travelindex.app.ui.files.FilesScreen
@@ -87,9 +89,16 @@ object Routes {
     fun tripEdit(id: Long) = "trip/$id/edit"
     fun itinerary(id: Long) = "trip/$id/itinerary"
     fun files(id: Long) = "trip/$id/files"
-    fun list(id: Long, type: ModuleType) = "trip/$id/m/${type.name}"
-    fun form(id: Long, type: ModuleType, itemId: Long = 0) = "trip/$id/m/${type.name}/form?itemId=$itemId"
-    fun item(id: Long, type: ModuleType, itemId: Long) = "trip/$id/m/${type.name}/item/$itemId"
+    // "module" es el nombre de un módulo (LODGING...) o de un apartado de transporte (TRAIN, BUS, FERRY, CAR_RENTAL, FLIGHT...).
+    fun list(id: Long, module: String) = "trip/$id/m/$module"
+    fun form(id: Long, module: String, itemId: Long = 0) = "trip/$id/m/$module/form?itemId=$itemId"
+    fun item(id: Long, module: String, itemId: Long) = "trip/$id/m/$module/item/$itemId"
+    fun list(id: Long, type: ModuleType) = list(id, type.name)
+    fun form(id: Long, type: ModuleType, itemId: Long = 0) = form(id, type.name, itemId)
+    fun item(id: Long, type: ModuleType, itemId: Long) = item(id, type.name, itemId)
+    fun list(id: Long, section: TransportSection) = list(id, section.routeName)
+    fun form(id: Long, section: TransportSection, itemId: Long = 0) = form(id, section.routeName, itemId)
+    fun item(id: Long, section: TransportSection, itemId: Long) = item(id, section.routeName, itemId)
 }
 
 private fun NavHostController.openTopLevel(route: String) {
@@ -101,7 +110,7 @@ private fun NavHostController.openTopLevel(route: String) {
 }
 
 private fun NavBackStackEntry.tripId(): Long = arguments?.getLong("tripId") ?: 0L
-private fun NavBackStackEntry.module(): ModuleType = ModuleType.fromName(arguments?.getString("module")) ?: ModuleType.FLIGHT
+private fun NavBackStackEntry.moduleRoute(): String = arguments?.getString("module") ?: ModuleType.FLIGHT.name
 
 private val longArg = { name: String -> navArgument(name) { type = NavType.LongType } }
 
@@ -117,7 +126,14 @@ fun TravelIndexNavHost() {
 
     fun openEvent(tripId: Long, e: ItineraryEvent) {
         val type = e.type.moduleType()
-        if (type == null) nav.navigate(Routes.itinerary(tripId)) else nav.navigate(Routes.item(tripId, type, e.sourceId))
+        if (type == null) {
+            nav.navigate(Routes.itinerary(tripId))
+        } else if (type == ModuleType.TRANSPORT) {
+            // Un tren se abre con los campos de un tren, no con los de un vuelo ni los de un coche.
+            nav.navigate(Routes.item(tripId, TransportSection.forTransport(e.kind), e.sourceId))
+        } else {
+            nav.navigate(Routes.item(tripId, type, e.sourceId))
+        }
     }
 
     Row {
@@ -204,6 +220,8 @@ fun TravelIndexNavHost() {
                             openItinerary = { nav.navigate(Routes.itinerary(id)) },
                             openList = { nav.navigate(Routes.list(id, it)) },
                             addItem = { nav.navigate(Routes.form(id, it)) },
+                            openSection = { nav.navigate(Routes.list(id, it)) },
+                            addSection = { nav.navigate(Routes.form(id, it)) },
                             openFiles = { nav.navigate(Routes.files(id)) },
                             openEvent = { openEvent(id, it) },
                         )
@@ -221,11 +239,11 @@ fun TravelIndexNavHost() {
                 val moduleArgs = listOf(longArg("tripId"), navArgument("module") { type = NavType.StringType })
                 composable(Routes.LIST_PATTERN, arguments = moduleArgs) { entry ->
                     val id = entry.tripId()
-                    val type = entry.module()
+                    val route = entry.moduleRoute()
                     ModuleListScreen(
-                        type = type, onBack = { nav.popBackStack() },
-                        onOpen = { nav.navigate(Routes.item(id, type, it)) },
-                        onAdd = { nav.navigate(Routes.form(id, type)) },
+                        target = ModuleTarget.parse(route), onBack = { nav.popBackStack() },
+                        onOpen = { nav.navigate(Routes.item(id, route, it)) },
+                        onAdd = { nav.navigate(Routes.form(id, route)) },
                     )
                 }
                 composable(
@@ -237,8 +255,8 @@ fun TravelIndexNavHost() {
                     arguments = moduleArgs + longArg("itemId"),
                 ) { entry ->
                     val id = entry.tripId()
-                    val type = entry.module()
-                    ModuleDetailScreen(onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.form(id, type, it)) })
+                    val route = entry.moduleRoute()
+                    ModuleDetailScreen(onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.form(id, route, it)) })
                 }
             }
         }

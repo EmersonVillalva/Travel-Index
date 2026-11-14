@@ -10,6 +10,7 @@ import com.travelindex.app.data.repo.AttachmentRepository
 import com.travelindex.app.data.repo.ModuleRepository
 import com.travelindex.app.data.repo.TripRepository
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.ModuleTarget
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TripBundle
 import com.travelindex.app.domain.forms.FieldError
@@ -73,9 +74,11 @@ class ModuleFormViewModel @Inject constructor(
     private val files: FileStorage,
 ) : ViewModel() {
     val tripId: Long = savedState["tripId"] ?: 0L
-    val type: ModuleType = ModuleType.fromName(savedState["module"]) ?: ModuleType.FLIGHT
+    /** El módulo y, en transporte, el apartado (tren, autobús, barco, coche) con el que se abrió la pantalla. */
+    private val target: ModuleTarget = ModuleTarget.parse(savedState["module"])
+    val type: ModuleType = target.type
     val itemId: Long = savedState["itemId"] ?: 0L
-    val spec: ModuleSpec = ModuleSpecs.of(type)
+    val spec: ModuleSpec = ModuleSpecs.of(type, target.section)
 
     private val _state = MutableStateFlow(FormState())
     val state: StateFlow<FormState> = _state.asStateFlow()
@@ -95,7 +98,7 @@ class ModuleFormViewModel @Inject constructor(
                     if (itemId != 0L && existingItem == null) {
                         _state.update { it.copy(loaded = true, notFound = true) }
                     } else {
-                        val values = existingItem?.values ?: FormDefaults.forNew(type, b, LocalDate.now())
+                        val values = existingItem?.values ?: FormDefaults.forNew(type, b, LocalDate.now(), transportType = target.section?.transportType)
                         _state.update { it.copy(loaded = true, values = values, existing = owned) }
                     }
                 } else {
@@ -182,9 +185,10 @@ class ModuleDetailViewModel @Inject constructor(
     private val attachments: AttachmentRepository,
 ) : ViewModel() {
     val tripId: Long = savedState["tripId"] ?: 0L
-    val type: ModuleType = ModuleType.fromName(savedState["module"]) ?: ModuleType.FLIGHT
+    private val target: ModuleTarget = ModuleTarget.parse(savedState["module"])
+    val type: ModuleType = target.type
     val itemId: Long = savedState["itemId"] ?: 0L
-    val spec: ModuleSpec = ModuleSpecs.of(type)
+    val spec: ModuleSpec = ModuleSpecs.of(type, target.section)
 
     val state: StateFlow<DetailState> = trips.observeBundle(tripId).map { b ->
         DetailState(

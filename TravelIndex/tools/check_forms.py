@@ -14,7 +14,10 @@ trip_spec = (ROOT / "ui/trips/TripSpec.kt").read_text(encoding="utf-8")
 trip_codec = (ROOT / "domain/forms/TripCodec.kt").read_text(encoding="utf-8")
 
 MAP = {"flight": "FlightCodec", "lodging": "LodgingCodec", "activity": "ActivityCodec", "transport": "TransportCodec",
-       "restaurant": "RestaurantCodec", "travelDoc": "TravelDocCodec", "expense": "ExpenseCodec", "destination": "DestinationCodec"}
+       "restaurant": "RestaurantCodec", "travelDoc": "TravelDocCodec", "expense": "ExpenseCodec", "destination": "DestinationCodec",
+       # Apartados por medio de transporte: mismas claves y mismo códec que "transport".
+       "transportTrain": "TransportCodec", "transportBus": "TransportCodec", "transportShip": "TransportCodec",
+       "transportCar": "TransportCodec"}
 problems = []
 
 

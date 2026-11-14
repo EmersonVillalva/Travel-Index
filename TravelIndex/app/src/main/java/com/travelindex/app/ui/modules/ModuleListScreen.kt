@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelindex.app.R
-import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.ModuleTarget
 import com.travelindex.app.domain.forms.ModuleItems
 import com.travelindex.app.ui.components.EmptyState
 import com.travelindex.app.ui.components.LoadingBox
@@ -37,14 +37,14 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModuleListScreen(
-    type: ModuleType,
+    target: ModuleTarget,
     onBack: () -> Unit,
     onOpen: (Long) -> Unit,
     onAdd: () -> Unit,
     vm: TripBundleViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
-    val spec = ModuleSpecs.of(type)
+    val spec = ModuleSpecs.of(target.type, target.section)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -60,7 +60,9 @@ fun ModuleListScreen(
     ) { pad ->
         val bundle = state.bundle
         if (!state.loaded) { LoadingBox(Modifier.padding(pad)); return@Scaffold }
-        val list = if (bundle == null) emptyList() else ModuleItems.of(type, bundle)
+        val list = if (bundle == null) emptyList() else ModuleItems.of(target.type, bundle)
+            // Un apartado de transporte (tren, autobús...) solo enseña los elementos de su tipo.
+            .filter { target.section?.matches(it.values["type"]) ?: true }
         val today = LocalDate.now()
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 340.dp),

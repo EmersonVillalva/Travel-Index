@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DirectionsBoat
+import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Flight
 import androidx.compose.material.icons.outlined.Hotel
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Restaurant
+import androidx.compose.material.icons.outlined.Train
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -45,6 +48,17 @@ fun eventIcon(type: EventType): ImageVector = when (type) {
     EventType.TRANSPORT_START, EventType.TRANSPORT_END -> Icons.Outlined.DirectionsCar
     EventType.RESTAURANT -> Icons.Outlined.Restaurant
     EventType.NOTE_DUE -> Icons.Outlined.NotificationsActive
+}
+
+/** Icono del evento: un tren, un autobús o un barco salen con su propio icono en vez del del coche. */
+fun eventIcon(e: ItineraryEvent): ImageVector = when (e.type) {
+    EventType.TRANSPORT_START, EventType.TRANSPORT_END -> when (e.kind) {
+        "TRAIN" -> Icons.Outlined.Train
+        "BUS" -> Icons.Outlined.DirectionsBus
+        "FERRY" -> Icons.Outlined.DirectionsBoat
+        else -> Icons.Outlined.DirectionsCar
+    }
+    else -> eventIcon(e.type)
 }
 
 @Composable
@@ -88,7 +102,7 @@ fun EventRow(
             Box(
                 Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
-            ) { Icon(eventIcon(event.type), contentDescription = null, tint = MaterialTheme.colorScheme.secondary) }
+            ) { Icon(eventIcon(event), contentDescription = null, tint = MaterialTheme.colorScheme.secondary) }
             Column(Modifier.weight(1f)) {
                 Text(eventTypeLabel(event) + zoneNote, style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
