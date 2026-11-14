@@ -5,8 +5,9 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.3.3)
-> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1, la 0.3.2 y la 0.3.3 aún no se han compilado en CI.
+> ## Estado real de esta versión (0.3.4)
+> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1, la 0.3.2, la 0.3.3 y la 0.3.4 aún no se han compilado en CI.
+> - **La 0.3.4:** si desmarcas un medio en el viaje, su apartado desaparece aunque tenga reservas (siguen guardadas y vuelven al marcarlo otra vez).
 > - **La 0.3.3 hace que los apartados del viaje sigan los medios elegidos:** solo sale «Vuelos» si marcaste avión, y tren, autobús, barco y coche tienen su propio apartado con sus campos (estación, vagón y asiento, puerto, camarote…); con dos medios salen los dos, y sin ninguno elegido salen «Vuelos» y «Transporte» como antes.
 > - **La 0.3.2 añade medios de transporte en el viaje (con una actualización de la base de datos local a la versión 3), impide una vuelta anterior a la ida, quita la pantalla «Mapa de vuelos», pone el tema oscuro por defecto y comparte los viajes como archivo `.travelindex`.** Se escribió en un entorno sin Android SDK ni red. Lo que sí se ejecutó aquí:
 >   - lógica de dominio (validaciones, itinerario, costes por categoría, nombres de aeropuerto, formato de «compartir viaje», calendario, recordatorios…) compilada con `kotlinc` y **tests JUnit en verde**;

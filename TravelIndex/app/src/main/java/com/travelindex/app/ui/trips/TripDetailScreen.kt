@@ -334,7 +334,7 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
                 pluralText(R.plurals.tile_events, b.events.size), a.openItinerary) }
             // Transporte: solo los apartados de los medios que se eligieron al crear el viaje.
             val transportTypes = b.transports.map { it.type }
-            TransportSections.shown(TravelModes.parse(trip.travelModes), b.flights.size, transportTypes).forEach { s ->
+            TransportSections.shown(TravelModes.parse(trip.travelModes), transportTypes).forEach { s ->
                 val spec = ModuleSpecs.of(s.module, s)
                 item {
                     Tile(spec.icon, stringResource(spec.titleRes),

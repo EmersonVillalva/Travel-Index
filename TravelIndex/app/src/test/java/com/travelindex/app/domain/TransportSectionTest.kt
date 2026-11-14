@@ -14,12 +14,12 @@ class TripSectionsTest {
     private val none = emptyList<String>()
 
     @Test fun `sin medios elegidos salen los apartados de siempre`() {
-        assertEquals(listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL), TransportSections.shown(emptyList(), 0, none))
+        assertEquals(listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL), TransportSections.shown(emptyList(), none))
         assertEquals(listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL), TransportSections.offered(emptyList()))
     }
 
     @Test fun `si solo eliges tren no sale vuelos`() {
-        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), 0, none)
+        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), none)
         assertEquals(listOf(TransportSection.TRAINS), shown)
         assertFalse(TransportSection.FLIGHTS in TransportSections.offered(listOf(TravelMode.TRAIN)))
         assertEquals(listOf(TransportSection.TRAINS), TransportSections.offered(listOf(TravelMode.TRAIN)))
@@ -28,7 +28,7 @@ class TripSectionsTest {
     @Test fun `con dos medios salen los dos`() {
         assertEquals(
             listOf(TransportSection.FLIGHTS, TransportSection.TRAINS),
-            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.PLANE), 0, none),
+            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.PLANE), none),
         )
         assertEquals(
             listOf(TransportSection.FLIGHTS, TransportSection.TRAINS),
@@ -44,23 +44,25 @@ class TripSectionsTest {
         )
     }
 
-    @Test fun `un apartado con reservas no desaparece aunque no se haya elegido`() {
-        // Viaje solo en tren pero con un vuelo guardado antes: el vuelo sigue a mano.
-        assertEquals(
-            listOf(TransportSection.FLIGHTS, TransportSection.TRAINS),
-            TransportSections.shown(listOf(TravelMode.TRAIN), 1, none),
-        )
-        // ...pero no se ofrece como nuevo en "Agregar".
+    @Test fun `al desmarcar un medio su apartado desaparece aunque tenga reservas`() {
+        // Viaje que ahora solo dice tren, con un autobús guardado: el autobús ya no se ve ni se ofrece.
+        val types = listOf("BUS", "TRAIN")
+        assertEquals(listOf(TransportSection.TRAINS), TransportSections.shown(listOf(TravelMode.TRAIN), types))
         assertEquals(listOf(TransportSection.TRAINS), TransportSections.offered(listOf(TravelMode.TRAIN)))
-        // Un autobús guardado en un viaje que ahora dice avión.
+        // Al volver a marcarlo, vuelve el apartado con su reserva.
         assertEquals(
-            listOf(TransportSection.FLIGHTS, TransportSection.BUSES),
-            TransportSections.shown(listOf(TravelMode.PLANE), 0, listOf("BUS")),
+            listOf(TransportSection.TRAINS, TransportSection.BUSES),
+            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.BUS), types),
         )
+        assertEquals(1, TransportSections.count(TransportSection.BUSES, 0, types))
+    }
+
+    @Test fun `un medio marcado sin reservas sigue saliendo`() {
+        assertEquals(listOf(TransportSection.BUSES), TransportSections.shown(listOf(TravelMode.BUS), none))
     }
 
     @Test fun `un taxi guardado sigue siendo alcanzable en un viaje con medios`() {
-        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), 0, listOf("TAXI", "TRAIN"))
+        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), listOf("TAXI", "TRAIN"))
         assertEquals(listOf(TransportSection.TRAINS, TransportSection.TRANSPORT_OTHER), shown)
     }
 

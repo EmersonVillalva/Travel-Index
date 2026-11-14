@@ -57,17 +57,17 @@ object TransportSections {
 
     /**
      * Apartados de transporte que se ven en el panel del viaje. Sin medios elegidos (viajes antiguos o sin rellenar)
-     * salen los de siempre: vuelos y transporte. Con medios elegidos, solo esos; y también cualquier apartado que ya
-     * tenga elementos, para no dejar reservas inalcanzables.
+     * salen los de siempre: vuelos y transporte. Con medios elegidos, solo esos: si desmarcas uno, su apartado
+     * desaparece aunque tenga reservas (siguen guardadas y vuelven al marcarlo otra vez). La excepción son los
+     * transportes sin medio propio (taxi, traslado, otros): no hay casilla que marcar, así que se ven si existen.
      */
-    fun shown(modes: List<TravelMode>, flightCount: Int, transportTypes: List<String>): List<TransportSection> {
+    fun shown(modes: List<TravelMode>, transportTypes: List<String>): List<TransportSection> {
         if (modes.isEmpty()) return FIXED_SECTIONS
         return TransportSection.entries.filter { s ->
             when (s) {
                 TransportSection.TRANSPORT_ALL -> false
-                TransportSection.FLIGHTS -> TravelMode.PLANE in modes || flightCount > 0
                 TransportSection.TRANSPORT_OTHER -> transportTypes.any { s.matches(it) }
-                else -> (s.mode != null && s.mode in modes) || transportTypes.any { s.matches(it) }
+                else -> s.mode != null && s.mode in modes
             }
         }
     }
