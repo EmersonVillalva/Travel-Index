@@ -467,6 +467,8 @@
     <string name="budget_expenses_title">Gastos</string>
 
     <!-- Archivos -->
+    <string name="a11y_expand_group">Mostrar estos archivos</string>
+    <string name="a11y_collapse_group">Ocultar estos archivos</string>
     <string name="files_empty_title">Aún no hay billetes ni comprobantes</string>
     <string name="files_empty_body">Guarda aquí tus billetes, tarjetas de embarque, reservas, seguros o visados. Súbelos desde el dispositivo o haz una foto. Se guardan en la app y se abren sin conexión.</string>
     <string name="files_group_transport_other">Taxis, traslados y otros</string>

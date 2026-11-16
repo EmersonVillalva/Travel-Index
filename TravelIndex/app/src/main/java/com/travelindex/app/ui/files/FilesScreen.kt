@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
+import com.travelindex.app.domain.FileGroup
 import com.travelindex.app.domain.FileGroups
 import com.travelindex.app.ui.components.ChoiceDialog
 import com.travelindex.app.ui.components.ConfirmDialog
@@ -55,12 +57,25 @@ fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
     var categorizing by remember { mutableStateOf<AttachmentEntity?>(null) }
     var associating by remember { mutableStateOf<AttachmentEntity?>(null) }
     var deleting by remember { mutableStateOf<AttachmentEntity?>(null) }
+    // Qué desplegables están abiertos (nombres de FileGroup separados por comas, para sobrevivir a la rotación).
+    var openGroupsCsv by rememberSaveable { mutableStateOf("") }
+    val openGroups = remember(openGroupsCsv) { openGroupsCsv.split(',').filterTo(HashSet()) { it.isNotEmpty() } }
+    // Siempre sobre el valor actual del estado (no sobre un conjunto capturado), para no pisar lo ya abierto.
+    fun toggleGroup(name: String) {
+        val current = openGroupsCsv.split(',').filterTo(HashSet()) { it.isNotEmpty() }
+        openGroupsCsv = (if (name in current) current - name else current + name).joinToString(",")
+    }
 
     val addFile = rememberAddFileFlow { uris -> vm.add(uris) }
     val addedMsg = stringResource(R.string.file_added)
     val failedMsg = stringResource(R.string.error_attach)
     LaunchedEffect(Unit) {
-        vm.results.collect { r -> snackbar.showSnackbar(if (r.failed > 0) failedMsg else addedMsg) }
+        vm.results.collect { r ->
+            // Lo recién subido entra sin asociar (apartado "Otros"): se abre ese desplegable para que se vea.
+            val current = openGroupsCsv.split(',').filterTo(HashSet()) { it.isNotEmpty() }
+            if (FileGroup.OTHER.name !in current) openGroupsCsv = (current + FileGroup.OTHER.name).joinToString(",")
+            snackbar.showSnackbar(if (r.failed > 0) failedMsg else addedMsg)
+        }
     }
 
     val bundle = state.bundle
@@ -101,8 +116,12 @@ fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
                         verticalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
                         groups.forEach { entry ->
-                            item(key = "group-${entry.group.name}") { FileGroupHeader(entry.group, entry.files.size) }
-                            items(entry.files, key = { it.id }) { att ->
+                            val name = entry.group.name
+                            val open = name in openGroups
+                            item(key = "group-$name") {
+                                FileGroupHeader(entry.group, entry.files.size, expanded = open, onToggle = { toggleGroup(name) })
+                            }
+                            if (open) items(entry.files, key = { it.id }) { att ->
                                 FileCard(
                                     att = att, ownerLabel = titles[ownerKeyOf(att)],
                                     onRename = { renaming = att }, onCategory = { categorizing = att },

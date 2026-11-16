@@ -1,6 +1,7 @@
 package com.travelindex.app.ui.files
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.DirectionsBoat
 import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Flight
 import androidx.compose.material.icons.outlined.Folder
@@ -109,15 +112,22 @@ fun fileGroupIcon(g: FileGroup): ImageVector = when (g) {
 
 /** Cabecera de un apartado de la lista de archivos: icono, nombre y cuántos archivos tiene. */
 @Composable
-fun FileGroupHeader(group: FileGroup, count: Int, modifier: Modifier = Modifier) {
-    Row(
-        modifier.fillMaxWidth().padding(top = Spacing.m, bottom = Spacing.xs),
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s),
-    ) {
-        Icon(fileGroupIcon(group), contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
-        Text(fileGroupTitle(group), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f),
-            maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+fun FileGroupHeader(group: FileGroup, count: Int, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    Card(modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+        Row(
+            Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(horizontal = Spacing.m, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+        ) {
+            Icon(fileGroupIcon(group), contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+            Text(fileGroupTitle(group), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f),
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+                if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                contentDescription = stringResource(if (expanded) R.string.a11y_collapse_group else R.string.a11y_expand_group),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
