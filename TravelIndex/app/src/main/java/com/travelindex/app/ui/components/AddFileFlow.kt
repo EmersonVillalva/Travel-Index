@@ -1,9 +1,13 @@
 package com.travelindex.app.ui.components
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.ContextWrapper
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import com.travelindex.app.data.CameraCapture
 
 /**
@@ -73,12 +80,40 @@ fun rememberAddFileFlow(onPicked: (List<Uri>) -> Unit): () -> Unit {
         }
     }
 
+    // Escáner de documentos de Google (recorte automático, varias páginas en un PDF). Si este dispositivo
+    // no lo tiene (sin Play Services), se cae a la foto normal con la cámara del sistema.
+    val scanner = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { res ->
+        val r = GmsDocumentScanningResult.fromActivityResultIntent(res.data)
+        val uris = r?.pdf?.uri?.let { listOf(it) } ?: r?.pages?.mapNotNull { it.imageUri }.orEmpty()
+        if (uris.isNotEmpty()) current(uris)
+    }
+
+    fun openScanner() {
+        val activity = ctx.findActivity() ?: return openCamera()
+        val options = GmsDocumentScannerOptions.Builder()
+            .setGalleryImportAllowed(true)
+            .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
+            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+            .build()
+        GmsDocumentScanning.getClient(options).getStartScanIntent(activity)
+            .addOnSuccessListener { sender ->
+                runCatching { scanner.launch(IntentSenderRequest.Builder(sender).build()) }.onFailure { openCamera() }
+            }
+            .addOnFailureListener { openCamera() }
+    }
+
     if (chooser) AddFileDialog(
         onDismiss = { chooser = false },
         onDevice = { chooser = false; documents.launch(arrayOf("*/*")) },
-        onCamera = { chooser = false; openCamera() },
+        onCamera = { chooser = false; openScanner() },
     )
     return remember { { chooser = true } }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 @Composable

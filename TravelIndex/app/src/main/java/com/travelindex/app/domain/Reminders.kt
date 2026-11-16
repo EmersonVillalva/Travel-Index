@@ -54,8 +54,15 @@ object ReminderPlanner {
                 val dayAtHour = e.start.toLocalDate().atTime(hour).atZone(e.start.zone)
                 val before = e.start.minusMinutes(settings.eventLeadMinutes.toLong())
                 when (e.type) {
-                    EventType.FLIGHT ->
+                    EventType.FLIGHT -> {
+                        // Dos avisos fijos por vuelo: con antelación (ajustable, 24 h) y el de última hora,
+                        // 1 hora antes de salir. Un vuelo guardado con poco margen recibe los que queden en el
+                        // futuro; como los dos instantes son fijos, nunca se repiten ni se reprograman.
                         add(e.key, e.start.minusHours(settings.flightLeadHours.toLong()), ReminderKind.FLIGHT, b, e.title, e.start)
+                        if (settings.flightLeadHours > 1) {
+                            add(e.key + ":SOON", e.start.minusHours(1), ReminderKind.FLIGHT, b, e.title, e.start)
+                        }
+                    }
                     EventType.LODGING_CHECK_IN -> {
                         val t = if (e.timeKnown && before.isBefore(dayAtHour)) before else dayAtHour
                         add(e.key, t, ReminderKind.LODGING_CHECK_IN, b, e.title, e.start, e.timeKnown)

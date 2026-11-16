@@ -26,6 +26,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,9 +36,11 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.travelindex.app.R
@@ -63,6 +66,8 @@ import com.travelindex.app.ui.theme.WidthClass
 import com.travelindex.app.ui.trips.CreateTripScreen
 import com.travelindex.app.ui.trips.TripActions
 import com.travelindex.app.ui.trips.TripDetailScreen
+import com.travelindex.app.data.AppShortcuts
+import com.travelindex.app.ui.search.SearchScreen
 import com.travelindex.app.ui.trips.TripsScreen
 import com.travelindex.app.ui.viewer.ViewerScreen
 
@@ -77,6 +82,7 @@ enum class TopLevel(val route: String, @StringRes val label: Int, val icon: Imag
 object Routes {
     const val NEW_TRIP = "newtrip"
     const val HISTORY = "history"
+    const val SEARCH = "search"
     const val PRIVACY = "profile/privacy"
     const val ABOUT = "profile/about"
 
@@ -128,6 +134,17 @@ fun TravelIndexNavHost() {
     val width = LocalWidthClass.current
     val showRail = current != null && width != WidthClass.Compact
     val showBar = current != null && width == WidthClass.Compact
+
+    // Acceso directo del icono pendiente («Nuevo viaje» o «Buscar»): se navega y se consume.
+    val shortcutVm: ShortcutViewModel = hiltViewModel()
+    val pendingShortcut by shortcutVm.pending.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingShortcut) {
+        when (pendingShortcut) {
+            AppShortcuts.DEST_NEW_TRIP -> nav.navigate(Routes.NEW_TRIP)
+            AppShortcuts.DEST_SEARCH -> nav.navigate(Routes.SEARCH)
+        }
+        if (pendingShortcut != null) shortcutVm.consume()
+    }
 
     fun openEvent(tripId: Long, e: ItineraryEvent) {
         val type = e.type.moduleType()
@@ -181,6 +198,7 @@ fun TravelIndexNavHost() {
                     HomeScreen(
                         onOpenTrip = { nav.navigate(Routes.trip(it)) },
                         onNewTrip = { nav.navigate(Routes.NEW_TRIP) },
+                        onOpenSearch = { nav.navigate(Routes.SEARCH) },
                         onOpenTrips = { nav.openTopLevel(TopLevel.Trips.route) },
                         onOpenEvent = { openEvent(it.trip.id, it.event) },
                         onOpenAttention = { nav.navigate(Routes.item(it.tripId, it.module, it.itemId)) },
@@ -205,6 +223,17 @@ fun TravelIndexNavHost() {
                     )
                 }
                 composable(Routes.HISTORY) { HistoryScreen(onBack = { nav.popBackStack() }, onOpenTrip = { nav.navigate(Routes.trip(it)) }) }
+
+                // Buscador global: viajes, reservas y archivos de todos los viajes.
+                composable(Routes.SEARCH) {
+                    SearchScreen(
+                        onBack = { nav.popBackStack() },
+                        onOpenTrip = { nav.navigate(Routes.trip(it)) },
+                        onOpenItem = { tripId, route, itemId -> nav.navigate(Routes.item(tripId, route, itemId)) },
+                        onOpenFiles = { nav.navigate(Routes.files(it)) },
+                        onOpenViewer = { nav.navigate(Routes.viewer(it)) },
+                    )
+                }
                 composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
                 composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
 

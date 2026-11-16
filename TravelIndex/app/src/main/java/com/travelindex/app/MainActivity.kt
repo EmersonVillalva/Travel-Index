@@ -20,7 +20,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.travelindex.app.data.AppShortcuts
 import com.travelindex.app.data.ImportInbox
+import com.travelindex.app.data.ShortcutInbox
 import com.travelindex.app.domain.AppSettings
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ThemeMode
@@ -42,6 +44,7 @@ class MainActivity : ComponentActivity() {
     private val appViewModel: AppViewModel by viewModels()
 
     @Inject lateinit var importInbox: ImportInbox
+    @Inject lateinit var shortcutInbox: ShortcutInbox
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
@@ -104,7 +107,8 @@ class MainActivity : ComponentActivity() {
             else -> null
         }
         if (uri != null) {
-            importInbox.offer(uri)
+            // travelindex://nuevo|buscar son los accesos directos del icono; cualquier otra cosa es un viaje compartido.
+            if (uri.scheme == AppShortcuts.SCHEME) shortcutInbox.offer(uri.host.orEmpty()) else importInbox.offer(uri)
             setIntent(Intent(this, MainActivity::class.java))   // para no procesarlo otra vez al recrear la actividad
         }
     }

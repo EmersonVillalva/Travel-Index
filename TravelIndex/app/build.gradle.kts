@@ -104,6 +104,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.coil.compose)
+    // Escáner de documentos con recorte automático (módulo de Google Play Services, funciona sin internet en la app).
+    implementation(libs.mlkit.document.scanner)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

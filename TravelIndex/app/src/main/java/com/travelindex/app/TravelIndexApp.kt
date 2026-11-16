@@ -1,6 +1,7 @@
 package com.travelindex.app
 
 import android.app.Application
+import com.travelindex.app.data.AppShortcuts
 import com.travelindex.app.reminders.NotificationChannels
 import com.travelindex.app.reminders.ReminderCoordinator
 import dagger.hilt.android.HiltAndroidApp
@@ -17,6 +18,7 @@ class TravelIndexApp : Application() {
     override fun onCreate() {
         super.onCreate()
         NotificationChannels.create(this)
+        AppShortcuts.install(this)
         reminders.start(appScope)
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Luggage
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Button
@@ -20,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -61,6 +63,7 @@ private const val PAST_PREVIEW = 4
 fun HomeScreen(
     onOpenTrip: (Long) -> Unit,
     onNewTrip: () -> Unit,
+    onOpenSearch: () -> Unit,
     onOpenTrips: () -> Unit,
     onOpenEvent: (DayEntry) -> Unit,
     onOpenAttention: (AttentionItem) -> Unit,
@@ -69,7 +72,14 @@ fun HomeScreen(
     val state by vm.state.collectAsStateWithLifecycle()
     val f = LocalFormats.current
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = onOpenSearch) { Icon(Icons.Filled.Search, stringResource(R.string.action_search)) }
+                },
+            )
+        },
         floatingActionButton = {
             if (state.hasTrips) ExtendedFloatingActionButton(
                 onClick = onNewTrip, icon = { Icon(Icons.Filled.Add, null) },

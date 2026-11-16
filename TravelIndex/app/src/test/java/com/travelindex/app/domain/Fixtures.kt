@@ -1,6 +1,7 @@
 package com.travelindex.app.domain
 
 import com.travelindex.app.data.db.ActivityEntity
+import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.data.db.FlightEntity
 import com.travelindex.app.data.db.LodgingEntity
 import com.travelindex.app.data.db.NoteItemEntity
@@ -55,8 +56,13 @@ object Fixtures {
         id = 1, tripId = 1, kind = "REMINDER", text = "Hacer check-in online",
         dueDate = LocalDate.of(2027, 6, 11), dueTime = LocalTime.of(8, 0),
     )
+    val attachment = AttachmentEntity(
+        id = 1, tripId = 1, ownerType = "FLIGHT", ownerId = 1, displayName = "billete_vuelo.pdf",
+        relativePath = "p1.pdf", mimeType = "application/pdf", sizeBytes = 10, createdAt = 1,
+    )
     fun bundle() = TripBundle(
         trip, flights = listOf(flight), lodgings = listOf(hotel), activities = listOf(activity),
         transports = listOf(transport), restaurants = listOf(restaurant), docs = listOf(doc), notes = listOf(note),
+        attachments = listOf(attachment),
     )
 }

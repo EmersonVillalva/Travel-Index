@@ -121,6 +121,8 @@
     <string name="sort_date_asc">Fecha: más antiguos primero</string>
     <string name="sort_date_desc">Fecha: más recientes primero</string>
     <string name="sort_name">Nombre (A-Z)</string>
+    <string name="search_hint_global">Viajes, reservas, lugares y archivos</string>
+    <string name="search_prompt">Escribe al menos dos letras: busca en todos tus viajes, sus reservas, lugares, documentos y archivos.</string>
     <string name="trips_search_hint">Buscar por nombre, ciudad o país</string>
     <string name="trips_empty_title">Aún no tienes viajes</string>
     <string name="trips_empty_body">Crea tu primer viaje y guarda en él vuelos, hoteles, documentos y más.</string>
@@ -469,7 +471,7 @@
     <string name="add_file_device">Elegir del dispositivo</string>
     <string name="add_file_device_hint">PDF, fotos u otros archivos</string>
     <string name="add_file_scan">Escanear documento</string>
-    <string name="add_file_scan_hint">Haz una foto con la cámara</string>
+    <string name="add_file_scan_hint">Con recorte automático (o una foto, si tu móvil no lo permite)</string>
     <string name="error_no_camera">No se pudo abrir la cámara en este dispositivo</string>
     <string name="file_name">Nombre del archivo</string>
     <string name="owner_none">Sin asociar (documento suelto)</string>
@@ -527,7 +529,7 @@
     <string name="df_long">Con nombre del mes</string>
     <string name="sec_notifications">Notificaciones</string>
     <string name="notif_enable">Recordatorios</string>
-    <string name="notif_enable_hint">Avisos de actividades, check-in y documentos que caducan. Cada vuelo avisa 24 horas antes de salir; si creas el viaje con menos tiempo, ese aviso ya no se envía.</string>
+    <string name="notif_enable_hint">Avisos de actividades, check-in y documentos que caducan. Cada vuelo avisa dos veces: con antelación (24 horas) y 1 hora antes de salir. Si guardas un vuelo con poco margen, recibes los avisos que aún queden por delante.</string>
     <string name="notif_system_off">Las notificaciones de Travel Index están desactivadas en los ajustes de Android, así que no recibirás avisos.</string>
     <string name="notif_open_settings">Abrir ajustes de Android</string>
     <string name="support_title">Apoya el proyecto</string>
@@ -567,7 +569,7 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="made_by">Hecho por Emerson Villalva Labrador</string>
     <string name="about_description">Todos tus viajes en un solo lugar: vuelos, alojamientos, actividades, documentos de viaje y calendario, guardados en tu dispositivo y disponibles sin conexión.</string>
     <string name="about_highlights_title">Qué incluye</string>
-    <string name="about_highlights">Vuelos con fecha, horas, duración y lo que pagaste a la vista; alojamientos, actividades con su duración (la hora de fin se calcula sola), transportes y restaurantes. Visados y documentos con aviso de caducidad. Archivos separados por apartado, con vista previa: súbelos desde el dispositivo o fotografía el documento. Itinerario y calendario. Lo que pagaste en cada viaje, por categorías, y el historial de tus viajes anteriores. Exporta el viaje completo a PDF. Compartir un viaje como copia exacta. Copia de seguridad y restauración.</string>
+    <string name="about_highlights">Buscador global y vuelos con fecha, horas, duración y lo que pagaste a la vista; alojamientos, actividades con su duración (la hora de fin se calcula sola), transportes y restaurantes. Visados y documentos con aviso de caducidad. Archivos separados por apartado, con vista previa y visor propio: súbelos desde el dispositivo o escanéalos con recorte automático. Itinerario y calendario. Lo que pagaste en cada viaje, por categorías, y el historial de tus viajes anteriores. Exporta el viaje completo a PDF. Compartir un viaje como copia exacta. Copia de seguridad y restauración.</string>
     <string name="about_limits_title">Qué no hace</string>
     <string name="about_limits">No tiene cuentas ni sincronización en la nube. No se conecta a internet. No convierte entre monedas. No muestra un mapa de calles: dibuja la ruta de cada vuelo. Los recordatorios usan alarmas aproximadas de Android, por lo que pueden retrasarse unos minutos. No consulta retrasos ni cancelaciones: los datos del vuelo los escribes tú. El PDF resume el viaje, con los números de documentos ocultos, y no incluye tus archivos adjuntos.</string>
 
@@ -578,7 +580,7 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="privacy_h_network">Conexión a internet</string>
     <string name="privacy_b_network">La app no se conecta a internet: no tiene ese permiso, no usa analítica, no muestra anuncios y no incluye rastreadores. Solo si abres un enlace, lo gestiona el navegador o la aplicación que tú elijas. Si decides apoyar el proyecto, la app abre en tu navegador un enlace de PayPal; es opcional y la app no recibe ningún dato de ese pago.</string>
     <string name="privacy_h_files">Archivos y fotos</string>
-    <string name="privacy_b_files">Los archivos que eliges se copian al almacenamiento privado de la app y no son accesibles para otras apps. Si usas «Escanear documento», se abre la cámara de tu dispositivo y la foto solo se guarda en la app si la aceptas. Al abrir o compartir un archivo, se concede acceso temporal a la app que tú elijas. Si eliminas un archivo o un viaje, se borra la copia.</string>
+    <string name="privacy_b_files">Los archivos que eliges se copian al almacenamiento privado de la app y no son accesibles para otras apps. «Escanear documento» usa el escáner de Google Play Services, que funciona en tu dispositivo: el documento solo se guarda en la app si lo aceptas (y sin Play Services se usa la cámara del sistema). Al abrir o compartir un archivo, se concede acceso temporal a la app que tú elijas. Si eliminas un archivo o un viaje, se borra la copia.</string>
     <string name="privacy_h_permissions">Permisos</string>
     <string name="privacy_b_permissions">Notificaciones: para mostrarte los avisos que programa tu propio dispositivo. Inicio del sistema: para volver a programar esos avisos al reiniciar el teléfono. No se solicitan permisos de internet, ubicación, contactos, cámara, micrófono ni almacenamiento: la foto de un documento la hace la cámara del sistema, no la app.</string>
     <string name="privacy_h_backup">Copias de seguridad</string>

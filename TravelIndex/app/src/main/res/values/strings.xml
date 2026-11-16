@@ -125,6 +125,8 @@
     <string name="sort_date_asc">Date: oldest first</string>
     <string name="sort_date_desc">Date: newest first</string>
     <string name="sort_name">Name (A-Z)</string>
+    <string name="search_hint_global">Trips, bookings, places and files</string>
+    <string name="search_prompt">Type at least two letters: it searches every trip, its bookings, places, documents and files.</string>
     <string name="trips_search_hint">Search by name, city or country</string>
     <string name="trips_empty_title">No trips yet</string>
     <string name="trips_empty_body">Create your first trip and keep flights, hotels, documents and more in it.</string>
@@ -473,7 +475,7 @@
     <string name="add_file_device">Pick from device</string>
     <string name="add_file_device_hint">PDFs, photos or other files</string>
     <string name="add_file_scan">Scan document</string>
-    <string name="add_file_scan_hint">Take a photo with the camera</string>
+    <string name="add_file_scan_hint">With automatic cropping (or a plain photo if unavailable)</string>
     <string name="error_no_camera">Couldn\'t open the camera on this device</string>
     <string name="file_name">File name</string>
     <string name="owner_none">Not linked (loose document)</string>
@@ -531,7 +533,7 @@
     <string name="df_long">With month name</string>
     <string name="sec_notifications">Notifications</string>
     <string name="notif_enable">Reminders</string>
-    <string name="notif_enable_hint">Alerts for activities, check-in and expiring documents. Each flight alerts 24 hours before departure; if you create the trip with less time left, that alert is skipped.</string>
+    <string name="notif_enable_hint">Alerts for activities, check-in and expiring documents. Each flight alerts twice: in advance (24 hours) and 1 hour before departure. If you save a flight on short notice, you get whichever alerts are still ahead.</string>
     <string name="notif_system_off">Travel Index notifications are turned off in Android settings, so you won\'t get any alerts.</string>
     <string name="notif_open_settings">Open Android settings</string>
     <string name="support_title">Support the project</string>
@@ -571,7 +573,7 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="made_by">Made by Emerson Villalva Labrador</string>
     <string name="about_description">All your trips in one place: flights, accommodation, activities, travel documents and calendar, stored on your device and available offline.</string>
     <string name="about_highlights_title">What it includes</string>
-    <string name="about_highlights">Flights with date, times, duration and what you paid at a glance; accommodation, activities with their duration (the end time is worked out for you), transport and restaurants. Visas and documents with expiry warnings. Files grouped by section, with previews: pick them from your device or photograph the document. Itinerary and calendar. What you paid on each trip, by category, plus the history of your past trips. Export the whole trip to PDF. Share a trip as an exact copy. Backup and restore.</string>
+    <string name="about_highlights">Global search and flights with date, times, duration and what you paid at a glance; accommodation, activities with their duration (the end time is worked out for you), transport and restaurants. Visas and documents with expiry warnings. Files grouped by section, with previews and a built-in viewer: pick them from your device or scan them with automatic cropping. Itinerary and calendar. What you paid on each trip, by category, plus the history of your past trips. Export the whole trip to PDF. Share a trip as an exact copy. Backup and restore.</string>
     <string name="about_limits_title">What it doesn\'t do</string>
     <string name="about_limits">No accounts and no cloud sync. It never connects to the internet. It doesn\'t convert between currencies. There\'s no street map: it draws each flight\'s route. Reminders use Android\'s approximate alarms, so they can run a few minutes late. It doesn\'t check delays or cancellations: you enter the flight details yourself. The PDF summarises the trip, with document numbers masked, and doesn\'t include your attached files.</string>
 
@@ -582,7 +584,7 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="privacy_h_network">Internet connection</string>
     <string name="privacy_b_network">The app never connects to the internet: it doesn\'t have that permission, uses no analytics, shows no ads and includes no trackers. Only when you open a link is it handled by the browser or app you choose. If you decide to support the project, the app opens a PayPal link in your browser; it\'s optional and the app receives no data about that payment.</string>
     <string name="privacy_h_files">Files and photos</string>
-    <string name="privacy_b_files">The files you pick are copied into the app\'s private storage and other apps can\'t access them. If you use “Scan document”, your device\'s camera opens and the photo is only stored in the app if you accept it. When you open or share a file, temporary access is granted to the app you choose. If you delete a file or a trip, the copy is deleted.</string>
+    <string name="privacy_b_files">The files you pick are copied into the app\'s private storage and other apps can\'t access them. “Scan document” uses the Google Play Services scanner, which runs on your device: the document is only stored in the app if you accept it (without Play Services, the system camera is used instead). When you open or share a file, temporary access is granted to the app you choose. If you delete a file or a trip, the copy is deleted.</string>
     <string name="privacy_h_permissions">Permissions</string>
     <string name="privacy_b_permissions">Notifications: to show the alerts your own device schedules. Boot: to re-schedule those alerts when the phone restarts. No internet, location, contacts, camera, microphone or storage permissions are requested: a document photo is taken by the system camera, not by the app.</string>
     <string name="privacy_h_backup">Backups</string>

@@ -26,10 +26,17 @@ class FileStorage @Inject constructor(@ApplicationContext private val context: C
 
     suspend fun import(uri: Uri): StoredFile = withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
-        val mime = resolver.getType(uri) ?: "application/octet-stream"
-        var name = "archivo"
+        var name = uri.lastPathSegment?.substringAfterLast('/') ?: "archivo"
         resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0)?.let { name = it }
+        }
+        // Un file:// (p. ej. el PDF del escáner) no tiene tipo en el resolver: se deduce por la extensión.
+        val mime = resolver.getType(uri) ?: when (name.substringAfterLast('.', "").lowercase()) {
+            "pdf" -> "application/pdf"
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "webp" -> "image/webp"
+            else -> "application/octet-stream"
         }
         val ext = name.substringAfterLast('.', "").takeIf { it.length in 1..5 }?.let { ".$it" } ?: ""
         val rel = UUID.randomUUID().toString() + ext
