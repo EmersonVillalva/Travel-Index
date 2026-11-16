@@ -21,9 +21,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TravelIndex.Splash">
 
+        <!-- singleTask: la app tiene una sola instancia. Al abrir un archivo .travelindex desde otra app
+             (WhatsApp, correo...), Android no crea una copia dentro de esa app: trae la Travel Index ya abierta
+             (o la arranca) y le entrega el archivo por onNewIntent, con la ventana de importación delante. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
