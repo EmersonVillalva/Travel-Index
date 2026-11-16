@@ -55,6 +55,8 @@ import com.travelindex.app.domain.forms.ModuleItems
 import com.travelindex.app.ui.components.FilePreview
 import com.travelindex.app.ui.components.Option
 import com.travelindex.app.ui.components.attachmentFile
+import com.travelindex.app.ui.components.categoryLabel
+import com.travelindex.app.ui.components.fileKindLabel
 import com.travelindex.app.ui.components.ChoiceDialog
 import com.travelindex.app.ui.components.humanSize
 import com.travelindex.app.ui.components.iconForMime
@@ -65,20 +67,6 @@ import com.travelindex.app.ui.modules.moduleTitle
 import com.travelindex.app.ui.theme.Spacing
 
 @Composable
-fun categoryLabel(c: AttachmentCategory): String = stringResource(
-    when (c) {
-        AttachmentCategory.BOARDING_PASS -> R.string.cat_boarding_pass
-        AttachmentCategory.TICKET -> R.string.cat_ticket
-        AttachmentCategory.RESERVATION -> R.string.cat_reservation
-        AttachmentCategory.CONFIRMATION -> R.string.cat_confirmation
-        AttachmentCategory.INSURANCE -> R.string.cat_insurance
-        AttachmentCategory.VISA -> R.string.cat_visa
-        AttachmentCategory.CONTRACT -> R.string.cat_contract
-        AttachmentCategory.PHOTO -> R.string.cat_photo
-        AttachmentCategory.OTHER -> R.string.cat_other
-    }
-)
-
 @StringRes
 fun fileGroupTitleRes(g: FileGroup): Int = when (g) {
     FileGroup.FLIGHTS -> R.string.mod_flights
@@ -190,9 +178,9 @@ fun FileCard(
         ) {
             Icon(iconForMime(att.mimeType), null, tint = MaterialTheme.colorScheme.secondary)
             Column(Modifier.weight(1f)) {
-                // El título es la reserva a la que pertenece ("Free tour Edimburgo"); el nombre del archivo
-                // (xxx.pdf) solo se enseña si el archivo no está asociado a nada, porque no habría otro rótulo.
-                Text(ownerLabel?.takeIf { it.isNotBlank() } ?: att.displayName,
+                // El título es la reserva a la que pertenece ("Free tour Edimburgo"). El nombre del archivo
+                // (xxx.pdf) no se enseña nunca; sin asociar, se rotula por lo que es ("Documento PDF", "Imagen").
+                Text(ownerLabel?.takeIf { it.isNotBlank() } ?: fileKindLabel(att.mimeType),
                     style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(
                     listOf(categoryLabel(AttachmentCategory.fromName(att.category)), humanSize(att.sizeBytes)).joinToString(" · "),

@@ -289,6 +289,9 @@
     <string name="sec_destination">Destino</string>
     <string name="sec_attachments">Archivos adjuntos</string>
     <string name="attach_empty">Aún no hay archivos adjuntos.</string>
+    <string name="file_kind_pdf">Documento PDF</string>
+    <string name="file_kind_image">Imagen</string>
+    <string name="file_kind_other">Archivo</string>
     <string name="attach_pending">Se guardará al pulsar Guardar</string>
 
     <!-- Campos -->

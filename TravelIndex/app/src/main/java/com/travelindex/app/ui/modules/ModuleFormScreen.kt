@@ -146,7 +146,7 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
                 if (spec.type.attachable) {
                     SectionCard(stringResource(R.string.sec_attachments)) {
                         state.existing.forEach { att -> AttachmentRow(att, onDelete = { confirmAttachment = att }) }
-                        state.pending.forEachIndexed { i, p -> PendingFileRow(p.name, onRemove = { vm.removePending(i) }, uri = p.uri) }
+                        state.pending.forEachIndexed { i, p -> PendingFileRow(onRemove = { vm.removePending(i) }, uri = p.uri) }
                         if (state.existing.isEmpty() && state.pending.isEmpty()) {
                             Text(stringResource(R.string.attach_empty), style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
