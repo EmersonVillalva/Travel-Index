@@ -661,6 +661,10 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="notif_note_title">Reminder</string>
     <string name="notif_doc_title">Document about to expire</string>
     <string name="notif_doc_text">%1$s · expires: %2$s</string>
+    <string name="widget_label">Next event</string>
+    <string name="widget_description">Your next trip event, at a glance.</string>
+    <string name="widget_empty">No upcoming plans</string>
+    <string name="widget_trip_starts">The trip starts on %1$s</string>
     <string name="when_today">today</string>
     <string name="when_tomorrow">tomorrow</string>
     <string name="when_day_time">%1$s at %2$s</string>

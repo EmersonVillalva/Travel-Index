@@ -74,6 +74,19 @@
             </intent-filter>
         </activity>
 
+        <!-- Widget «Próximo evento» de la pantalla de inicio. El sistema le habla por componente explícito. -->
+        <receiver
+            android:name=".widget.NextEventWidget"
+            android:exported="false"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_event_info" />
+        </receiver>
+
         <!-- Recibe las alarmas que programa la propia app: no es accesible desde otras apps. -->
         <receiver
             android:name=".reminders.ReminderReceiver"

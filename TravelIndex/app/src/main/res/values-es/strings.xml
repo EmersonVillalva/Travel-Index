@@ -657,6 +657,10 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="notif_note_title">Recordatorio</string>
     <string name="notif_doc_title">Documento a punto de caducar</string>
     <string name="notif_doc_text">%1$s · caduca: %2$s</string>
+    <string name="widget_label">Próximo evento</string>
+    <string name="widget_description">Lo siguiente de tu viaje, de un vistazo.</string>
+    <string name="widget_empty">Sin planes próximos</string>
+    <string name="widget_trip_starts">El viaje empieza el %1$s</string>
     <string name="when_today">hoy</string>
     <string name="when_tomorrow">mañana</string>
     <string name="when_day_time">%1$s a las %2$s</string>
