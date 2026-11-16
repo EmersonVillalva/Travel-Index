@@ -172,7 +172,9 @@ SKIP_LOWER_PLAIN = {"remember", "getValue", "setValue", "provideDelegate",
                     # métodos Java (ByteArrayOutputStream.size(), ZipFile.size()) y constante de enum (FieldType.URL)
                     "size", "URL",
                     # kotlin.error() de la biblioteca estándar frente a la semántica error() de Compose
-                    "error"}
+                    "error",
+                    # método de ComposeContentTestRule frente a la extensión de Activity del mismo nombre
+                    "setContent"}
 for f in files:
     local_decl = {n for n, fs in all_decl_names.items() if f.rel in fs}
     for name, fulls in lib_imports.items():
