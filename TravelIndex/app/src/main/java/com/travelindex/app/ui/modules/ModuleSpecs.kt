@@ -169,7 +169,7 @@ object ModuleSpecs {
             f("location", R.string.f_location),
             f("date", R.string.f_date, FieldType.DATE, required = true),
             f("startTime", R.string.f_start_time, FieldType.TIME),
-            f("endTime", R.string.f_end_time, FieldType.TIME),
+            f("duration", R.string.f_duration, FieldType.DURATION),
             f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
             f("organizer", R.string.f_organizer),
             f("meetingAddress", R.string.f_meeting),
@@ -182,7 +182,7 @@ object ModuleSpecs {
         ),
         sections = listOf(
             FormSection(R.string.sec_activity, listOf("name", "description", "location")),
-            FormSection(R.string.sec_schedule, listOf("date", "startTime", "endTime", "timeZone")),
+            FormSection(R.string.sec_schedule, listOf("date", "startTime", "duration", "timeZone")),
             FormSection(R.string.sec_booking, listOf("organizer", "meetingAddress", "participants", "locator", "bookingUrl", "price", "currency")),
             FormSection(R.string.sec_notes, listOf("notes")),
         ),

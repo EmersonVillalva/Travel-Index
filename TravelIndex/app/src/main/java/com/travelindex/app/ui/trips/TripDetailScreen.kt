@@ -1,7 +1,5 @@
 package com.travelindex.app.ui.trips
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -73,6 +72,7 @@ import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.TransportSections
 import com.travelindex.app.domain.TripBundle
+import com.travelindex.app.domain.pdf.TripPdf
 import com.travelindex.app.domain.tripDurationDays
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.LoadingBox
@@ -81,6 +81,7 @@ import com.travelindex.app.ui.components.SectionTitle
 import com.travelindex.app.ui.components.StatTile
 import com.travelindex.app.ui.components.TripCard
 import com.travelindex.app.ui.components.pluralText
+import com.travelindex.app.ui.components.rememberAddFileFlow
 import com.travelindex.app.ui.modules.EventRow
 import com.travelindex.app.ui.modules.ModuleSpecs
 import com.travelindex.app.ui.modules.docWarningColor
@@ -90,6 +91,7 @@ import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
 import com.travelindex.app.ui.theme.StatusWarn
+import java.io.File
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -120,14 +122,28 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
     var confirmCancel by rememberSaveable { mutableStateOf(false) }
     var confirmShare by rememberSaveable { mutableStateOf(false) }
     val sharing by vm.sharing.collectAsStateWithLifecycle()
+    val pdfBusy by vm.pdfBusy.collectAsStateWithLifecycle()
+    // El PDF ya creado: mientras haya uno, se ofrece abrirlo o compartirlo.
+    var pdfFile by remember { mutableStateOf<File?>(null) }
     val ctx = LocalContext.current
     val shareFailed = stringResource(R.string.error_share_trip)
     val shareText = stringResource(R.string.share_trip_text, state.bundle?.trip?.name.orEmpty(), TripShareManager.PLAY_URL)
     val okMsg = stringResource(R.string.file_added)
     val errMsg = stringResource(R.string.error_attach)
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.addFile(uri) }
+    val addFile = rememberAddFileFlow { uris -> uris.forEach { vm.addFile(it) } }
+    val pdfFailed = stringResource(R.string.error_pdf)
+    val noAppToOpen = stringResource(R.string.error_no_app_to_open)
+    val shareFailedMsg = stringResource(R.string.error_share)
     LaunchedEffect(Unit) { vm.messages.collect { ok -> snackbar.showSnackbar(if (ok) okMsg else errMsg) } }
+    LaunchedEffect(Unit) {
+        vm.pdfEvents.collect { e ->
+            when (e) {
+                is ShareEvent.Ready -> pdfFile = e.file
+                ShareEvent.Failed -> snackbar.showSnackbar(pdfFailed)
+            }
+        }
+    }
     LaunchedEffect(Unit) {
         vm.shareEvents.collect { e ->
             when (e) {
@@ -155,6 +171,8 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
                                 onClick = { menuOpen = false; actions.onEdit() })
                             DropdownMenuItem(text = { Text(stringResource(R.string.action_share_trip)) },
                                 onClick = { menuOpen = false; confirmShare = true })
+                            DropdownMenuItem(text = { Text(stringResource(R.string.action_export_pdf)) },
+                                onClick = { menuOpen = false; vm.exportPdf() })
                             DropdownMenuItem(
                                 text = { Text(stringResource(if (bundle.trip.cancelled) R.string.action_reactivate_trip else R.string.action_cancel_trip)) },
                                 onClick = { menuOpen = false; if (bundle.trip.cancelled) vm.setCancelled(false) else confirmCancel = true },
@@ -187,7 +205,7 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
                 when (choice) {
                     is AddChoice.Section -> actions.addSection(choice.section)
                     is AddChoice.Module -> actions.addItem(choice.type)
-                    AddChoice.File -> picker.launch(arrayOf("*/*"))
+                    AddChoice.File -> addFile()
                 }
             },
         )
@@ -202,6 +220,30 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
         title = { Text(stringResource(R.string.share_preparing)) },
         text = { LinearProgressIndicator(Modifier.fillMaxWidth()) },
     )
+    if (pdfBusy) AlertDialog(
+        onDismissRequest = {}, confirmButton = {},
+        title = { Text(stringResource(R.string.pdf_generating)) },
+        text = { LinearProgressIndicator(Modifier.fillMaxWidth()) },
+    )
+    pdfFile?.let { file ->
+        AlertDialog(
+            onDismissRequest = { pdfFile = null },
+            title = { Text(stringResource(R.string.pdf_ready_title)) },
+            text = { Text(stringResource(R.string.pdf_ready_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pdfFile = null
+                    if (!FileActions.share(ctx, file, TripPdf.MIME)) scope.launch { snackbar.showSnackbar(shareFailedMsg) }
+                }) { Text(stringResource(R.string.pdf_share)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    pdfFile = null
+                    if (!FileActions.open(ctx, file, TripPdf.MIME)) scope.launch { snackbar.showSnackbar(noAppToOpen) }
+                }) { Text(stringResource(R.string.pdf_open)) }
+            },
+        )
+    }
     if (confirmDelete && bundle != null) ConfirmDialog(
         title = stringResource(R.string.delete_trip_title), body = stringResource(R.string.delete_trip_body, bundle.trip.name),
         confirmLabel = stringResource(R.string.action_delete),

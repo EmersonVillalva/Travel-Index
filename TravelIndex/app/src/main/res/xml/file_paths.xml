@@ -4,4 +4,6 @@
     <files-path name="attachments" path="attachments/" />
     <!-- Archivo .travelindex temporal del viaje que el usuario va a compartir (se reemplaza en cada compartición). -->
     <cache-path name="shared" path="shared/" />
+    <!-- Foto temporal que hace la cámara al escanear un documento (se copia a attachments/ y se borra). -->
+    <cache-path name="camera" path="camera/" />
 </paths>

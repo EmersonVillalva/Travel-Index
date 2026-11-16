@@ -94,8 +94,14 @@ fun EventRow(
             Modifier.fillMaxWidth().padding(Spacing.m),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            Column(Modifier.width(64.dp)) {
+            Column(Modifier.width(72.dp)) {
                 Text(timeText, style = MaterialTheme.typography.titleMedium)
+                // Actividades con duración: la hora a la que terminan, calculada por la app.
+                val endText = event.end?.takeIf { event.timeKnown && event.type == EventType.ACTIVITY }?.let { end ->
+                    val days = java.time.temporal.ChronoUnit.DAYS.between(event.start.toLocalDate(), end.toLocalDate())
+                    "– " + f.time(end) + if (days > 0) " (+$days)" else ""
+                }
+                if (endText != null) Text(endText, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (showDate) Text(f.shortDay(event.start.toLocalDate()), style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

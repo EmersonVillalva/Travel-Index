@@ -60,3 +60,13 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         db.execSQL("ALTER TABLE `trips` ADD COLUMN `travelModes` TEXT NOT NULL DEFAULT ''")
     }
 }
+
+/**
+ * v3 -> v4: la actividad guarda su duración (opcional) en vez de la hora de fin.
+ * Solo AÑADE una columna que admite vacío; las actividades que ya existen quedan igual y siguen mostrando su hora de fin.
+ */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `activities` ADD COLUMN `durationMinutes` INTEGER")
+    }
+}

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Luggage
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Sort
@@ -70,7 +71,7 @@ fun groupTitle(g: TripGroup): String = stringResource(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripsScreen(
-    onOpenTrip: (Long) -> Unit, onNewTrip: () -> Unit, vm: TripsViewModel = hiltViewModel(),
+    onOpenTrip: (Long) -> Unit, onNewTrip: () -> Unit, onOpenHistory: () -> Unit, vm: TripsViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     var sortMenu by remember { mutableStateOf(false) }
@@ -82,6 +83,7 @@ fun TripsScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.nav_trips)) },
                 actions = {
+                    IconButton(onClick = onOpenHistory) { Icon(Icons.Outlined.History, stringResource(R.string.history_action)) }
                     IconButton(onClick = { importPicker.launch(arrayOf("*/*")) }) {
                         Icon(Icons.Outlined.Download, stringResource(R.string.action_import_trip))
                     }

@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Flight
@@ -18,16 +21,32 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.travelindex.app.R
+import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.forms.FlightCodec
+import com.travelindex.app.ui.components.Pill
+import com.travelindex.app.ui.components.formatMoneyValue
+import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
+import com.travelindex.app.ui.theme.StatusDanger
+import com.travelindex.app.ui.theme.StatusNeutral
+import com.travelindex.app.ui.theme.StatusWarn
+import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /** Flecha de vuelo: puntos en los extremos, línea discontinua con punta y un avión en el centro. */
 @Composable
@@ -74,6 +93,86 @@ fun FlightRouteCard(
             Column(Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
                 Text(to, style = MaterialTheme.typography.titleMedium, maxLines = 3, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.End)
                 if (arrClock.isNotBlank()) Text(arrClock, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+/**
+ * Tarjeta de un vuelo en la lista: aerolínea y número, fecha, horas de salida y llegada, duración, aeropuertos y lo que
+ * costó. Todo se ve sin abrir el vuelo.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlightItemCard(values: Map<String, String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val f = LocalFormats.current
+    val flight = remember(values) { runCatching { FlightCodec.build(0, 0, values) }.getOrNull() }
+    val title = listOf(values["airline"].orEmpty().trim(), values["flightNumber"].orEmpty().trim()).filter { it.isNotEmpty() }.joinToString(" ")
+    val from = Airports.displayName(values["departureAirport"].orEmpty())
+    val to = Airports.displayName(values["arrivalAirport"].orEmpty())
+    val price = formatMoneyValue(values["price"], values["currency"])
+
+    val dep = flight?.let { Instant.ofEpochMilli(it.departureEpochMs).atZone(ZoneId.of(it.departureZoneId)) }
+    val knownArrival = flight != null && FlightCodec.hasArrival(flight)
+    val arr = if (knownArrival && flight != null) Instant.ofEpochMilli(flight.arrivalEpochMs).atZone(ZoneId.of(flight.arrivalZoneId)) else null
+    val minutes = flight?.takeIf { knownArrival }?.let { FlightCodec.durationMinutes(it) }?.takeIf { it > 0 }
+    val dayOffset = if (dep != null && arr != null) ChronoUnit.DAYS.between(dep.toLocalDate(), arr.toLocalDate()).toInt() else 0
+
+    val status = values["status"].orEmpty().trim()
+    val statusLabel = if (status.isEmpty() || status == "CONFIRMED") null
+        else choiceText(ModuleSpecs.of(ModuleType.FLIGHT).field("status"), status)
+    val extras = listOfNotNull(
+        values["locator"]?.trim()?.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.flight_chip_locator, it) },
+        values["terminal"]?.trim()?.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.flight_chip_terminal, it) },
+        values["seat"]?.trim()?.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.flight_chip_seat, it) },
+    )
+
+    Card(
+        onClick = onClick, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(Modifier.padding(Spacing.m), verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.m)) {
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Outlined.Flight, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) }
+                Column(Modifier.weight(1f)) {
+                    Text(title.ifEmpty { from }, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (dep != null) Text(f.date(dep.toLocalDate()), style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (price != null) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(price, style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.flight_paid), style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                Column(Modifier.weight(1.1f)) {
+                    Text(dep?.let { f.time(it) } ?: "—", style = MaterialTheme.typography.titleLarge)
+                    Text(from, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+                FlightArrow(Modifier.weight(1f), minutes?.let { durationText(it) })
+                Column(Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.Top) {
+                        Text(arr?.let { f.time(it) } ?: "—", style = MaterialTheme.typography.titleLarge)
+                        if (dayOffset > 0) Text("+$dayOffset", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
+                    }
+                    Text(to, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.End)
+                }
+            }
+
+            if (statusLabel != null || extras.isNotEmpty()) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.s), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    if (statusLabel != null) Pill(statusLabel, if (status == "CANCELLED") StatusDanger else StatusWarn)
+                    extras.forEach { Pill(it, StatusNeutral) }
+                }
             }
         }
     }

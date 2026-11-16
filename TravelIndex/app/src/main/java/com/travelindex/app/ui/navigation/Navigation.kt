@@ -48,6 +48,7 @@ import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.moduleType
 import com.travelindex.app.ui.calendar.CalendarScreen
 import com.travelindex.app.ui.files.FilesScreen
+import com.travelindex.app.ui.history.HistoryScreen
 import com.travelindex.app.ui.home.HomeScreen
 import com.travelindex.app.ui.itinerary.ItineraryScreen
 import com.travelindex.app.ui.modules.ModuleDetailScreen
@@ -74,6 +75,7 @@ enum class TopLevel(val route: String, @StringRes val label: Int, val icon: Imag
 /** Todas las rutas de la app. Los argumentos tienen el mismo nombre que leen los ViewModels (tripId, module, itemId, add). */
 object Routes {
     const val NEW_TRIP = "newtrip"
+    const val HISTORY = "history"
     const val PRIVACY = "profile/privacy"
     const val ABOUT = "profile/about"
 
@@ -182,7 +184,10 @@ fun TravelIndexNavHost() {
                     )
                 }
                 composable(TopLevel.Trips.route) {
-                    TripsScreen(onOpenTrip = { nav.navigate(Routes.trip(it)) }, onNewTrip = { nav.navigate(Routes.NEW_TRIP) })
+                    TripsScreen(
+                        onOpenTrip = { nav.navigate(Routes.trip(it)) }, onNewTrip = { nav.navigate(Routes.NEW_TRIP) },
+                        onOpenHistory = { nav.navigate(Routes.HISTORY) },
+                    )
                 }
                 composable(TopLevel.Calendar.route) {
                     CalendarScreen(
@@ -196,6 +201,7 @@ fun TravelIndexNavHost() {
                         onOpenAbout = { nav.navigate(Routes.ABOUT) },
                     )
                 }
+                composable(Routes.HISTORY) { HistoryScreen(onBack = { nav.popBackStack() }, onOpenTrip = { nav.navigate(Routes.trip(it)) }) }
                 composable(Routes.PRIVACY) { PrivacyPolicyScreen(onBack = { nav.popBackStack() }) }
                 composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
 

@@ -24,6 +24,7 @@ import com.travelindex.app.domain.Airports
 import com.travelindex.app.domain.Money
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.domain.forms.FieldError
+import com.travelindex.app.domain.forms.Durations
 import com.travelindex.app.domain.forms.FieldType
 import com.travelindex.app.ui.theme.LocalFormats
 import java.time.LocalDate
@@ -125,6 +126,17 @@ fun FormField(
                 onClear = if (!def.required && value.isNotBlank()) ({ onChange("") }) else null,
             )
             if (open) TimePickerDialogHost(parsed, onDismiss = { open = false }, onPick = { onChange(it.toString()); open = false })
+        }
+
+        FieldType.DURATION -> {
+            var open by remember { mutableStateOf(false) }
+            val minutes = Durations.parse(value)
+            PickerField(
+                label = label, value = minutes?.let { Durations.text(it.toLong()) } ?: value, error = errMsg, modifier = modifier,
+                onClick = { open = true },
+                onClear = if (!def.required && value.isNotBlank()) ({ onChange("") }) else null,
+            )
+            if (open) DurationPickerDialog(minutes, onDismiss = { open = false }, onPick = { onChange(it?.toString().orEmpty()); open = false })
         }
 
         FieldType.ZONE -> {

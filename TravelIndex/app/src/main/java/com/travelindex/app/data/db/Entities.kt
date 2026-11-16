@@ -118,6 +118,7 @@ data class ActivityEntity(
     val location: String = "",
     val date: LocalDate,
     val startTime: LocalTime? = null,
+    /** Solo actividades guardadas con la versión 0.3 o anterior; desde la 0.4 se guarda la duración y la hora de fin se calcula. */
     val endTime: LocalTime? = null,
     val timeZoneId: String,
     val organizer: String = "",
@@ -128,6 +129,8 @@ data class ActivityEntity(
     val locator: String = "",
     val bookingUrl: String = "",
     val notes: String = "",
+    /** Duración en minutos (opcional). Con la hora de inicio, la app calcula a qué hora termina. */
+    val durationMinutes: Int? = null,
 )
 
 @Entity(

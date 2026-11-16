@@ -29,6 +29,8 @@ import com.travelindex.app.domain.DocWarning
 import com.travelindex.app.domain.DocWarnings
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.forms.ActivityCodec
+import com.travelindex.app.domain.forms.Durations
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.domain.forms.FieldType
 import com.travelindex.app.domain.forms.FlightCodec
@@ -44,6 +46,7 @@ import com.travelindex.app.ui.theme.StatusNeutral
 import com.travelindex.app.ui.theme.StatusOk
 import com.travelindex.app.ui.theme.StatusWarn
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -60,9 +63,19 @@ private fun Formats.t(v: Map<String, String>, k: String): String = timeOf(v, k)?
 
 private fun joinNonBlank(sep: String, vararg parts: String): String = parts.filter { it.isNotBlank() }.joinToString(sep)
 
-fun durationText(minutes: Long): String {
-    val h = minutes / 60; val m = minutes % 60
-    return when { h == 0L -> "$m min"; m == 0L -> "$h h"; else -> "$h h $m min" }
+fun durationText(minutes: Long): String = Durations.text(minutes)
+
+/** Hora de fin de una actividad ("12:30"); si cae en otro día, con los días de más ("02:30 (+1)"). */
+fun Formats.endClock(end: LocalDateTime, startDate: LocalDate): String {
+    val days = ChronoUnit.DAYS.between(startDate, end.toLocalDate())
+    return time(end.toLocalTime()) + if (days > 0) " (+$days)" else ""
+}
+
+/** Hora de fin calculada de una actividad a partir de los valores del formulario, o null si no se puede calcular. */
+fun activityEndClock(f: Formats, v: Map<String, String>): String? {
+    val a = runCatching { ActivityCodec.build(0, 0, v) }.getOrNull() ?: return null
+    val end = ActivityCodec.end(a) ?: return null
+    return f.endClock(end, a.date)
 }
 
 @Composable
@@ -98,6 +111,7 @@ fun displayValue(def: FieldDef, v: Map<String, String>, reveal: Boolean): String
         def.type == FieldType.ZONE -> zoneLabel(raw)
         def.type == FieldType.AIRPORT -> Airports.displayName(raw)
         def.type == FieldType.CHOICE -> choiceText(def, raw)
+        def.type == FieldType.DURATION -> Durations.parse(raw)?.let { Durations.text(it.toLong()) } ?: raw
         def.type == FieldType.MONEY -> formatMoneyValue(raw, v["currency"]) ?: raw
         else -> raw
     }
@@ -142,10 +156,17 @@ private fun rowTexts(spec: ModuleSpec, v: Map<String, String>, today: LocalDate,
                 null, null,
             )
         }
-        ModuleType.ACTIVITY -> RowTexts(
-            title, v.v("location"),
-            joinNonBlank(" · ", f.d(v, "date"), joinNonBlank(" – ", f.t(v, "startTime"), f.t(v, "endTime"))), null, null,
-        )
+        ModuleType.ACTIVITY -> {
+            // La hora de fin no se escribe: sale de la hora de inicio y la duración.
+            val minutes = Durations.parse(v.v("duration"))
+            RowTexts(
+                title, v.v("location"),
+                joinNonBlank(" · ", f.d(v, "date"),
+                    joinNonBlank(" – ", f.t(v, "startTime"), activityEndClock(f, v).orEmpty()),
+                    minutes?.let { durationText(it.toLong()) }.orEmpty()),
+                null, null,
+            )
+        }
         ModuleType.TRANSPORT -> RowTexts(
             title,
             joinNonBlank(" · ", choiceText(spec.field("type"), v.v("type")), joinNonBlank(" → ", v.v("originPlace"), v.v("destinationPlace"))),
@@ -178,6 +199,7 @@ private fun rowTexts(spec: ModuleSpec, v: Map<String, String>, today: LocalDate,
 /** Tarjeta de un elemento en las listas de cada módulo. */
 @Composable
 fun ModuleItemCard(spec: ModuleSpec, item: ModuleItem, today: LocalDate, tripEnd: LocalDate?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    if (spec.type == ModuleType.FLIGHT) { FlightItemCard(item.values, onClick, modifier); return }
     val t = rowTexts(spec, item.values, today, tripEnd)
     Card(
         onClick = onClick, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,

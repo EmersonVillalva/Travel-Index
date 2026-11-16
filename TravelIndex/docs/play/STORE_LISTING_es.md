@@ -9,10 +9,13 @@ Travel Index reúne todo lo de tus viajes en un solo lugar, sin cuenta.
 • Escribe tus vuelos con aerolínea, aeropuertos (por nombre) y horas: la duración se calcula sola.
 • Aviso 24 horas antes de volar, y avisos de check-in y caducidad de documentos.
 • Itinerario cronológico y calendario con todos tus eventos.
+• Archivos separados por apartado: súbelos desde el dispositivo o fotografía el documento.
+• Exporta el viaje completo a PDF y consulta el historial de tus viajes anteriores.
 • Comparte un viaje y la otra persona lo recibe como una copia exacta.
 • Copia de seguridad y restauración desde tu propio dispositivo.
 • Tus datos se guardan en tu dispositivo y funcionan sin conexión. Sin cuenta, sin anuncios.
 
 **Categoría:** Viajes y información local · **Etiquetas:** viajes, itinerario, organizador
 **Seguridad de los datos (borrador):** la app no recopila ni comparte datos y no tiene permiso de internet; los datos del viaje se almacenan solo en el dispositivo. Si el usuario comparte un viaje, lo hace él mismo enviando un archivo.
+**Nota sobre donaciones:** la app incluye una fila opcional «Apoya el proyecto» que abre PayPal en el navegador. Antes de publicar en Google Play, revisa su política de pagos; si no admite ese enlace, pon `travelindex.showDonations=false` en `gradle.properties`.
 **Pendiente:** icono 512×512, gráfico 1024×500, ≥2 capturas de teléfono.

@@ -51,7 +51,7 @@ class DemoData @Inject constructor(
             ModuleType.ACTIVITY, id, 0,
             mapOf(
                 "name" to "Visita al Coliseo", "location" to "Piazza del Colosseo, Roma", "date" to start.plusDays(1).toString(),
-                "startTime" to "10:00", "endTime" to "12:30", "timeZone" to "Europe/Rome", "participants" to "2",
+                "startTime" to "10:00", "duration" to "150", "timeZone" to "Europe/Rome", "participants" to "2",
                 "price" to "32", "currency" to currency,
             ),
         )

@@ -2,8 +2,6 @@ package com.travelindex.app.ui.modules
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,8 +50,10 @@ import com.travelindex.app.ui.components.FormField
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.PendingFileRow
 import com.travelindex.app.ui.components.SectionCard
+import com.travelindex.app.ui.components.rememberAddFileFlow
 import java.time.LocalDate
 import com.travelindex.app.ui.theme.CenteredContent
+import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
 
 /** Formulario único para todos los módulos: los campos salen de la especificación del módulo. */
@@ -71,7 +71,7 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
     val saveMsg = stringResource(R.string.error_save)
     val fileMsg = stringResource(R.string.error_attach)
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.addFile(uri) }
+    val addFile = rememberAddFileFlow { uris -> uris.forEach { vm.addFile(it) } }
 
     LaunchedEffect(Unit) {
         vm.events.collect { e ->
@@ -131,6 +131,15 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
                                 },
                             )
                         }
+                        // Actividad: en cuanto hay hora de inicio y duración, se ve a qué hora terminará.
+                        if (spec.type == ModuleType.ACTIVITY && defs.any { it.key == "duration" }) {
+                            val endText = activityEndClock(LocalFormats.current, state.values)
+                            Text(
+                                if (endText != null) stringResource(R.string.activity_ends_at, endText) else stringResource(R.string.duration_hint),
+                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = Spacing.xs),
+                            )
+                        }
                     }
                 }
 
@@ -142,7 +151,7 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
                             Text(stringResource(R.string.attach_empty), style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        OutlinedButton(onClick = { picker.launch(arrayOf("*/*")) }, Modifier.fillMaxWidth()) {
+                        OutlinedButton(onClick = addFile, Modifier.fillMaxWidth()) {
                             Icon(Icons.Outlined.AttachFile, null)
                             Text("  " + stringResource(R.string.action_attach))
                         }

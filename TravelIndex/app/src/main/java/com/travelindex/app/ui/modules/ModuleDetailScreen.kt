@@ -1,8 +1,6 @@
 package com.travelindex.app.ui.modules
 
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,6 +56,7 @@ import com.travelindex.app.ui.components.InfoRow
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.Pill
 import com.travelindex.app.ui.components.SectionCard
+import com.travelindex.app.ui.components.rememberAddFileFlow
 import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
@@ -78,7 +77,7 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDet
     val noApp = stringResource(R.string.error_no_app)
     fun toast(msg: String) = Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.addFile(uri) }
+    val addFile = rememberAddFileFlow { uris -> uris.forEach { vm.addFile(it) } }
 
     LaunchedEffect(Unit) { vm.messages.collect { snackbar.showSnackbar(attachError) } }
     // Si el elemento desaparece (borrado), se vuelve a la lista.
@@ -108,6 +107,8 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDet
             ModuleType.ACTIVITY -> runCatching { ActivityCodec.build(0, 0, v) }.getOrNull()?.let { ActivityCodec.durationMinutes(it) }
             else -> null
         }?.takeIf { it > 0 }
+        // Actividad con hora de inicio y duración: la app calcula a qué hora termina.
+        val activityEnd = if (spec.type == ModuleType.ACTIVITY) activityEndClock(LocalFormats.current, v) else null
 
         CenteredContent(Modifier.padding(pad)) {
             Column(
@@ -123,9 +124,10 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDet
                         duration = duration?.let { durationText(it) },
                     )
                 }
-                if ((duration != null && spec.type != ModuleType.FLIGHT) || phone.isNotEmpty() || url.isNotEmpty()) {
+                if ((duration != null && spec.type != ModuleType.FLIGHT) || activityEnd != null || phone.isNotEmpty() || url.isNotEmpty()) {
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
                         if (duration != null && spec.type != ModuleType.FLIGHT) Pill(stringResource(R.string.duration_label, durationText(duration)), StatusOk)
+                        if (activityEnd != null) Pill(stringResource(R.string.activity_ends_at, activityEnd), StatusOk)
                         if (phone.isNotEmpty()) AssistChip(
                             onClick = { if (!FileActions.dial(ctx, phone)) toast(noApp) },
                             label = { Text(stringResource(R.string.action_call)) },
@@ -165,7 +167,7 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDet
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         state.attachments.forEach { att -> AttachmentRow(att, onDelete = { confirmAttachment = att }) }
-                        OutlinedButton(onClick = { picker.launch(arrayOf("*/*")) }, Modifier.fillMaxWidth()) {
+                        OutlinedButton(onClick = addFile, Modifier.fillMaxWidth()) {
                             Icon(Icons.Outlined.AttachFile, null)
                             Text("  " + stringResource(R.string.action_attach))
                         }

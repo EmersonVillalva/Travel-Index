@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 
-enum class FieldType { TEXT, MULTILINE, PHONE, URL, INT, MONEY, CURRENCY, DATE, TIME, ZONE, CHOICE, AIRPORT }
+enum class FieldType { TEXT, MULTILINE, PHONE, URL, INT, MONEY, CURRENCY, DATE, TIME, ZONE, CHOICE, AIRPORT, DURATION }
 
 /** [labelRes] es un id de recurso (Int) que rellena la capa de interfaz; el dominio no depende de Android. */
 data class Choice(val key: String, val labelRes: Int)
@@ -28,6 +28,24 @@ enum class FieldError {
 
 typealias FormValues = Map<String, String>
 
+/** Duraciones en minutos, guardadas como texto en el formulario ("150" = 2 h 30 min). */
+object Durations {
+    /** Máximo que admite un campo de duración: 7 días. */
+    const val MAX_MINUTES = 7 * 24 * 60
+
+    fun parse(text: String?): Int? = text?.trim()?.toIntOrNull()?.takeIf { it in 1..MAX_MINUTES }
+
+    fun isValid(text: String?): Boolean = parse(text) != null
+
+    /** "2 h 30 min", "45 min", "3 h". */
+    fun text(minutes: Long): String {
+        val h = minutes / 60; val m = minutes % 60
+        return when { h == 0L -> "$m min"; m == 0L -> "$h h"; else -> "$h h $m min" }
+    }
+
+    fun of(hours: Int, minutes: Int): Int = (hours.coerceAtLeast(0) * 60 + minutes.coerceAtLeast(0)).coerceAtMost(MAX_MINUTES)
+}
+
 object FormValidator {
     /** Valida cada campo según su tipo. Los campos MONEY usan la moneda del campo "currency" del mismo formulario. */
     fun validate(fields: List<FieldDef>, values: FormValues): Map<String, FieldError> {
@@ -43,6 +61,7 @@ object FormValidator {
                 FieldType.DATE -> if (runCatching { LocalDate.parse(v) }.isSuccess) null else FieldError.INVALID_DATE
                 FieldType.TIME -> if (runCatching { LocalTime.parse(v) }.isSuccess) null else FieldError.INVALID_TIME
                 FieldType.INT -> if ((v.toIntOrNull() ?: -1) >= 0) null else FieldError.INVALID_NUMBER
+                FieldType.DURATION -> if (Durations.isValid(v)) null else FieldError.INVALID_NUMBER
                 FieldType.CURRENCY -> if (Money.isValidCurrency(v)) null else FieldError.INVALID_CURRENCY
                 FieldType.MONEY ->
                     if (!Money.isValidCurrency(currency)) null   // el error se marca en el campo de moneda

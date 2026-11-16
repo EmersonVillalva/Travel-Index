@@ -24,6 +24,8 @@ android {
         targetSdk = 35
         versionCode = providers.gradleProperty("travelindex.versionCode").get().toInt()
         versionName = providers.gradleProperty("travelindex.versionName").get()
+        // Fila «Apoya el proyecto» de Perfil. Ponla en false (travelindex.showDonations) para una tienda que no admita enlaces de donación.
+        buildConfigField("boolean", "SHOW_DONATIONS", providers.gradleProperty("travelindex.showDonations").getOrElse("true").toBooleanStrict().toString())
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

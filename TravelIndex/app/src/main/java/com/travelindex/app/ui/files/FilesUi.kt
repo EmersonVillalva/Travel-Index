@@ -1,5 +1,6 @@
 package com.travelindex.app.ui.files
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Badge
+import androidx.compose.material.icons.outlined.DirectionsBoat
+import androidx.compose.material.icons.outlined.DirectionsBus
+import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Flight
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Hotel
+import androidx.compose.material.icons.outlined.Restaurant
+import androidx.compose.material.icons.outlined.Train
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.AttachmentCategory
+import com.travelindex.app.domain.FileGroup
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TripBundle
 import com.travelindex.app.domain.forms.ModuleItems
@@ -62,6 +75,62 @@ fun categoryLabel(c: AttachmentCategory): String = stringResource(
         AttachmentCategory.OTHER -> R.string.cat_other
     }
 )
+
+@StringRes
+fun fileGroupTitleRes(g: FileGroup): Int = when (g) {
+    FileGroup.FLIGHTS -> R.string.mod_flights
+    FileGroup.TRAINS -> R.string.mod_trains
+    FileGroup.BUSES -> R.string.mod_buses
+    FileGroup.SHIPS -> R.string.mod_ships
+    FileGroup.CARS -> R.string.mod_cars
+    FileGroup.TRANSPORT_OTHER -> R.string.files_group_transport_other
+    FileGroup.LODGING -> R.string.mod_lodgings
+    FileGroup.ACTIVITIES -> R.string.mod_activities
+    FileGroup.RESTAURANTS -> R.string.mod_restaurants
+    FileGroup.DOCUMENTS -> R.string.mod_docs
+    FileGroup.OTHER -> R.string.files_group_other
+}
+
+@Composable
+fun fileGroupTitle(g: FileGroup): String = stringResource(fileGroupTitleRes(g))
+
+fun fileGroupIcon(g: FileGroup): ImageVector = when (g) {
+    FileGroup.FLIGHTS -> Icons.Outlined.Flight
+    FileGroup.TRAINS -> Icons.Outlined.Train
+    FileGroup.BUSES -> Icons.Outlined.DirectionsBus
+    FileGroup.SHIPS -> Icons.Outlined.DirectionsBoat
+    FileGroup.CARS, FileGroup.TRANSPORT_OTHER -> Icons.Outlined.DirectionsCar
+    FileGroup.LODGING -> Icons.Outlined.Hotel
+    FileGroup.ACTIVITIES -> Icons.Outlined.Explore
+    FileGroup.RESTAURANTS -> Icons.Outlined.Restaurant
+    FileGroup.DOCUMENTS -> Icons.Outlined.Badge
+    FileGroup.OTHER -> Icons.Outlined.Folder
+}
+
+/** Cabecera de un apartado de la lista de archivos: icono, nombre y cuántos archivos tiene. */
+@Composable
+fun FileGroupHeader(group: FileGroup, count: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier.fillMaxWidth().padding(top = Spacing.m, bottom = Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s),
+    ) {
+        Icon(fileGroupIcon(group), contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+        Text(fileGroupTitle(group), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f),
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Nombre de cada reserva a la que hay archivos asociados ("TIPO:id" → "Iberia IB3456"), para rotular el archivo. */
+@Composable
+fun ownerTitles(b: TripBundle): Map<String, String> {
+    val out = HashMap<String, String>()
+    ModuleType.entries.filter { it.attachable }.forEach { t ->
+        val spec = ModuleSpecs.of(t)
+        ModuleItems.of(t, b).forEach { out["${t.name}:${it.id}"] = moduleTitle(spec, it.values) }
+    }
+    return out
+}
 
 /** Clave "TIPO:id" del elemento al que está asociado un archivo; "" si es un documento suelto. */
 fun ownerKeyOf(att: AttachmentEntity): String =

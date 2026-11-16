@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.travelindex.app.data.TripShareManager
 import com.travelindex.app.data.repo.AttachmentRepository
 import com.travelindex.app.data.repo.TripRepository
+import com.travelindex.app.export.TripPdfExporter
 import com.travelindex.app.ui.modules.BundleState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -33,6 +34,7 @@ class TripDetailViewModel @Inject constructor(
     private val repo: TripRepository,
     private val attachments: AttachmentRepository,
     private val shareManager: TripShareManager,
+    private val pdfExporter: TripPdfExporter,
 ) : ViewModel() {
     val tripId: Long = savedState["tripId"] ?: 0L
 
@@ -57,6 +59,22 @@ class TripDetailViewModel @Inject constructor(
             val file = runCatching { shareManager.export(tripId) }.getOrNull()
             _sharing.value = false
             _share.send(if (file != null) ShareEvent.Ready(file) else ShareEvent.Failed)
+        }
+    }
+
+    private val _pdf = Channel<ShareEvent>(Channel.BUFFERED)
+    val pdfEvents = _pdf.receiveAsFlow()
+    private val _pdfBusy = MutableStateFlow(false)
+    val pdfBusy: StateFlow<Boolean> = _pdfBusy.asStateFlow()
+
+    /** Crea el PDF del viaje completo; la pantalla ofrece abrirlo o compartirlo cuando está listo. */
+    fun exportPdf() {
+        if (_pdfBusy.value) return
+        _pdfBusy.value = true
+        viewModelScope.launch {
+            val file = runCatching { pdfExporter.export(tripId) }.getOrNull()
+            _pdfBusy.value = false
+            _pdf.send(if (file != null) ShareEvent.Ready(file) else ShareEvent.Failed)
         }
     }
 

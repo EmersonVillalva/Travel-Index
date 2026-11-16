@@ -63,8 +63,6 @@ class CodecsTest {
     @Test fun `reglas cruzadas de fechas`() {
         val h = LodgingCodec.values(Fixtures.hotel) + mapOf("checkOutDate" to "2027-06-01")
         assertEquals(FieldError.END_BEFORE_START, LodgingCodec.cross(h)["checkOutDate"])
-        val a = ActivityCodec.values(Fixtures.activity) + mapOf("endTime" to "09:00")
-        assertEquals(FieldError.END_BEFORE_START, ActivityCodec.cross(a)["endTime"])
         assertEquals(150L, ActivityCodec.durationMinutes(Fixtures.activity))
         val t = TransportCodec.values(Fixtures.transport) + mapOf("endDate" to "2027-06-10")
         assertEquals(FieldError.END_BEFORE_START, TransportCodec.cross(t)["endDate"])

@@ -130,7 +130,9 @@ object LodgingCodec {
 object ActivityCodec {
     fun values(a: ActivityEntity): FormValues = mapOf(
         "name" to a.name, "description" to a.description, "location" to a.location,
-        "date" to a.date.text(), "startTime" to a.startTime.text(), "endTime" to a.endTime.text(),
+        // La hora de fin ya no se pide: se guarda la duración y la hora de fin se calcula. Una actividad antigua con hora
+        // de fin enseña la duración que sale de sus dos horas, y al guardarla queda ya con duración.
+        "date" to a.date.text(), "startTime" to a.startTime.text(), "duration" to (durationMinutes(a)?.toString() ?: ""),
         "timeZone" to a.timeZoneId, "organizer" to a.organizer, "meetingAddress" to a.meetingAddress,
         "price" to a.priceMinor.money(a.currency), "currency" to a.currency,
         "participants" to a.participants.toString(), "locator" to a.locator, "bookingUrl" to a.bookingUrl, "notes" to a.notes,
@@ -138,20 +140,36 @@ object ActivityCodec {
 
     fun build(tripId: Long, id: Long, v: FormValues): ActivityEntity = ActivityEntity(
         id = id, tripId = tripId, name = v.str("name"), description = v.str("description"), location = v.str("location"),
-        date = v.date("date")!!, startTime = v.time("startTime"), endTime = v.time("endTime"),
+        date = v.date("date")!!, startTime = v.time("startTime"),
+        // Siempre sin hora de fin: lo que se guarda es la duración. Un paquete compartido con la versión 0.3 trae "endTime"
+        // y no "duration"; en ese caso la duración sale de sus dos horas.
+        endTime = null,
         timeZoneId = v.zone("timeZone").id, organizer = v.str("organizer"), meetingAddress = v.str("meetingAddress"),
         priceMinor = v.minor("price"), currency = v.currency(), participants = v.int("participants", 1).coerceAtLeast(1),
         locator = v.str("locator"), bookingUrl = v.str("bookingUrl"), notes = v.str("notes"),
+        durationMinutes = Durations.parse(v["duration"]) ?: legacyMinutes(v.time("startTime"), v.time("endTime"))?.toInt(),
     )
 
-    fun cross(v: FormValues): Map<String, FieldError> {
-        val s = v.time("startTime"); val e = v.time("endTime")
-        return if (s != null && e != null && e.isBefore(s)) mapOf("endTime" to FieldError.END_BEFORE_START) else emptyMap()
+    /** La duración es opcional: no hay nada que comprobar entre campos. */
+    fun cross(@Suppress("UNUSED_PARAMETER") v: FormValues): Map<String, FieldError> = emptyMap()
+
+    private fun legacyMinutes(start: LocalTime?, end: LocalTime?): Long? {
+        if (start == null || end == null) return null
+        return ChronoUnit.MINUTES.between(start, end).takeIf { it > 0 }
     }
 
-    fun durationMinutes(a: ActivityEntity): Long? {
-        val s = a.startTime ?: return null; val e = a.endTime ?: return null
-        return ChronoUnit.MINUTES.between(s, e).takeIf { it >= 0 }
+    /** Duración de la actividad en minutos: la guardada o, en las antiguas, la que sale de su hora de inicio y de fin. */
+    fun durationMinutes(a: ActivityEntity): Long? =
+        a.durationMinutes?.toLong()?.takeIf { it > 0 } ?: legacyMinutes(a.startTime, a.endTime)
+
+    /**
+     * Momento (hora local de la actividad) en que termina: inicio + duración. Sin hora de inicio o sin duración no se puede
+     * calcular y devuelve null. Si la duración pasa de medianoche, la fecha de fin es la del día siguiente.
+     */
+    fun end(a: ActivityEntity): LocalDateTime? {
+        val start = a.startTime ?: return null
+        val minutes = durationMinutes(a) ?: return null
+        return a.date.atTime(start).plusMinutes(minutes)
     }
 }
 

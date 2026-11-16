@@ -34,7 +34,7 @@ object Fixtures {
     )
     val activity = ActivityEntity(
         id = 1, tripId = 1, name = "Coliseo", location = "Piazza del Colosseo", date = LocalDate.of(2027, 6, 13),
-        startTime = LocalTime.of(10, 0), endTime = LocalTime.of(12, 30), timeZoneId = "Europe/Rome", participants = 2,
+        startTime = LocalTime.of(10, 0), durationMinutes = 150, timeZoneId = "Europe/Rome", participants = 2,
     )
     val transport = TransportEntity(
         id = 1, tripId = 1, type = "CAR_RENTAL", company = "Hertz", model = "Fiat 500", plate = "AB123CD",

@@ -32,11 +32,21 @@ sql = []
 for call in re.finditer(r"db\.execSQL\((.*?)\n?\s*\)\n", mig, flags=re.S):
     lits = re.findall(r'"((?:\\.|[^"\\])*)"', call.group(1))
     sql.append("".join(lits).replace("\\\"", '"'))
+expected = entities()
+
+def table_ddl(name, cols, skip=()):
+    parts = []
+    for c, (aff, nn, pk) in cols.items():
+        if c in skip: continue
+        parts.append("id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" if pk else f"{c} {aff}" + (" NOT NULL" if nn else ""))
+    return f"CREATE TABLE {name} ({', '.join(parts)}, FOREIGN KEY(tripId) REFERENCES trips(id) ON UPDATE NO ACTION ON DELETE CASCADE)"
+
 con = sqlite3.connect(":memory:")
 con.execute("CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+# La tabla de actividades existe desde la versión 1 (no la crea ninguna migración): se parte de su forma en la versión 3.
+con.execute(table_ddl("activities", expected["activities"], skip=("durationMinutes",)))
+con.execute("CREATE INDEX index_activities_tripId ON activities (tripId)")
 for s in sql: con.execute(s)
-
-expected = entities()
 bad = 0
 for table in ["transports", "restaurants", "travel_docs", "note_items"]:
     exp = expected.get(table)
@@ -61,6 +71,28 @@ trips_got = {r[1]: (r[2].upper(), r[3], r[5], r[4]) for r in con.execute("PRAGMA
 tm = trips_got.get("travelModes")
 if tm is None or tm[0] != "TEXT" or tm[1] != 1 or tm[2] != 0:
     print(f"[X] trips.travelModes tras la migración: {tm}"); bad += 1
+
+# --- v3 -> v4: columna durationMinutes de la actividad ---
+act_exp = expected.get("activities", {})
+if act_exp.get("durationMinutes") != ("INTEGER", 0, 0):
+    print(f"[X] activities.durationMinutes en la entidad: {act_exp.get('durationMinutes')}"); bad += 1
+act_got = {r[1]: (r[2].upper(), r[3], 1 if r[5] > 0 else 0) for r in con.execute("PRAGMA table_info(activities)")}
+if act_got != act_exp:
+    print(f"[X] activities tras la migración: sobran {set(act_got)-set(act_exp)}, faltan {set(act_exp)-set(act_got)}, distintas "
+          f"{[k for k in act_exp if k in act_got and act_got[k] != act_exp[k]]}"); bad += 1
+# Simulación real: una actividad de la versión 3 (con hora de fin y sin duración) debe sobrevivir intacta.
+sim3 = sqlite3.connect(":memory:")
+sim3.execute("CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+sim3.execute(table_ddl("activities", act_exp, skip=("durationMinutes",)))
+v3_cols = [c for c in act_exp if c not in ("durationMinutes", "id")]
+v3_vals = ", ".join("'x'" if act_exp[c][0] == "TEXT" else "1" for c in v3_cols)
+sim3.execute(f"INSERT INTO activities ({', '.join(v3_cols)}) VALUES ({v3_vals})")
+m34 = re.search(r"MIGRATION_3_4.*?db\.execSQL\((.*?)\)\n", mig, flags=re.S)
+if not m34: print("[X] MIGRATION_3_4 no encontrada"); bad += 1
+else:
+    sim3.execute("".join(re.findall(r'"((?:\\.|[^"\\])*)"', m34.group(1))))
+    row = sim3.execute("SELECT name, endTime, durationMinutes FROM activities").fetchone()
+    if row != ("x", 1, None): print(f"[X] la actividad existente quedó como {row}"); bad += 1
 
 # Simulación real: un viaje de la versión 2 (sin la columna) debe sobrevivir y quedar con valor vacío.
 sim = sqlite3.connect(":memory:")

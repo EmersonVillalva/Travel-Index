@@ -40,6 +40,7 @@ class FileStorage @Inject constructor(@ApplicationContext private val context: C
         } catch (t: Throwable) {
             dest.delete(); throw t
         }
+        CameraCapture.deleteIfCapture(context, uri)
         StoredFile(rel, name, mime, dest.length())
     }
 

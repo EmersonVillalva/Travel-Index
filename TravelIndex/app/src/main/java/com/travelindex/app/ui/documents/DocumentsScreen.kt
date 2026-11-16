@@ -1,7 +1,5 @@
 package com.travelindex.app.ui.documents
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -55,6 +53,7 @@ import com.travelindex.app.ui.components.EmptyState
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.Option
 import com.travelindex.app.ui.components.SectionTitle
+import com.travelindex.app.ui.components.rememberAddFileFlow
 import com.travelindex.app.ui.files.CategoryDialog
 import com.travelindex.app.ui.files.FileCard
 import com.travelindex.app.ui.files.RenameDialog
@@ -89,7 +88,7 @@ fun DocumentsScreen(
     var associating by remember { mutableStateOf<Pair<TripBundle, AttachmentEntity>?>(null) }
     var deleting by remember { mutableStateOf<AttachmentEntity?>(null) }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+    val addFile = rememberAddFileFlow { uris ->
         val trip = pendingTrip
         if (trip != null) vm.add(trip, uris)
         pendingTrip = null
@@ -102,7 +101,7 @@ fun DocumentsScreen(
         val trips = state.bundles
         when {
             trips.isEmpty() -> Unit   // sin viajes no hay donde guardar: la pantalla ya lo explica
-            trips.size == 1 -> { pendingTrip = trips[0].trip.id; picker.launch(arrayOf("*/*")) }
+            trips.size == 1 -> { pendingTrip = trips[0].trip.id; addFile() }
             else -> choosingTrip = true
         }
     }
@@ -224,7 +223,7 @@ fun DocumentsScreen(
                 title = stringResource(R.string.docs_choose_trip),
                 options = bundles.map { Option(it.trip.id.toString(), it.trip.name) }, selected = null,
                 searchable = bundles.size > 8, onDismiss = { choosingTrip = false },
-                onPick = { key -> choosingTrip = false; pendingTrip = key.toLongOrNull(); picker.launch(arrayOf("*/*")) },
+                onPick = { key -> choosingTrip = false; pendingTrip = key.toLongOrNull(); addFile() },
             )
         }
         renaming?.let { att ->

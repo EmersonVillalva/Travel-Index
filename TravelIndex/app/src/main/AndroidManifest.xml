@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permisos mínimos. Sin internet: la app no se conecta a ningún servidor. Fotos y archivos se importan con selectores del sistema (sin permisos de almacenamiento). -->
+    <!-- La cámara es opcional: la foto de un documento la hace la app de cámara del sistema (no hace falta el permiso CAMERA)
+         y los móviles sin cámara pueden instalar la app igualmente. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <!-- Mostrar los recordatorios que el usuario programa (Android 13+ lo pide en tiempo de ejecución). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Volver a programar los recordatorios tras reiniciar el teléfono. -->

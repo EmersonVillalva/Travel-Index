@@ -63,6 +63,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.travelindex.app.BuildConfig
 import com.travelindex.app.R
 import com.travelindex.app.data.FileActions
 import com.travelindex.app.data.FileStorage
@@ -100,6 +101,7 @@ fun ProfileScreen(
     var picking by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingRestore by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
+    var supportOpen by rememberSaveable { mutableStateOf(false) }
 
     // Estado real de las notificaciones en el sistema (el usuario puede desactivarlas en Ajustes de Android).
     var systemNotif by remember { mutableStateOf(NotificationManagerCompat.from(ctx).areNotificationsEnabled()) }
@@ -220,6 +222,8 @@ fun ProfileScreen(
                     // ---- Información ----
                     SectionCard(stringResource(R.string.sec_about)) {
                         SettingRow(stringResource(R.string.about_title), "") { onOpenAbout() }
+                        // Apoyo voluntario: una fila más, al final de Perfil. No hay avisos ni botones en el resto de la app.
+                        if (BuildConfig.SHOW_DONATIONS) SupportRow { supportOpen = true }
                     }
                     Text(
                         stringResource(R.string.made_by), style = MaterialTheme.typography.labelMedium,
@@ -237,6 +241,7 @@ fun ProfileScreen(
     }
 
     // ---- Diálogos ----
+    if (supportOpen) SupportDialog(onDismiss = { supportOpen = false })
     if (editingName) NameDialog(s.userName, onDismiss = { editingName = false }, onSave = { vm.setName(it); editingName = false })
 
     when (picking?.let { runCatching { Picking.valueOf(it) }.getOrNull() }) {

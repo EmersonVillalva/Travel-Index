@@ -1,14 +1,11 @@
 package com.travelindex.app.ui.files
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,7 +13,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -29,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -38,27 +33,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
-import com.travelindex.app.domain.AttachmentCategory
+import com.travelindex.app.domain.FileGroups
 import com.travelindex.app.ui.components.ChoiceDialog
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.EmptyState
 import com.travelindex.app.ui.components.LoadingBox
+import com.travelindex.app.ui.components.rememberAddFileFlow
 import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.Spacing
 
-/** Archivos de un viaje: añadir varios a la vez, abrir, compartir, renombrar, categorizar, asociar y eliminar. */
+/**
+ * Billetes y comprobantes de un viaje, separados por lo que son (vuelos, trenes, alojamientos, visados...). Se pueden subir
+ * del dispositivo o escanear con la cámara, abrir, compartir, renombrar, categorizar, asociar a una reserva y eliminar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
-    var filter by rememberSaveable { mutableStateOf("") }
     var renaming by remember { mutableStateOf<AttachmentEntity?>(null) }
     var categorizing by remember { mutableStateOf<AttachmentEntity?>(null) }
     var associating by remember { mutableStateOf<AttachmentEntity?>(null) }
     var deleting by remember { mutableStateOf<AttachmentEntity?>(null) }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris -> vm.add(uris) }
+    val addFile = rememberAddFileFlow { uris -> vm.add(uris) }
     val addedMsg = stringResource(R.string.file_added)
     val failedMsg = stringResource(R.string.error_attach)
     LaunchedEffect(Unit) {
@@ -77,15 +75,17 @@ fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { picker.launch(arrayOf("*/*")) },
+                onClick = addFile,
                 icon = { Icon(Icons.Filled.Add, null) }, text = { Text(stringResource(R.string.action_add_file)) },
             )
         },
     ) { pad ->
         if (bundle == null) { LoadingBox(Modifier.padding(pad)); return@Scaffold }
         val owners = ownerOptions(bundle)
-        val categoriesPresent = AttachmentCategory.entries.filter { c -> bundle.attachments.any { it.category == c.name } }
-        val shown = bundle.attachments.filter { filter.isEmpty() || it.category == filter }
+        val titles = ownerTitles(bundle)
+        val groups = remember(bundle.attachments, bundle.transports) {
+            FileGroups.group(bundle.attachments, bundle.transports.associate { it.id to it.type })
+        }
 
         CenteredContent(Modifier.padding(pad)) {
             Column(Modifier.fillMaxSize()) {
@@ -93,31 +93,22 @@ fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
                     EmptyState(
                         stringResource(R.string.files_empty_title), stringResource(R.string.files_empty_body),
                         icon = Icons.Outlined.Folder,
-                        actionLabel = stringResource(R.string.action_add_file), onAction = { picker.launch(arrayOf("*/*")) },
+                        actionLabel = stringResource(R.string.action_add_file), onAction = addFile,
                     )
                 } else {
-                    if (categoriesPresent.size > 1) {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = Spacing.m, vertical = Spacing.s),
-                            horizontalArrangement = Arrangement.spacedBy(Spacing.s),
-                        ) {
-                            item { FilterChip(selected = filter.isEmpty(), onClick = { filter = "" },
-                                label = { Text(stringResource(R.string.filter_all)) }) }
-                            items(categoriesPresent, key = { it.name }) { c ->
-                                FilterChip(selected = filter == c.name, onClick = { filter = c.name }, label = { Text(categoryLabel(c)) })
-                            }
-                        }
-                    }
                     LazyColumn(
-                        contentPadding = PaddingValues(start = Spacing.m, end = Spacing.m, top = Spacing.s, bottom = 96.dp),
+                        contentPadding = PaddingValues(start = Spacing.m, end = Spacing.m, top = Spacing.xs, bottom = 96.dp),
                         verticalArrangement = Arrangement.spacedBy(Spacing.s),
                     ) {
-                        items(shown, key = { it.id }) { att ->
-                            FileCard(
-                                att = att, ownerLabel = owners.firstOrNull { it.key.isNotEmpty() && it.key == ownerKeyOf(att) }?.label,
-                                onRename = { renaming = att }, onCategory = { categorizing = att },
-                                onAssociate = { associating = att }, onDelete = { deleting = att },
-                            )
+                        groups.forEach { entry ->
+                            item(key = "group-${entry.group.name}") { FileGroupHeader(entry.group, entry.files.size) }
+                            items(entry.files, key = { it.id }) { att ->
+                                FileCard(
+                                    att = att, ownerLabel = titles[ownerKeyOf(att)],
+                                    onRename = { renaming = att }, onCategory = { categorizing = att },
+                                    onAssociate = { associating = att }, onDelete = { deleting = att },
+                                )
+                            }
                         }
                     }
                 }

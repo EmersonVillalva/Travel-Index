@@ -6,6 +6,7 @@ import com.travelindex.app.data.db.LodgingEntity
 import com.travelindex.app.data.db.NoteItemEntity
 import com.travelindex.app.data.db.RestaurantEntity
 import com.travelindex.app.data.db.TransportEntity
+import com.travelindex.app.domain.forms.ActivityCodec
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -97,7 +98,7 @@ object ItineraryBuilder {
                 key = "ACTIVITY:${a.id}", type = EventType.ACTIVITY, sourceId = a.id, tripId = a.tripId,
                 title = a.name, subtitle = a.location.ifBlank { null },
                 start = a.date.atTime(st ?: LocalTime.MIN).atZone(zone),
-                end = a.endTime?.let { a.date.atTime(it).atZone(zone) },
+                end = ActivityCodec.end(a)?.atZone(zone),
                 timeKnown = st != null,
             )
         }
