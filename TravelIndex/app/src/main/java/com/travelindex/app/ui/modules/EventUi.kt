@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBoat
@@ -94,7 +94,7 @@ fun EventRow(
             Modifier.fillMaxWidth().padding(Spacing.m),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            Column(Modifier.width(72.dp)) {
+            Column(Modifier.widthIn(min = 72.dp)) {
                 Text(timeText, style = MaterialTheme.typography.titleMedium)
                 // Actividades con duración: la hora a la que terminan, calculada por la app.
                 val endText = event.end?.takeIf { event.timeKnown && event.type == EventType.ACTIVITY }?.let { end ->

@@ -170,7 +170,9 @@ SKIP_LOWER_PLAIN = {"remember", "getValue", "setValue", "provideDelegate",
                     "map", "first", "launch", "catch", "update", "edit", "filter", "forEach", "collect", "flatMap",
                     "Map", "List", "Set",
                     # métodos Java (ByteArrayOutputStream.size(), ZipFile.size()) y constante de enum (FieldType.URL)
-                    "size", "URL"}
+                    "size", "URL",
+                    # kotlin.error() de la biblioteca estándar frente a la semántica error() de Compose
+                    "error"}
 for f in files:
     local_decl = {n for n, fs in all_decl_names.items() if f.rel in fs}
     for name, fulls in lib_imports.items():

@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
@@ -100,18 +102,27 @@ fun fileGroupIcon(g: FileGroup): ImageVector = when (g) {
 /** Cabecera de un apartado de la lista de archivos: icono, nombre y cuántos archivos tiene. */
 @Composable
 fun FileGroupHeader(group: FileGroup, count: Int, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    // El lector de pantalla anuncia la cabecera entera con su estado («Vuelos, 3, desplegado») y qué hace el toque.
+    val stateText = stringResource(if (expanded) R.string.a11y_expanded else R.string.a11y_collapsed)
     Card(modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(horizontal = Spacing.m, vertical = 14.dp),
+            Modifier.fillMaxWidth()
+                .clickable(
+                    onClick = onToggle,
+                    onClickLabel = stringResource(if (expanded) R.string.a11y_collapse_group else R.string.a11y_expand_group),
+                )
+                .semantics { stateDescription = stateText }
+                .padding(horizontal = Spacing.m, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.s),
         ) {
             Icon(fileGroupIcon(group), contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
             Text(fileGroupTitle(group), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f),
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            // La flecha es decorativa: el estado ya lo anuncia la propia fila.
             Icon(
                 if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
-                contentDescription = stringResource(if (expanded) R.string.a11y_collapse_group else R.string.a11y_expand_group),
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -168,7 +179,8 @@ fun FileCard(
     val open: () -> Unit = onOpen ?: { openAttachment(ctx, att) }
     var menu by remember { mutableStateOf(false) }
     Card(
-        onClick = open, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
+        onClick = open, onClickLabel = stringResource(R.string.action_open),
+        modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         // Vista previa visible sin tener que abrir el archivo (imagen o primera página de un PDF).

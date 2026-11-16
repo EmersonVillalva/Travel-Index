@@ -462,6 +462,8 @@
 
     <!-- Files -->
     <string name="a11y_expand_group">Show these files</string>
+    <string name="a11y_expanded">Expanded</string>
+    <string name="a11y_collapsed">Collapsed</string>
     <string name="a11y_collapse_group">Hide these files</string>
     <string name="files_empty_title">No tickets or bookings yet</string>
     <string name="files_empty_body">Keep your tickets, boarding passes, bookings, insurance or visas here. Pick them from your device or take a photo. They\'re stored in the app and open offline.</string>

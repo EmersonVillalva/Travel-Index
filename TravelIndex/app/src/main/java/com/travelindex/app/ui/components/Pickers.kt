@@ -45,6 +45,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -68,7 +70,9 @@ fun PickerField(
     val errorColor = MaterialTheme.colorScheme.error
     Column(modifier.fillMaxWidth()) {
         OutlinedCard(
-            onClick = onClick, modifier = Modifier.fillMaxWidth(),
+            onClick = onClick,
+            // El error no es solo un borde rojo: el lector de pantalla también lo anuncia.
+            modifier = Modifier.fillMaxWidth().semantics { if (error != null) error(error) },
             border = BorderStroke(1.dp, if (error != null) errorColor else MaterialTheme.colorScheme.outline),
         ) {
             Row(

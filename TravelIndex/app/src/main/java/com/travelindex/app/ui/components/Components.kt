@@ -27,6 +27,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -176,7 +178,9 @@ fun EmptyState(
 
 @Composable
 fun SectionTitle(text: String, modifier: Modifier = Modifier) =
-    Text(text, modifier.padding(top = Spacing.l, bottom = Spacing.s), style = MaterialTheme.typography.titleMedium)
+    // heading(): con un lector de pantalla se puede saltar de sección en sección.
+    Text(text, modifier.padding(top = Spacing.l, bottom = Spacing.s).semantics { heading() },
+        style = MaterialTheme.typography.titleMedium)
 
 @Composable
 fun LoadingBox(modifier: Modifier = Modifier) {

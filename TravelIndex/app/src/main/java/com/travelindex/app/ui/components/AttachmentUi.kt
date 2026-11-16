@@ -99,7 +99,7 @@ fun AttachmentRow(att: AttachmentEntity, onDelete: () -> Unit, modifier: Modifie
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         FilePreview(mime = att.mimeType, file = attachmentFile(ctx, att), onClick = open)
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = open).padding(vertical = 4.dp),
+            Modifier.fillMaxWidth().clickable(onClick = open, onClickLabel = stringResource(R.string.action_open)).padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(iconForMime(att.mimeType), contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(28.dp))
