@@ -66,7 +66,6 @@ import com.travelindex.app.ui.modules.ModuleSpecs
 import com.travelindex.app.ui.modules.moduleTitle
 import com.travelindex.app.ui.theme.Spacing
 
-@Composable
 @StringRes
 fun fileGroupTitleRes(g: FileGroup): Int = when (g) {
     FileGroup.FLIGHTS -> R.string.mod_flights
