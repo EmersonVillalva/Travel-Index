@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.ViewerSupport
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.domain.forms.FieldType
 import com.travelindex.app.ui.components.AttachmentRow
@@ -59,7 +60,7 @@ import com.travelindex.app.ui.theme.Spacing
 /** Formulario único para todos los módulos: los campos salen de la especificación del módulo. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewModel()) {
+fun ModuleFormScreen(onClose: () -> Unit, onOpenViewer: (Long) -> Unit, vm: ModuleFormViewModel = hiltViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val spec = vm.spec
     val ctx = LocalContext.current
@@ -145,7 +146,10 @@ fun ModuleFormScreen(onClose: () -> Unit, vm: ModuleFormViewModel = hiltViewMode
 
                 if (spec.type.attachable) {
                     SectionCard(stringResource(R.string.sec_attachments)) {
-                        state.existing.forEach { att -> AttachmentRow(att, onDelete = { confirmAttachment = att }) }
+                        state.existing.forEach { att ->
+                            AttachmentRow(att, onDelete = { confirmAttachment = att },
+                                onOpen = if (ViewerSupport.opensInternally(att.mimeType)) ({ onOpenViewer(att.id) }) else null)
+                        }
                         state.pending.forEachIndexed { i, p -> PendingFileRow(onRemove = { vm.removePending(i) }, uri = p.uri) }
                         if (state.existing.isEmpty() && state.pending.isEmpty()) {
                             Text(stringResource(R.string.attach_empty), style = MaterialTheme.typography.bodyMedium,

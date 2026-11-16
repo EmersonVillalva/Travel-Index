@@ -93,12 +93,13 @@ fun shareAttachment(context: Context, att: AttachmentEntity) {
 
 /** Un archivo ya guardado: vista previa visible (imagen o PDF) y debajo abrir (pulsar), compartir y eliminar. */
 @Composable
-fun AttachmentRow(att: AttachmentEntity, onDelete: () -> Unit, modifier: Modifier = Modifier) {
+fun AttachmentRow(att: AttachmentEntity, onDelete: () -> Unit, modifier: Modifier = Modifier, onOpen: (() -> Unit)? = null) {
     val ctx = LocalContext.current
+    val open: () -> Unit = onOpen ?: { openAttachment(ctx, att) }
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        FilePreview(mime = att.mimeType, file = attachmentFile(ctx, att), onClick = { openAttachment(ctx, att) })
+        FilePreview(mime = att.mimeType, file = attachmentFile(ctx, att), onClick = open)
         Row(
-            Modifier.fillMaxWidth().clickable { openAttachment(ctx, att) }.padding(vertical = 4.dp),
+            Modifier.fillMaxWidth().clickable(onClick = open).padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(iconForMime(att.mimeType), contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(28.dp))

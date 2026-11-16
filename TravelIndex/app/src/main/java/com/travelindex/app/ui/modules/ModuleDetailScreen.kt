@@ -47,6 +47,7 @@ import com.travelindex.app.data.FileActions
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.Airports
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.ViewerSupport
 import com.travelindex.app.domain.forms.ActivityCodec
 import com.travelindex.app.domain.forms.FieldType
 import com.travelindex.app.domain.forms.FlightCodec
@@ -65,7 +66,7 @@ import com.travelindex.app.ui.theme.StatusOk
 /** Detalle completo de un elemento: todos sus datos, acciones rápidas y archivos adjuntos. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDetailViewModel = hiltViewModel()) {
+fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, onOpenViewer: (Long) -> Unit, vm: ModuleDetailViewModel = hiltViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val ctx = LocalContext.current
     val spec = vm.spec
@@ -166,7 +167,10 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, vm: ModuleDet
                             Text(stringResource(R.string.attach_empty), style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        state.attachments.forEach { att -> AttachmentRow(att, onDelete = { confirmAttachment = att }) }
+                        state.attachments.forEach { att ->
+                            AttachmentRow(att, onDelete = { confirmAttachment = att },
+                                onOpen = if (ViewerSupport.opensInternally(att.mimeType)) ({ onOpenViewer(att.id) }) else null)
+                        }
                         OutlinedButton(onClick = addFile, Modifier.fillMaxWidth()) {
                             Icon(Icons.Outlined.AttachFile, null)
                             Text("  " + stringResource(R.string.action_attach))

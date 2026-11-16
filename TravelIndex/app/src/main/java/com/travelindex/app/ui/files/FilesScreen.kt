@@ -36,6 +36,7 @@ import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.FileGroup
 import com.travelindex.app.domain.FileGroups
+import com.travelindex.app.domain.ViewerSupport
 import com.travelindex.app.ui.components.ChoiceDialog
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.EmptyState
@@ -50,7 +51,7 @@ import com.travelindex.app.ui.theme.Spacing
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
+fun FilesScreen(onBack: () -> Unit, onOpenViewer: (Long) -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var renaming by remember { mutableStateOf<AttachmentEntity?>(null) }
@@ -126,6 +127,8 @@ fun FilesScreen(onBack: () -> Unit, vm: TripFilesViewModel = hiltViewModel()) {
                                     att = att, ownerLabel = titles[ownerKeyOf(att)],
                                     onRename = { renaming = att }, onCategory = { categorizing = att },
                                     onAssociate = { associating = att }, onDelete = { deleting = att },
+                                    // PDFs e imágenes se abren en el visor de la app; el resto, en una app externa.
+                                    onOpen = if (ViewerSupport.opensInternally(att.mimeType)) ({ onOpenViewer(att.id) }) else null,
                                 )
                             }
                         }

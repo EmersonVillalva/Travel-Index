@@ -162,11 +162,13 @@ fun FileCard(
     onAssociate: (() -> Unit)?,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpen: (() -> Unit)? = null,
 ) {
     val ctx = LocalContext.current
+    val open: () -> Unit = onOpen ?: { openAttachment(ctx, att) }
     var menu by remember { mutableStateOf(false) }
     Card(
-        onClick = { openAttachment(ctx, att) }, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
+        onClick = open, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         // Vista previa visible sin tener que abrir el archivo (imagen o primera página de un PDF).
@@ -188,7 +190,7 @@ fun FileCard(
             }
             IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, stringResource(R.string.action_more)) }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(stringResource(R.string.action_open)) }, onClick = { menu = false; openAttachment(ctx, att) })
+                DropdownMenuItem(text = { Text(stringResource(R.string.action_open)) }, onClick = { menu = false; open() })
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_share)) }, onClick = { menu = false; shareAttachment(ctx, att) })
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_rename)) }, onClick = { menu = false; onRename() })
                 DropdownMenuItem(text = { Text(stringResource(R.string.action_set_category)) }, onClick = { menu = false; onCategory() })

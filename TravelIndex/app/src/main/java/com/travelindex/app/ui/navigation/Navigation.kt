@@ -64,6 +64,7 @@ import com.travelindex.app.ui.trips.CreateTripScreen
 import com.travelindex.app.ui.trips.TripActions
 import com.travelindex.app.ui.trips.TripDetailScreen
 import com.travelindex.app.ui.trips.TripsScreen
+import com.travelindex.app.ui.viewer.ViewerScreen
 
 enum class TopLevel(val route: String, @StringRes val label: Int, val icon: ImageVector) {
     Home("home", R.string.nav_home, Icons.Outlined.Home),
@@ -83,6 +84,7 @@ object Routes {
     const val TRIP_EDIT_PATTERN = "trip/{tripId}/edit"
     const val ITINERARY_PATTERN = "trip/{tripId}/itinerary"
     const val FILES_PATTERN = "trip/{tripId}/files"
+    const val VIEWER_PATTERN = "viewer/{attachmentId}"
     const val LIST_PATTERN = "trip/{tripId}/m/{module}"
     const val FORM_PATTERN = "trip/{tripId}/m/{module}/form?itemId={itemId}"
     const val ITEM_PATTERN = "trip/{tripId}/m/{module}/item/{itemId}"
@@ -91,6 +93,7 @@ object Routes {
     fun tripEdit(id: Long) = "trip/$id/edit"
     fun itinerary(id: Long) = "trip/$id/itinerary"
     fun files(id: Long) = "trip/$id/files"
+    fun viewer(attachmentId: Long) = "viewer/$attachmentId"
     // "module" es el nombre de un módulo (LODGING...) o de un apartado de transporte (TRAIN, BUS, FERRY, CAR_RENTAL, FLIGHT...).
     fun list(id: Long, module: String) = "trip/$id/m/$module"
     fun form(id: Long, module: String, itemId: Long = 0) = "trip/$id/m/$module/form?itemId=$itemId"
@@ -239,7 +242,14 @@ fun TravelIndexNavHost() {
                     val id = entry.tripId()
                     ItineraryScreen(onBack = { nav.popBackStack() }, onOpenEvent = { openEvent(id, it) })
                 }
-                composable(Routes.FILES_PATTERN, arguments = listOf(longArg("tripId"))) { FilesScreen(onBack = { nav.popBackStack() }) }
+                composable(Routes.FILES_PATTERN, arguments = listOf(longArg("tripId"))) {
+                    FilesScreen(onBack = { nav.popBackStack() }, onOpenViewer = { nav.navigate(Routes.viewer(it)) })
+                }
+
+                // Visor interno de un archivo (PDF o imagen), venga de donde venga.
+                composable(Routes.VIEWER_PATTERN, arguments = listOf(longArg("attachmentId"))) {
+                    ViewerScreen(onBack = { nav.popBackStack() })
+                }
 
                 // ---- Módulos (vuelos, alojamientos...) ----
                 val moduleArgs = listOf(longArg("tripId"), navArgument("module") { type = NavType.StringType })
@@ -255,14 +265,15 @@ fun TravelIndexNavHost() {
                 composable(
                     Routes.FORM_PATTERN,
                     arguments = moduleArgs + navArgument("itemId") { type = NavType.LongType; defaultValue = 0L },
-                ) { ModuleFormScreen(onClose = { nav.popBackStack() }) }
+                ) { ModuleFormScreen(onClose = { nav.popBackStack() }, onOpenViewer = { nav.navigate(Routes.viewer(it)) }) }
                 composable(
                     Routes.ITEM_PATTERN,
                     arguments = moduleArgs + longArg("itemId"),
                 ) { entry ->
                     val id = entry.tripId()
                     val route = entry.moduleRoute()
-                    ModuleDetailScreen(onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.form(id, route, it)) })
+                    ModuleDetailScreen(onBack = { nav.popBackStack() }, onEdit = { nav.navigate(Routes.form(id, route, it)) },
+                        onOpenViewer = { nav.navigate(Routes.viewer(it)) })
                 }
             }
         }
