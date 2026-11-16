@@ -401,7 +401,9 @@ private fun Tile(icon: ImageVector, title: String, subtitle: String, onClick: ()
     Card(onClick = onClick, shape = MaterialTheme.shapes.medium, elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
         Column(Modifier.fillMaxWidth().padding(Spacing.m), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Icon(icon, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(28.dp))
-            Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 2)
+            // minLines = 2: todas las tarjetas reservan dos líneas de título, tengan una o dos
+            // («Visados y documentos de viaje»), para que la cuadrícula quede con alturas iguales.
+            Text(title, style = MaterialTheme.typography.titleSmall, minLines = 2, maxLines = 2)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
         }
     }

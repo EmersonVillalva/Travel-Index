@@ -5,8 +5,9 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.4.6)
-> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 a la 0.4.6 aún no se han compilado en CI.
+> ## Estado real de esta versión (0.4.7)
+> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 a la 0.4.5 no se compilaron en CI; la 0.4.6 sí compiló y se probó en un móvil.
+> - **La 0.4.7:** las tarjetas de «Secciones del viaje» tienen todas la misma altura (antes «Visados y documentos de viaje» salía más alta por su título a dos líneas).
 > - **La 0.4.6:** el nombre del archivo (xxx.pdf) ya no se ve en ningún sitio: dentro de una reserva los archivos se rotulan por su categoría («Billete», «Reserva»…) y tipo («Documento PDF», «Imagen»), y en «Billetes y reservas» los sueltos también. El nombre real solo aparece al renombrar.
 > - **La 0.4.5 es limpieza y un arreglo:** exportar un PDF ya no puede borrar el archivo de «Compartir viaje» pendiente (ni al revés), y se elimina el código muerto de la 0.3.x (pantallas retiradas, viaje de ejemplo y restos del estado de vuelos) con sus textos huérfanos.
 > - **La 0.4.4:** el apartado pasa a llamarse «Billetes y reservas»; cada archivo se rotula con el título de su reserva («Free tour Edimburgo») en vez del nombre del archivo, y mientras carga la vista previa del PDF sale un hueco con el icono (sin nombres de archivo sueltos).
