@@ -6,10 +6,16 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -51,9 +57,16 @@ fun FilePreview(
     } else {
         val ctx = LocalContext.current
         val page by produceState<Bitmap?>(initialValue = null, file, uri) { value = renderFirstPdfPage(ctx, file, uri) }
-        page?.let {
+        val p = page
+        if (p == null) {
+            // Mientras se dibuja la primera página: un hueco del mismo ancho con el icono, para que la tarjeta no salte.
+            Box(base.height(170.dp).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
+                Icon(iconForMime(mime), contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(40.dp))
+            }
+        } else {
             Image(
-                bitmap = it.asImageBitmap(), contentDescription = null, modifier = base,
+                bitmap = p.asImageBitmap(), contentDescription = null, modifier = base,
                 contentScale = ContentScale.Crop, alignment = Alignment.TopCenter,
             )
         }

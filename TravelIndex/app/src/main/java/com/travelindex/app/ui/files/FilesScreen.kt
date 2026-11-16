@@ -45,7 +45,7 @@ import com.travelindex.app.ui.theme.CenteredContent
 import com.travelindex.app.ui.theme.Spacing
 
 /**
- * Billetes y comprobantes de un viaje, separados por lo que son (vuelos, trenes, alojamientos, visados...). Se pueden subir
+ * Billetes y reservas de un viaje, separados por lo que son (vuelos, trenes, alojamientos, visados...). Se pueden subir
  * del dispositivo o escanear con la cámara, abrir, compartir, renombrar, categorizar, asociar a una reserva y eliminar.
  */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -230,7 +230,7 @@
     <string name="mod_expenses">Gastos</string>
     <string name="mod_budget">Presupuesto y gastos</string>
     <string name="mod_destinations">Destinos</string>
-    <string name="mod_files">Billetes y comprobantes</string>
+    <string name="mod_files">Billetes y reservas</string>
     <string name="mod_notes">Notas y listas</string>
 
     <string name="new_flight">Nuevo vuelo</string>
@@ -469,7 +469,7 @@
     <!-- Archivos -->
     <string name="a11y_expand_group">Mostrar estos archivos</string>
     <string name="a11y_collapse_group">Ocultar estos archivos</string>
-    <string name="files_empty_title">Aún no hay billetes ni comprobantes</string>
+    <string name="files_empty_title">Aún no hay billetes ni reservas</string>
     <string name="files_empty_body">Guarda aquí tus billetes, tarjetas de embarque, reservas, seguros o visados. Súbelos desde el dispositivo o haz una foto. Se guardan en la app y se abren sin conexión.</string>
     <string name="files_group_transport_other">Taxis, traslados y otros</string>
     <string name="files_group_other">Otros archivos del viaje</string>

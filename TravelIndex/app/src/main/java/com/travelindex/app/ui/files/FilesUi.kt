@@ -190,13 +190,14 @@ fun FileCard(
         ) {
             Icon(iconForMime(att.mimeType), null, tint = MaterialTheme.colorScheme.secondary)
             Column(Modifier.weight(1f)) {
-                Text(att.displayName, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                // El título es la reserva a la que pertenece ("Free tour Edimburgo"); el nombre del archivo
+                // (xxx.pdf) solo se enseña si el archivo no está asociado a nada, porque no habría otro rótulo.
+                Text(ownerLabel?.takeIf { it.isNotBlank() } ?: att.displayName,
+                    style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(
                     listOf(categoryLabel(AttachmentCategory.fromName(att.category)), humanSize(att.sizeBytes)).joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (!ownerLabel.isNullOrBlank()) Text(ownerLabel, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, stringResource(R.string.action_more)) }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
