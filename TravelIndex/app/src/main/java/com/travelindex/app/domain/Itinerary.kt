@@ -62,6 +62,26 @@ object ItineraryBuilder {
     ): List<ItineraryEvent> {
         val out = mutableListOf<ItineraryEvent>()
 
+        // Movimientos del viaje (vuelos y transportes), para colocar el alojamiento sin hora en su sitio:
+        // el día de llegada primero viajas y luego te instalas, así que el check-in sin hora va después del
+        // último movimiento de ese día; el último día dejas la habitación y luego viajas, así que el
+        // check-out sin hora va antes del primer movimiento. Con hora puesta, manda la hora.
+        val movements = buildList {
+            flights.forEach { f ->
+                add(Instant.ofEpochMilli(f.departureEpochMs).atZone(ZoneId.of(f.departureZoneId)))
+                add(Instant.ofEpochMilli(f.arrivalEpochMs).atZone(ZoneId.of(f.arrivalZoneId)))
+            }
+            transports.forEach { t ->
+                val zone = ZoneId.of(t.timeZoneId)
+                add(t.startDate.atTime(t.startTime ?: LocalTime.MIN).atZone(zone))
+                t.endDate?.let { add(it.atTime(t.endTime ?: t.startTime ?: LocalTime.MIN).atZone(zone)) }
+            }
+        }
+        fun lastMovementOn(d: LocalDate, zone: ZoneId): ZonedDateTime? =
+            movements.filter { it.withZoneSameInstant(zone).toLocalDate() == d }.maxByOrNull { it.toInstant() }
+        fun firstMovementOn(d: LocalDate, zone: ZoneId): ZonedDateTime? =
+            movements.filter { it.withZoneSameInstant(zone).toLocalDate() == d }.minByOrNull { it.toInstant() }
+
         flights.forEach { f ->
             val dep = Instant.ofEpochMilli(f.departureEpochMs).atZone(ZoneId.of(f.departureZoneId))
             val arr = Instant.ofEpochMilli(f.arrivalEpochMs).atZone(ZoneId.of(f.arrivalZoneId))
@@ -77,16 +97,34 @@ object ItineraryBuilder {
             val zone = ZoneId.of(l.timeZoneId)
             val inTime = l.checkInTime
             val outTime = l.checkOutTime
+            val inStart = if (inTime != null) l.checkInDate.atTime(inTime).atZone(zone) else {
+                val base = l.checkInDate.atTime(DEFAULT_CHECK_IN).atZone(zone)
+                val last = lastMovementOn(l.checkInDate, zone)
+                if (last == null || last.isBefore(base)) base else {
+                    val cand = last.plusMinutes(1)
+                    val cap = l.checkInDate.atTime(LocalTime.of(23, 59)).atZone(zone)
+                    if (cand.isAfter(cap)) cap else cand
+                }
+            }
+            val outStart = if (outTime != null) l.checkOutDate.atTime(outTime).atZone(zone) else {
+                val base = l.checkOutDate.atTime(DEFAULT_CHECK_OUT).atZone(zone)
+                val first = firstMovementOn(l.checkOutDate, zone)
+                if (first == null || first.isAfter(base)) base else {
+                    val cand = first.minusMinutes(1)
+                    val floor = l.checkOutDate.atStartOfDay(zone)
+                    if (cand.isBefore(floor)) floor else cand
+                }
+            }
             out += ItineraryEvent(
                 key = "LODGING_IN:${l.id}", type = EventType.LODGING_CHECK_IN, sourceId = l.id, tripId = l.tripId,
                 title = l.name, subtitle = l.address.ifBlank { null },
-                start = l.checkInDate.atTime(inTime ?: DEFAULT_CHECK_IN).atZone(zone),
+                start = inStart,
                 end = null, timeKnown = inTime != null,
             )
             out += ItineraryEvent(
                 key = "LODGING_OUT:${l.id}", type = EventType.LODGING_CHECK_OUT, sourceId = l.id, tripId = l.tripId,
                 title = l.name, subtitle = l.address.ifBlank { null },
-                start = l.checkOutDate.atTime(outTime ?: DEFAULT_CHECK_OUT).atZone(zone),
+                start = outStart,
                 end = null, timeKnown = outTime != null,
             )
         }
@@ -107,10 +145,10 @@ object ItineraryBuilder {
             val zone = ZoneId.of(t.timeZoneId)
             val st = t.startTime
             val route = listOf(t.originPlace, t.destinationPlace).filter { it.isNotBlank() }.joinToString(" → ")
-            val title = t.company.ifBlank { t.model }
+            val title = t.company.ifBlank { t.model }.ifBlank { route }
             out += ItineraryEvent(
                 key = "TRANSPORT_START:${t.id}", type = EventType.TRANSPORT_START, sourceId = t.id, tripId = t.tripId,
-                title = title, subtitle = route.ifBlank { null },
+                title = title, subtitle = route.takeIf { it.isNotBlank() && it != title },
                 start = t.startDate.atTime(st ?: LocalTime.MIN).atZone(zone),
                 end = null, timeKnown = st != null, kind = t.type,
             )
@@ -118,7 +156,7 @@ object ItineraryBuilder {
                 val et = t.endTime
                 out += ItineraryEvent(
                     key = "TRANSPORT_END:${t.id}", type = EventType.TRANSPORT_END, sourceId = t.id, tripId = t.tripId,
-                    title = title, subtitle = t.destinationPlace.ifBlank { null },
+                    title = title, subtitle = t.destinationPlace.takeIf { it.isNotBlank() && it != title },
                     start = ed.atTime(et ?: LocalTime.MIN).atZone(zone),
                     end = null, timeKnown = et != null, kind = t.type,
                 )

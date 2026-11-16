@@ -56,6 +56,10 @@ import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.FormField
+import com.travelindex.app.ui.theme.LocalFormats
+import com.travelindex.app.ui.components.errorText
+import com.travelindex.app.ui.components.PickerField
+import com.travelindex.app.ui.components.DateRangePickerDialogHost
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.SectionCard
 import com.travelindex.app.ui.components.TravelModePicker
@@ -127,10 +131,7 @@ fun CreateTripScreen(
                     }
                 }
                 SectionCard(stringResource(R.string.sec_trip_dates)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
-                        Column(Modifier.weight(1f)) { TripField(TripSpec.startDate, state, vm) }
-                        Column(Modifier.weight(1f)) { TripField(TripSpec.endDate, state, vm) }
-                    }
+                    TripDatesField(state, vm)
                 }
                 SectionCard(stringResource(R.string.sec_trip_transport)) {
                     Text(
@@ -171,6 +172,40 @@ fun CreateTripScreen(
         title = stringResource(R.string.discard_title), body = stringResource(R.string.discard_body),
         confirmLabel = stringResource(R.string.action_discard),
         onConfirm = { confirmDiscard = false; onClose() }, onDismiss = { confirmDiscard = false },
+    )
+}
+
+/**
+ * Ida y vuelta en un solo calendario: marcas el primer día y el último (1 feb – 5 feb) y aceptas,
+ * sin abrir dos ventanas. La ida es el primer día marcado y el regreso el último.
+ */
+@Composable
+private fun TripDatesField(state: TripFormState, vm: CreateTripViewModel) {
+    val formats = LocalFormats.current
+    var open by remember { mutableStateOf(false) }
+    fun parsed(key: String): LocalDate? =
+        state.values[key]?.takeIf { it.isNotBlank() }?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    val start = parsed(TripSpec.startDate.key)
+    val end = parsed(TripSpec.endDate.key)
+    val err = state.errors[TripSpec.startDate.key] ?: state.errors[TripSpec.endDate.key]
+    PickerField(
+        label = stringResource(R.string.field_trip_dates),
+        value = when {
+            start != null && end != null -> formats.date(start) + " – " + formats.date(end)
+            start != null -> formats.date(start)
+            else -> ""
+        },
+        onClick = { open = true },
+        error = err?.let { errorText(it) },
+    )
+    if (open) DateRangePickerDialogHost(
+        initialStart = start, initialEnd = end,
+        onDismiss = { open = false },
+        onPick = { s, e ->
+            vm.setValue(TripSpec.startDate.key, s.toString())
+            vm.setValue(TripSpec.endDate.key, e.toString())
+            open = false
+        },
     )
 }
 

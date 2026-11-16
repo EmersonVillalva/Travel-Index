@@ -136,6 +136,8 @@
     <string name="trip_form_title_edit">Editar viaje</string>
     <string name="trip_saved">Viaje guardado</string>
     <string name="sec_trip_basic">Datos del viaje</string>
+    <string name="field_trip_dates">Fechas del viaje (ida y vuelta)</string>
+    <string name="sec_route">Trayecto</string>
     <string name="sec_trip_dates">Fechas</string>
     <string name="sec_trip_budget">Viajeros y moneda</string>
     <string name="sec_trip_transport">Medios de transporte</string>
@@ -171,7 +173,6 @@
     <string name="sec_train">Tren</string>
     <string name="sec_bus">Autobús</string>
     <string name="sec_ship">Barco</string>
-    <string name="sec_car">Coche</string>
     <string name="sec_arrival_to">Llegada</string>
     <string name="f_carrier">Compañía</string>
     <string name="f_train_number">Número de tren</string>
@@ -187,9 +188,6 @@
     <string name="f_cabin_seat">Camarote o asiento</string>
     <string name="f_port_origin">Puerto de salida</string>
     <string name="f_port_dest">Puerto de llegada</string>
-    <string name="f_car_company">Empresa de alquiler (si lo alquilas)</string>
-    <string name="f_pickup_place">Lugar de recogida o salida</string>
-    <string name="f_return_place">Lugar de devolución o llegada</string>
     <string name="sec_trip_cover">Portada</string>
     <string name="sec_trip_more">Descripción y notas</string>
     <string name="cover_none">Sin portada</string>

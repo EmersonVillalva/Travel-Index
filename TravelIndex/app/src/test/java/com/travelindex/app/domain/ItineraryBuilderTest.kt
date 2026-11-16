@@ -65,6 +65,47 @@ class ItineraryBuilderTest {
         assertEquals(LocalDate.of(2027, 6, 12), days.single().date)
         assertTrue(days.single().events.single().end!!.zone.id == "America/New_York")
     }
+
+    // El día de llegada, primero el transporte y luego el alojamiento aunque el check-in no tenga hora.
+    @Test fun `check-in sin hora sale despues del vuelo que llega tarde ese dia`() {
+        val lateFlight = flight.copy(
+            departureEpochMs = ms("Europe/Madrid", 2027, 6, 12, 18, 0),
+            arrivalEpochMs = ms("Europe/Rome", 2027, 6, 12, 20, 30),
+        )
+        val day = ItineraryBuilder.group(
+            ItineraryBuilder.events(listOf(lateFlight), listOf(hotel.copy(checkInTime = null)), emptyList()),
+        ).first { it.date == LocalDate.of(2027, 6, 12) }
+        assertEquals(listOf(EventType.FLIGHT, EventType.LODGING_CHECK_IN), day.events.map { it.type })
+    }
+
+    // El último día, el check-out sin hora sale antes del transporte de vuelta, aunque salga de madrugada.
+    @Test fun `check-out sin hora sale antes del vuelo de vuelta aunque salga pronto`() {
+        val returnFlight = flight.copy(
+            id = 2, departureAirport = "FCO", arrivalAirport = "MAD",
+            departureEpochMs = ms("Europe/Rome", 2027, 6, 15, 8, 0), departureZoneId = "Europe/Rome",
+            arrivalEpochMs = ms("Europe/Madrid", 2027, 6, 15, 10, 30), arrivalZoneId = "Europe/Madrid",
+        )
+        val day = ItineraryBuilder.group(
+            ItineraryBuilder.events(listOf(returnFlight), listOf(hotel.copy(checkOutTime = null)), emptyList()),
+        ).first { it.date == LocalDate.of(2027, 6, 15) }
+        assertEquals(listOf(EventType.LODGING_CHECK_OUT, EventType.FLIGHT), day.events.map { it.type })
+    }
+
+    // Sin transportes ese día, el check-in sin hora conserva su hora por defecto (15:00).
+    @Test fun `sin movimientos ese dia el check-in sin hora se queda a las 15`() {
+        val ev = ItineraryBuilder.events(emptyList(), listOf(hotel.copy(checkInTime = null)), emptyList())
+            .first { it.type == EventType.LODGING_CHECK_IN }
+        assertEquals(15, ev.start.hour)
+    }
+
+    // El coche simplificado no tiene empresa ni modelo: su título es el trayecto, sin repetirlo en el subtítulo.
+    @Test fun `un coche sin empresa se titula por su trayecto`() {
+        val car = Fixtures.transport.copy(company = "", model = "", originPlace = "Aeropuerto", destinationPlace = "Centro")
+        val ev = ItineraryBuilder.events(emptyList(), emptyList(), emptyList(), transports = listOf(car))
+            .first { it.type == EventType.TRANSPORT_START }
+        assertEquals("Aeropuerto → Centro", ev.title)
+        assertEquals(null, ev.subtitle)
+    }
 }
 
 class ItineraryExtendedTest {
