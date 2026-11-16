@@ -32,7 +32,8 @@ class TripPdfExporter @Inject constructor(
         val bundle = trips.bundles.filterNotNull().first().firstOrNull { it.trip.id == tripId } ?: return@withContext null
         val formats = Formats(settings.settings.first().dateFormat)
         val blocks = TripPdfContent(context, formats).build(bundle)
-        sharedDir.listFiles()?.forEach { it.delete() }   // solo se conserva el último archivo compartido
+        // Solo se conserva el último PDF. El archivo de «Compartir viaje» vive en la misma carpeta y no se toca.
+        sharedDir.listFiles()?.filter { it.name.endsWith("." + TripPdf.EXTENSION) }?.forEach { it.delete() }
         val file = File(sharedDir, TripPdf.fileNameFor(bundle.trip.name))
         val name = bundle.trip.name.take(40)
         try {

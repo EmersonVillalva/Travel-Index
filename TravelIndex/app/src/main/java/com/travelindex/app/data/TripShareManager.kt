@@ -64,7 +64,8 @@ class TripShareManager @Inject constructor(
     /** Crea el archivo del viaje en la caché y lo devuelve; null si no existe o es demasiado grande. */
     suspend fun export(tripId: Long): File? = withContext(Dispatchers.IO) {
         val bundle = trips.bundles.filterNotNull().first().firstOrNull { it.trip.id == tripId } ?: return@withContext null
-        sharedDir.listFiles()?.forEach { it.delete() }   // solo se conserva el último
+        // Solo se conserva el último viaje compartido. El PDF exportado vive en la misma carpeta y no se toca.
+        sharedDir.listFiles()?.filter { it.name.endsWith("." + TripShareFormat.EXTENSION) }?.forEach { it.delete() }
 
         val zipPaths = HashMap<Long, String>()
         bundle.attachments.forEach { a ->

@@ -5,8 +5,9 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.4.4)
-> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 a la 0.4.4 aún no se han compilado en CI.
+> ## Estado real de esta versión (0.4.5)
+> - **La base 0.1 y la 0.2 compilaron en GitHub Actions** y la 0.2 se instaló en un móvil. La 0.3.0 llegó a compilar tras un único arreglo (WorkManager), que la 0.3.1 ya no usa. La 0.3.1 a la 0.4.5 aún no se han compilado en CI.
+> - **La 0.4.5 es limpieza y un arreglo:** exportar un PDF ya no puede borrar el archivo de «Compartir viaje» pendiente (ni al revés), y se elimina el código muerto de la 0.3.x (pantallas retiradas, viaje de ejemplo y restos del estado de vuelos) con sus textos huérfanos.
 > - **La 0.4.4:** el apartado pasa a llamarse «Billetes y reservas»; cada archivo se rotula con el título de su reserva («Free tour Edimburgo») en vez del nombre del archivo, y mientras carga la vista previa del PDF sale un hueco con el icono (sin nombres de archivo sueltos).
 > - **La 0.4.3:** abrir un `.travelindex` desde otra app (WhatsApp, correo…) ya no crea una segunda copia de la app: trae la que está abierta con la ventana de importación delante (`launchMode=singleTask`).
 > - **La 0.4.2 firma las builds de debug con una clave fija** (`debug.keystore`, clave de pruebas con la contraseña estándar «android»): a partir de ella, el APK de CI se actualiza encima del instalado sin desinstalar. Al pasar de una build anterior a la 0.4.2 hay que desinstalar una última vez (haz antes la copia de seguridad en Perfil y restáurala después). El release de Google Play sigue usando el keystore privado del autor, que no está en el repositorio.
@@ -35,7 +36,7 @@ Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · D
 | Notificaciones | Un único interruptor en Perfil: si está activado, avisos locales (vuelo 24 h antes, check-in, actividades, caducidades) |
 | Perfil | Nombre y foto, tema **oscuro (por defecto) o claro**, moneda por defecto, formato de fecha, avisos, bloqueo de capturas, copia de seguridad y restauración, privacidad, acerca de y una fila opcional «Apoya el proyecto» (abre PayPal en el navegador; se puede ocultar con `travelindex.showDonations=false`) |
 
-Se retiraron en la 0.3.0: la consulta de vuelos por internet (en la 0.3.1), pestaña Documentos, presupuesto y gastos, destinos, notas y listas, equipaje, datos de reserva del vuelo (localizador, billete…), tema «sistema», viaje de ejemplo y los selectores de antelación de avisos. El código de algunas pantallas retiradas permanece en el repositorio sin usarse (`ui/documents`, `ui/budget`, `ui/notes`, `data/DemoData.kt`) y puede borrarse a mano.
+Se retiraron en la 0.3.0: la consulta de vuelos por internet (en la 0.3.1), pestaña Documentos, presupuesto y gastos, destinos, notas y listas, equipaje, datos de reserva del vuelo (localizador, billete…), tema «sistema», viaje de ejemplo y los selectores de antelación de avisos. El código de esas pantallas retiradas se eliminó del repositorio en la 0.4.5.
 
 ## Limitaciones conocidas
 - Solo en español.
