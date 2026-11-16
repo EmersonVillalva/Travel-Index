@@ -160,6 +160,39 @@ unused = sorted(n for n in strings if n not in used_strings and n not in ("app_n
 if unused:
     warnings.append("textos sin usar (no es un error): " + ", ".join(unused))
 
+# ---- Paridad entre idiomas ---------------------------------------------------------------------------
+# El archivo base (values/) es inglés y values-es/ el español: deben tener exactamente las mismas claves
+# y los mismos marcadores %n$x en cada texto, o un idioma se caería al inglés (o rompería el formato).
+def parse_locale(path):
+    txt = read(path)
+    sts = {m.group(1): m.group(2) for m in re.finditer(r'<string name="([^"]+)"[^>]*>(.*?)</string>', txt, re.S)}
+    pls = {m.group(1): m.group(2) for m in re.finditer(r'<plurals name="([^"]+)">(.*?)</plurals>', txt, re.S)}
+    return sts, pls
+
+def placeholders(s):
+    return sorted(re.findall(r"%\d+\$[sdf]", s))
+
+base_s, base_p = parse_locale(RES / "values" / "strings.xml")
+for loc_dir in sorted(RES.glob("values-*")):
+    f = loc_dir / "strings.xml"
+    if not f.exists():
+        continue
+    loc = loc_dir.name
+    loc_s, loc_p = parse_locale(f)
+    # La marca (translatable=false) vive solo en el base.
+    base_keys = {k for k in base_s if k not in ("app_name", "app_tagline")}
+    missing = sorted(base_keys - set(loc_s))
+    extra = sorted(set(loc_s) - set(base_s))
+    if missing:
+        errors.append(f"{loc}: faltan textos: {', '.join(missing[:8])}{'…' if len(missing) > 8 else ''}")
+    if extra:
+        errors.append(f"{loc}: textos que no existen en el base: {', '.join(extra[:8])}")
+    if set(base_p) != set(loc_p):
+        errors.append(f"{loc}: plurals distintos: {sorted(set(base_p) ^ set(loc_p))}")
+    for k in base_keys & set(loc_s):
+        if placeholders(base_s[k]) != placeholders(loc_s[k]):
+            errors.append(f"{loc}: marcadores distintos en {k}")
+
 for w in warnings:
     print("AVISO:", w)
 if errors:
