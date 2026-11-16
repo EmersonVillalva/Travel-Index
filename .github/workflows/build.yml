@@ -32,8 +32,8 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Revisiones estáticas (informativas)
-        continue-on-error: true
+      # Puerta 1: los verificadores propios son obligatorios (si fallan, no hay APK).
+      - name: Verificadores del proyecto
         run: |
           python3 tools/check_project.py
           python3 tools/check_resources.py
@@ -41,7 +41,8 @@ jobs:
           python3 tools/check_imports.py
           python3 tools/check_migration.py
 
-      - name: Tests unitarios
+      # Puerta 2: tests de dominio y de interfaz (Robolectric). Si fallan, se sube el informe y se para.
+      - name: Tests (dominio + interfaz)
         id: tests
         continue-on-error: true
         run: gradle testDebugUnitTest --stacktrace
@@ -52,6 +53,31 @@ jobs:
         with:
           name: TravelIndex-informe-tests
           path: TravelIndex/app/build/reports/tests/
+
+      - name: Los tests son obligatorios
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Los tests han fallado; el APK no se genera. Mira el artefacto TravelIndex-informe-tests."
+          exit 1
+
+      # Puerta 3: Android Lint. Caza textos sin traducir, APIs mal usadas y recursos rotos.
+      - name: Lint
+        id: lint
+        continue-on-error: true
+        run: gradle lintDebug --stacktrace
+
+      - name: Informe de lint (si falla)
+        if: steps.lint.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TravelIndex-informe-lint
+          path: TravelIndex/app/build/reports/lint-results-debug.html
+
+      - name: Lint es obligatorio
+        if: steps.lint.outcome == 'failure'
+        run: |
+          echo "::error::Lint ha encontrado errores; el APK no se genera. Mira el artefacto TravelIndex-informe-lint."
+          exit 1
 
       - name: Compilar APK debug
         run: gradle assembleDebug --stacktrace

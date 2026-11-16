@@ -67,6 +67,18 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
+
+    testOptions {
+        // Robolectric necesita los recursos reales de la app (textos, temas).
+        unitTests.isIncludeAndroidResources = true
+    }
+
+    lint {
+        // Puerta de calidad en CI: un error de lint tumba el build.
+        abortOnError = true
+        // La paridad de idiomas la garantiza tools/check_resources.py (probado con mutación); el aviso duplicaría ruido.
+        disable += "MissingTranslation"
+    }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 
@@ -95,6 +107,11 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Tests de interfaz en el JVM (Robolectric + Compose): pulsan composables reales sin emulador.
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.robolectric)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.room.testing)
