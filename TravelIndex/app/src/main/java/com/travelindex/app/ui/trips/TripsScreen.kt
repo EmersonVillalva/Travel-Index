@@ -165,7 +165,9 @@ fun TripsScreen(
                             item(key = "h-" + section.group.name, span = { GridItemSpan(maxLineSpan) }) {
                                 SectionTitle(groupTitle(section.group) + " · " + section.trips.size, Modifier.padding(top = Spacing.xs))
                             }
-                            items(section.trips, key = { it.id }) { trip -> TripCard(trip, onClick = { onOpenTrip(trip.id) }, paidText = state.paid[trip.id]) }
+                            items(section.trips, key = { it.id }) { trip ->
+                                TripCard(trip, onClick = { onOpenTrip(trip.id) }, paidText = state.paid[trip.id], modifier = Modifier.animateItem())
+                            }
                         }
                     }
                 }

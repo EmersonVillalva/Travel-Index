@@ -8,6 +8,9 @@ object ViewerSupport {
     const val MIN_SCALE = 1f
     const val MAX_SCALE = 5f
 
+    /** Zoom del doble toque: suficiente para leer sin perder el contexto. */
+    const val DOUBLE_TAP_SCALE = 2.5f
+
     /** El visor interno abre PDFs e imágenes; el resto sigue yendo a una app externa. */
     fun opensInternally(mime: String): Boolean = mime == "application/pdf" || mime.startsWith("image/")
 
@@ -30,4 +33,12 @@ object ViewerSupport {
         val m = maxPan(sizePx, scale)
         return offset.coerceIn(-m, m)
     }
+
+    /**
+     * Desplazamiento tras un doble toque para que el punto tocado quede (dentro de los límites) centrado:
+     * con origen de transformación en el centro, el punto p acaba en centro + (p − centro)·escala, así que
+     * se compensa con (centro − p)·(escala − 1).
+     */
+    fun doubleTapPan(tap: Float, sizePx: Float, scale: Float): Float =
+        clampPan((sizePx / 2f - tap) * (clampScale(scale) - 1f), sizePx, scale)
 }

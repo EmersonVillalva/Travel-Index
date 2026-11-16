@@ -42,6 +42,18 @@ class ViewerTest {
     }
 
     @Test
+    fun `doble toque hacia el punto tocado, dentro de los limites`() {
+        val s = ViewerSupport.DOUBLE_TAP_SCALE
+        // Tocar el centro no desplaza nada.
+        assertEquals(0f, ViewerSupport.doubleTapPan(500f, 1000f, s))
+        // Tocar el borde izquierdo desplaza a la derecha, sin pasarse del límite (750 con 2,5x en 1000 px).
+        assertEquals(750f, ViewerSupport.doubleTapPan(0f, 1000f, s))
+        assertEquals(-750f, ViewerSupport.doubleTapPan(1000f, 1000f, s))
+        // Un punto intermedio queda centrado exactamente: (500 − 300) · 1,5 = 300.
+        assertEquals(300f, ViewerSupport.doubleTapPan(300f, 1000f, s))
+    }
+
+    @Test
     fun `el desplazamiento no saca el contenido del marco`() {
         // Sin zoom no hay desplazamiento posible.
         assertEquals(0f, ViewerSupport.maxPan(1000f, 1f))

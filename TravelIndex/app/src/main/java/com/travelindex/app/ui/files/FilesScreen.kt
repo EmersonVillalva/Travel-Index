@@ -120,10 +120,12 @@ fun FilesScreen(onBack: () -> Unit, onOpenViewer: (Long) -> Unit, vm: TripFilesV
                             val name = entry.group.name
                             val open = name in openGroups
                             item(key = "group-$name") {
-                                FileGroupHeader(entry.group, entry.files.size, expanded = open, onToggle = { toggleGroup(name) })
+                                FileGroupHeader(entry.group, entry.files.size, expanded = open, onToggle = { toggleGroup(name) },
+                                    modifier = Modifier.animateItem())
                             }
                             if (open) items(entry.files, key = { it.id }) { att ->
                                 FileCard(
+                                    modifier = Modifier.animateItem(),
                                     att = att, ownerLabel = titles[ownerKeyOf(att)],
                                     onRename = { renaming = att }, onCategory = { categorizing = att },
                                     onAssociate = { associating = att }, onDelete = { deleting = att },

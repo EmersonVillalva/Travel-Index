@@ -1,8 +1,11 @@
 package com.travelindex.app.ui.viewer
 
 import android.graphics.Bitmap
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
@@ -112,7 +115,7 @@ fun ViewerScreen(onBack: () -> Unit, vm: ViewerViewModel = hiltViewModel()) {
 
             state.isPdf -> PdfViewer(vm, state.pageCount ?: 0, Modifier.padding(pad))
 
-            else -> ZoomablePane(Modifier.padding(pad)) {
+            else -> ZoomablePane(Modifier.padding(pad), panBothAxes = true) {
                 AsyncImage(
                     model = state.file, contentDescription = null,
                     modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit,
@@ -160,22 +163,24 @@ private fun PdfViewer(vm: ViewerViewModel, pages: Int, modifier: Modifier = Modi
 @Composable
 private fun PdfPageView(vm: ViewerViewModel, index: Int, renderWidth: Int) {
     val bitmap by produceState<Bitmap?>(initialValue = null, index, renderWidth) { value = vm.renderPage(index, renderWidth) }
-    val b = bitmap
-    if (b == null) {
-        // Hueco con la proporción de un A4 mientras se dibuja, para que la lista no pegue saltos.
-        Box(Modifier.fillMaxWidth().aspectRatio(1 / 1.414f).background(MaterialTheme.colorScheme.surfaceVariant))
-    } else {
-        Image(b.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.FillWidth)
+    // Fundido del hueco (proporción A4) a la página ya dibujada, sin saltos ni parpadeo.
+    Crossfade(targetState = bitmap, label = "pdfPage") { b ->
+        if (b == null) {
+            Box(Modifier.fillMaxWidth().aspectRatio(1 / 1.414f).background(MaterialTheme.colorScheme.surfaceVariant))
+        } else {
+            Image(b.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.FillWidth)
+        }
     }
 }
 
 /**
- * Marco con zoom: pellizco para acercar (hasta 5x) y mover con dos dedos; doble toque vuelve al tamaño normal.
- * El desplazamiento normal con un dedo sigue siendo de la lista de dentro, por eso se usa [transformable]
- * (solo reacciona a gestos de dos dedos) y no un detector de arrastre.
+ * Marco con zoom: pellizco para acercar (hasta 5x); doble toque acerca hacia el punto tocado y vuelve.
+ * Ampliado, se puede arrastrar con un dedo (en el PDF solo en horizontal, para que el dedo siga pasando
+ * páginas; en una imagen en ambos ejes). [transformable] solo reacciona a gestos de dos dedos, así que el
+ * desplazamiento normal de la lista no se toca.
  */
 @Composable
-private fun ZoomablePane(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+private fun ZoomablePane(modifier: Modifier = Modifier, panBothAxes: Boolean = false, content: @Composable BoxScope.() -> Unit) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
@@ -186,10 +191,35 @@ private fun ZoomablePane(modifier: Modifier = Modifier, content: @Composable Box
         offsetY = ViewerSupport.clampPan(offsetY + pan.y, size.height.toFloat(), scale)
         if (scale == 1f) { offsetX = 0f; offsetY = 0f }
     }
+    val zoomed = scale > 1f
     Box(
         modifier.fillMaxSize().onSizeChanged { size = it }.clipToBounds()
-            .pointerInput(Unit) { detectTapGestures(onDoubleTap = { scale = 1f; offsetX = 0f; offsetY = 0f }) }
-            .transformable(transform),
+            .pointerInput(Unit) {
+                detectTapGestures(onDoubleTap = { tap ->
+                    if (scale > 1f) { scale = 1f; offsetX = 0f; offsetY = 0f } else {
+                        scale = ViewerSupport.DOUBLE_TAP_SCALE
+                        offsetX = ViewerSupport.doubleTapPan(tap.x, size.width.toFloat(), scale)
+                        offsetY = ViewerSupport.doubleTapPan(tap.y, size.height.toFloat(), scale)
+                    }
+                })
+            }
+            .transformable(transform)
+            .then(
+                if (!zoomed) Modifier
+                else if (panBothAxes) Modifier.pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                        change.consume()
+                        offsetX = ViewerSupport.clampPan(offsetX + drag.x, size.width.toFloat(), scale)
+                        offsetY = ViewerSupport.clampPan(offsetY + drag.y, size.height.toFloat(), scale)
+                    }
+                }
+                else Modifier.pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dx ->
+                        change.consume()
+                        offsetX = ViewerSupport.clampPan(offsetX + dx, size.width.toFloat(), scale)
+                    }
+                }
+            ),
     ) {
         Box(
             Modifier.fillMaxSize().graphicsLayer {
