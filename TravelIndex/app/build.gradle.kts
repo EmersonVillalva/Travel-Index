@@ -30,6 +30,15 @@ android {
     }
 
     signingConfigs {
+        // Clave fija SOLO para builds de debug: así todas las builds (CI incluido) firman igual y el APK se
+        // actualiza sin desinstalar. Es una clave de pruebas con la contraseña estándar pública «android»;
+        // no guarda ningún secreto y no sirve para publicar (el release usa tu keystore privado).
+        getByName("debug") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         if (keystoreProps.isNotEmpty()) {
             create("release") {
                 storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
