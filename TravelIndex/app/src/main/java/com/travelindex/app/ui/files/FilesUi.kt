@@ -40,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -181,9 +182,11 @@ fun FileCard(
     val ctx = LocalContext.current
     val open: () -> Unit = onOpen ?: { openAttachment(ctx, att) }
     var menu by remember { mutableStateOf(false) }
+    // Card(onClick=...) de Material 3 no admite etiqueta de accesibilidad: el clic va en el modificador, recortado a la forma.
     Card(
-        onClick = open, onClickLabel = stringResource(R.string.action_open),
-        modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,
+        modifier = modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = open, onClickLabel = stringResource(R.string.action_open)),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         // Vista previa visible sin tener que abrir el archivo (imagen o primera página de un PDF).
