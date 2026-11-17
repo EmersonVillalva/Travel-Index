@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import com.travelindex.app.R
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.ui.components.DateRangePickerDialogHost
+import com.travelindex.app.ui.components.TripDateFields
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -89,6 +90,47 @@ class RangeCalendarTest {
         compose.onNodeWithText(month(2027, 2)).performClick()
         compose.onNodeWithText("2028").performClick()
         compose.onNodeWithText(month(2028, 2)).assertIsDisplayed()
+    }
+
+    private fun openFields(start: LocalDate?, end: LocalDate?) {
+        picked = null
+        compose.setContent {
+            MaterialTheme { TripDateFields(start, end, startError = null, endError = null, onPick = { s, e -> picked = s to e }) }
+        }
+    }
+
+    @Test
+    fun hayDosCamposIdaYVueltaConSuFecha() {
+        openFields(LocalDate.of(2027, 2, 1), LocalDate.of(2027, 2, 5))
+        compose.onNodeWithText(str(R.string.field_start)).assertIsDisplayed()
+        compose.onNodeWithText(str(R.string.field_end)).assertIsDisplayed()
+        compose.onNodeWithText(f.date(LocalDate.of(2027, 2, 1))).assertIsDisplayed()
+        compose.onNodeWithText(f.date(LocalDate.of(2027, 2, 5))).assertIsDisplayed()
+    }
+
+    @Test
+    fun elCampoVueltaCambiaSoloLaVuelta() {
+        openFields(LocalDate.of(2027, 2, 1), LocalDate.of(2027, 2, 5))
+        compose.onNodeWithText(str(R.string.field_end)).performClick()
+        compose.onNodeWithContentDescription(day(2027, 2, 9)).performClick()
+        compose.onNodeWithText(str(R.string.action_ok)).performClick()
+        assertEquals(LocalDate.of(2027, 2, 1) to LocalDate.of(2027, 2, 9), picked)
+    }
+
+    @Test
+    fun elCampoIdaCambiaSoloLaIda() {
+        openFields(LocalDate.of(2027, 2, 4), LocalDate.of(2027, 2, 9))
+        compose.onNodeWithText(str(R.string.field_start)).performClick()
+        compose.onNodeWithContentDescription(day(2027, 2, 2)).performClick()
+        compose.onNodeWithText(str(R.string.action_ok)).performClick()
+        assertEquals(LocalDate.of(2027, 2, 2) to LocalDate.of(2027, 2, 9), picked)
+    }
+
+    @Test
+    fun elCampoVueltaAbreEnElMesDeLaVuelta() {
+        openFields(LocalDate.of(2027, 2, 26), LocalDate.of(2027, 3, 3))
+        compose.onNodeWithText(str(R.string.field_end)).performClick()
+        compose.onNodeWithText(month(2027, 3)).assertIsDisplayed()
     }
 
     @Test

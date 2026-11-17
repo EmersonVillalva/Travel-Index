@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
 import com.travelindex.app.domain.MonthGrid
+import com.travelindex.app.domain.RangeEdge
 import com.travelindex.app.domain.RangeSelection
 import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
@@ -66,11 +67,17 @@ fun DateRangePickerDialogHost(
     initialEnd: LocalDate?,
     onDismiss: () -> Unit,
     onPick: (LocalDate, LocalDate) -> Unit,
+    /** Se abrió desde el campo de la Ida o de la Vuelta: el calendario cambia solo ese extremo. */
+    edge: RangeEdge? = null,
 ) {
     // Se guardan como texto para que el estado sobreviva a un giro de pantalla.
     var startText by rememberSaveable { mutableStateOf(initialStart?.toString().orEmpty()) }
     var endText by rememberSaveable { mutableStateOf(initialEnd?.toString().orEmpty()) }
-    var monthText by rememberSaveable { mutableStateOf(YearMonth.from(initialStart ?: LocalDate.now()).toString()) }
+    var monthText by rememberSaveable {
+        // Abre en el mes del extremo que se va a cambiar.
+        val focus = if (edge == RangeEdge.END) initialEnd ?: initialStart else initialStart
+        mutableStateOf(YearMonth.from(focus ?: LocalDate.now()).toString())
+    }
     var yearsOpen by rememberSaveable { mutableStateOf(false) }
 
     val selection = RangeSelection(startText.toDateOrNull(), endText.toDateOrNull())
@@ -80,7 +87,18 @@ fun DateRangePickerDialogHost(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.field_trip_dates)) },
+        title = {
+            val hasRange = initialStart != null && initialEnd != null
+            Text(
+                stringResource(
+                    when {
+                        hasRange && edge == RangeEdge.START -> R.string.field_start
+                        hasRange && edge == RangeEdge.END -> R.string.field_end
+                        else -> R.string.field_trip_dates
+                    }
+                )
+            )
+        },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
                 Text(
@@ -108,7 +126,7 @@ fun DateRangePickerDialogHost(
                     YearChooser(month) { year -> monthText = month.withYear(year).toString(); yearsOpen = false }
                 } else {
                     MonthView(month, selection) { day ->
-                        val next = selection.tap(day)
+                        val next = selection.tap(day, edge)
                         startText = next.start?.toString().orEmpty()
                         endText = next.end?.toString().orEmpty()
                     }
@@ -210,4 +228,37 @@ private fun DayCell(day: LocalDate, selection: RangeSelection, today: LocalDate,
             )
         }
     }
+}
+
+/**
+ * Fechas del viaje en dos campos, Ida y Vuelta, como siempre; los dos abren el mismo calendario de rango
+ * y cada uno cambia su extremo. [onPick] recibe ida y vuelta ya elegidas.
+ */
+@Composable
+fun TripDateFields(
+    start: LocalDate?,
+    end: LocalDate?,
+    startError: String?,
+    endError: String?,
+    onPick: (LocalDate, LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val formats = LocalFormats.current
+    var edge by remember { mutableStateOf<RangeEdge?>(null) }
+    var open by remember { mutableStateOf(false) }
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+        PickerField(
+            label = stringResource(R.string.field_start), value = start?.let { formats.date(it) }.orEmpty(),
+            onClick = { edge = RangeEdge.START; open = true }, modifier = Modifier.weight(1f), error = startError,
+        )
+        PickerField(
+            label = stringResource(R.string.field_end), value = end?.let { formats.date(it) }.orEmpty(),
+            onClick = { edge = RangeEdge.END; open = true }, modifier = Modifier.weight(1f), error = endError,
+        )
+    }
+    if (open) DateRangePickerDialogHost(
+        initialStart = start, initialEnd = end, edge = edge,
+        onDismiss = { open = false },
+        onPick = { s, e -> onPick(s, e); open = false },
+    )
 }

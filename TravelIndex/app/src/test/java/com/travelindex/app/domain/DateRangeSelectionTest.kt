@@ -52,6 +52,32 @@ class DateRangeSelectionTest {
         assertFalse(s.bandLeft(d(9)) || s.bandRight(d(14)))
     }
 
+    @Test fun `desde el campo Vuelta solo cambia la vuelta`() {
+        val s = RangeSelection(d(10), d(14))
+        assertEquals(RangeSelection(d(10), d(20)), s.tap(d(20), RangeEdge.END))
+        assertEquals(RangeSelection(d(10), d(10)), s.tap(d(10), RangeEdge.END))   // la vuelta puede ser la propia ida
+        assertEquals(RangeSelection(d(5), null), s.tap(d(5), RangeEdge.END))       // antes de la ida: empieza de nuevo
+    }
+
+    @Test fun `desde el campo Ida solo cambia la ida`() {
+        val s = RangeSelection(d(10), d(14))
+        assertEquals(RangeSelection(d(3), d(14)), s.tap(d(3), RangeEdge.START))
+        assertEquals(RangeSelection(d(14), d(14)), s.tap(d(14), RangeEdge.START))
+        assertEquals(RangeSelection(d(20), null), s.tap(d(20), RangeEdge.START))   // después de la vuelta: empieza de nuevo
+    }
+
+    @Test fun `sin rango previo el campo no cambia el comportamiento`() {
+        assertEquals(RangeSelection().tap(d(10)), RangeSelection().tap(d(10), RangeEdge.END))
+        assertEquals(RangeSelection().tap(d(10)), RangeSelection().tap(d(10), RangeEdge.START))
+        val onlyStart = RangeSelection(d(10), null)
+        assertEquals(RangeSelection(d(10), d(14)), onlyStart.tap(d(14), RangeEdge.END))
+    }
+
+    @Test fun `tras cambiar un extremo el siguiente toque sigue cambiando ese extremo`() {
+        val s = RangeSelection(d(10), d(14)).tap(d(20), RangeEdge.END).tap(d(17), RangeEdge.END)
+        assertEquals(RangeSelection(d(10), d(17)), s)
+    }
+
     @Test fun `el rango puede cruzar de mes`() {
         val s = RangeSelection(d(28), d(2, 3))
         assertTrue(s.bandLeft(d(1, 3)) && s.bandRight(d(1, 3)))

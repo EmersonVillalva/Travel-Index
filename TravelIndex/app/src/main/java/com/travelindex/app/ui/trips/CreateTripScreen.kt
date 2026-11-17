@@ -56,10 +56,8 @@ import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.FormField
-import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.components.errorText
-import com.travelindex.app.ui.components.PickerField
-import com.travelindex.app.ui.components.DateRangePickerDialogHost
+import com.travelindex.app.ui.components.TripDateFields
 import com.travelindex.app.ui.components.LoadingBox
 import com.travelindex.app.ui.components.SectionCard
 import com.travelindex.app.ui.components.TravelModePicker
@@ -176,35 +174,20 @@ fun CreateTripScreen(
 }
 
 /**
- * Ida y vuelta en un solo calendario: marcas el primer día y el último (1 feb – 5 feb) y aceptas,
- * sin abrir dos ventanas. La ida es el primer día marcado y el regreso el último.
+ * Ida y vuelta en dos campos (como siempre) que abren un solo calendario: marcas el primer y el último día
+ * (1 feb – 5 feb) sin abrir dos ventanas; tocando un campo después, el calendario cambia solo ese extremo.
  */
 @Composable
 private fun TripDatesField(state: TripFormState, vm: CreateTripViewModel) {
-    val formats = LocalFormats.current
-    var open by remember { mutableStateOf(false) }
     fun parsed(key: String): LocalDate? =
         state.values[key]?.takeIf { it.isNotBlank() }?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-    val start = parsed(TripSpec.startDate.key)
-    val end = parsed(TripSpec.endDate.key)
-    val err = state.errors[TripSpec.startDate.key] ?: state.errors[TripSpec.endDate.key]
-    PickerField(
-        label = stringResource(R.string.field_trip_dates),
-        value = when {
-            start != null && end != null -> formats.date(start) + " – " + formats.date(end)
-            start != null -> formats.date(start)
-            else -> ""
-        },
-        onClick = { open = true },
-        error = err?.let { errorText(it) },
-    )
-    if (open) DateRangePickerDialogHost(
-        initialStart = start, initialEnd = end,
-        onDismiss = { open = false },
+    TripDateFields(
+        start = parsed(TripSpec.startDate.key), end = parsed(TripSpec.endDate.key),
+        startError = state.errors[TripSpec.startDate.key]?.let { errorText(it) },
+        endError = state.errors[TripSpec.endDate.key]?.let { errorText(it) },
         onPick = { s, e ->
             vm.setValue(TripSpec.startDate.key, s.toString())
             vm.setValue(TripSpec.endDate.key, e.toString())
-            open = false
         },
     )
 }

@@ -4,14 +4,22 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
+/** Qué extremo del viaje se quiere cambiar al abrir el calendario desde su campo (Ida o Vuelta). */
+enum class RangeEdge { START, END }
+
 /**
  * Lo marcado en el calendario de fechas del viaje: ida y vuelta en una sola ventana.
  * Primer toque = ida; segundo toque (el mismo día o uno posterior) = vuelta; un toque anterior a la ida
  * vuelve a empezar desde ahí; con el rango completo, el siguiente toque empieza otro.
  * Un solo día marcado sirve como viaje de un día (la vuelta es la propia ida).
+ *
+ * Si se abrió desde el campo de la Ida o de la Vuelta ([edge]) y ya había un rango, el toque cambia solo
+ * ese extremo (la ida sin pasar de la vuelta, la vuelta sin ir antes de la ida); si no cabe, se empieza de nuevo.
  */
 data class RangeSelection(val start: LocalDate? = null, val end: LocalDate? = null) {
-    fun tap(day: LocalDate): RangeSelection = when {
+    fun tap(day: LocalDate, edge: RangeEdge? = null): RangeSelection = when {
+        edge == RangeEdge.START && start != null && end != null && !day.isAfter(end) -> RangeSelection(day, end)
+        edge == RangeEdge.END && start != null && end != null && !day.isBefore(start) -> RangeSelection(start, day)
         start == null || end != null -> RangeSelection(day, null)
         day.isBefore(start) -> RangeSelection(day, null)
         else -> RangeSelection(start, day)

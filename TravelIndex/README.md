@@ -5,7 +5,8 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.7.4)
+> ## Estado real de esta versión (0.7.5)
+> - **La 0.7.5 vuelve a mostrar las fechas del viaje en dos campos, Fecha de salida y Fecha de regreso,** que abren el mismo calendario de rango (una sola ventana, con flechas de mes). Pulsar un campo cambia solo ese extremo (la salida sin pasar de la vuelta, la vuelta sin ir antes de la salida); el calendario se abre en el mes de ese extremo. Sin cambios en la base de datos.
 > - **La 0.7.4 cambia el calendario de las fechas del viaje:** sigue siendo una sola ventana donde se marcan ida y vuelta, pero ahora con **flechas para pasar de mes** (en vez de desplazarse hacia abajo), un salto de año al pulsar el mes y la semana empezando según el idioma. Un solo día marcado vale como viaje de un día. Los calendarios de una sola fecha (transportes, alojamiento…) no cambian. Sin cambios en la base de datos.
 > - **La 0.7.3 quita «(opcional)» de las vistas de solo lectura.** En el detalle de un vuelo la sección sigue llamándose «Llegada» y en el de una actividad el campo «Duración» (y lo mismo en el PDF); «(opcional)» solo aparece al añadir o editar los datos. Sin cambios en la base de datos.
 > - **La 0.7.3 enseña lo pagado en cada apartado del viaje.** En las tarjetas del panel (vuelos, tren, autobús, barco, coche, alojamiento, actividades, restaurantes) aparece el precio total pagado: dos o más reservas se suman y los elementos sin precio no cuentan; si un apartado no tiene ningún precio, no sale nada. Las monedas distintas nunca se mezclan (salen una al lado de otra).
