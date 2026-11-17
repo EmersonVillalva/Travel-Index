@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.travelindex.app.MainActivity
 import com.travelindex.app.R
+import com.travelindex.app.data.LanguageManager
 import com.travelindex.app.domain.ReminderKind
 import java.time.Instant
 import java.time.LocalDate
@@ -21,7 +22,8 @@ import java.time.format.FormatStyle
 object NotificationChannels {
     const val REMINDERS = "reminders"
 
-    fun create(context: Context) {
+    fun create(base: Context) {
+        val context = LanguageManager.localize(base)
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(
             NotificationChannel(REMINDERS, context.getString(R.string.notif_channel_name), NotificationManager.IMPORTANCE_HIGH).apply {
@@ -35,7 +37,8 @@ object NotificationChannels {
 class ReminderReceiver : BroadcastReceiver() {
 
     @SuppressLint("MissingPermission")
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(base: Context, intent: Intent) {
+        val context = LanguageManager.localize(base)   // el aviso sale en el idioma elegido en la app
         val kind = runCatching { ReminderKind.valueOf(intent.getStringExtra(EXTRA_KIND).orEmpty()) }.getOrNull() ?: return
         val key = intent.getStringExtra(EXTRA_KEY) ?: return
         val subject = intent.getStringExtra(EXTRA_SUBJECT).orEmpty()

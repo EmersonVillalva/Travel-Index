@@ -18,8 +18,9 @@ object AppShortcuts {
     const val DEST_NEW_TRIP = "new"
     const val DEST_SEARCH = "search"
 
-    fun install(context: Context) {
+    fun install(base: Context) {
         runCatching {
+            val context = LanguageManager.localize(base)
             fun shortcut(id: String, labelRes: Int, iconRes: Int, dest: String) =
                 ShortcutInfoCompat.Builder(context, id)
                     .setShortLabel(context.getString(labelRes))

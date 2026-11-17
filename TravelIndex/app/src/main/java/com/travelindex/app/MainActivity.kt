@@ -1,5 +1,6 @@
 package com.travelindex.app
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -22,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.travelindex.app.data.AppShortcuts
 import com.travelindex.app.data.ImportInbox
+import com.travelindex.app.data.LanguageManager
 import com.travelindex.app.data.ShortcutInbox
 import com.travelindex.app.domain.AppSettings
 import com.travelindex.app.domain.Formats
@@ -45,6 +47,11 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var importInbox: ImportInbox
     @Inject lateinit var shortcutInbox: ShortcutInbox
+
+    /** Pantallas, diálogos y fechas en el idioma elegido en Perfil (español por defecto). */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageManager.localize(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()

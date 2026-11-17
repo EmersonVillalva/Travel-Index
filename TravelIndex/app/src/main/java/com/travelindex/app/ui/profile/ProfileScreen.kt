@@ -1,6 +1,9 @@
 package com.travelindex.app.ui.profile
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -69,6 +72,8 @@ import com.travelindex.app.BuildConfig
 import com.travelindex.app.R
 import com.travelindex.app.data.FileActions
 import com.travelindex.app.data.FileStorage
+import com.travelindex.app.data.LanguageManager
+import com.travelindex.app.domain.AppLanguage
 import com.travelindex.app.domain.DateFormatOption
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ThemeMode
@@ -84,7 +89,7 @@ import java.time.LocalDate
 
 /** Página donde el usuario consigue su propia clave gratuita del servicio de datos de vuelos. */
 
-private enum class Picking { CURRENCY, DATE }
+private enum class Picking { CURRENCY, DATE, LANGUAGE }
 
 /** Perfil y ajustes: datos personales, preferencias, notificaciones, privacidad, copia de seguridad y datos. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,6 +109,7 @@ fun ProfileScreen(
     var pendingRestore by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var supportOpen by rememberSaveable { mutableStateOf(false) }
+    var language by remember { mutableStateOf(LanguageManager.get(ctx)) }
 
     // Estado real de las notificaciones en el sistema (el usuario puede desactivarlas en Ajustes de Android).
     var systemNotif by remember { mutableStateOf(NotificationManagerCompat.from(ctx).areNotificationsEnabled()) }
@@ -165,6 +171,7 @@ fun ProfileScreen(
                     SectionCard(stringResource(R.string.sec_preferences)) {
                         SettingRow(stringResource(R.string.pref_currency), s.defaultCurrency) { picking = Picking.CURRENCY.name }
                         SettingRow(stringResource(R.string.pref_date_format), Formats(s.dateFormat).date(LocalDate.now())) { picking = Picking.DATE.name }
+                        SettingRow(stringResource(R.string.pref_language), stringResource(languageName(language))) { picking = Picking.LANGUAGE.name }
                         Text(stringResource(R.string.pref_theme), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = Spacing.xs))
                         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
                             listOf(ThemeMode.LIGHT to R.string.theme_light, ThemeMode.DARK to R.string.theme_dark)
@@ -262,6 +269,22 @@ fun ProfileScreen(
                 onPick = { k -> DateFormatOption.entries.firstOrNull { it.name == k }?.let(vm::setDateFormat); picking = null },
             )
         }
+        Picking.LANGUAGE -> ChoiceDialog(
+            title = stringResource(R.string.pref_language),
+            options = AppLanguage.entries.map { Option(it.key, stringResource(languageName(it))) },
+            selected = language.key, searchable = false,
+            onDismiss = { picking = null },
+            onPick = { k ->
+                picking = null
+                val chosen = AppLanguage.fromKey(k)
+                if (chosen != language) {
+                    language = chosen
+                    LanguageManager.set(ctx, chosen)
+                    // Recrear la pantalla vuelve a leer los textos en el idioma nuevo; el viaje y la navegación se conservan.
+                    ctx.findHostActivity()?.recreate()
+                }
+            },
+        )
         null -> Unit
     }
 
@@ -286,6 +309,18 @@ private fun dateFormatName(o: DateFormatOption): Int = when (o) {
     DateFormatOption.MDY -> R.string.df_mdy
     DateFormatOption.YMD -> R.string.df_ymd
     DateFormatOption.LONG -> R.string.df_long
+}
+
+private fun languageName(l: AppLanguage): Int = when (l) {
+    AppLanguage.SPANISH -> R.string.lang_spanish
+    AppLanguage.ENGLISH -> R.string.lang_english
+    AppLanguage.SYSTEM -> R.string.lang_system
+}
+
+private tailrec fun Context.findHostActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findHostActivity()
+    else -> null
 }
 
 @Composable

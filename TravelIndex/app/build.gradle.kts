@@ -80,6 +80,11 @@ android {
         disable += "MissingTranslation"
     }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+    bundle {
+        // El idioma se elige dentro de la app (Perfil → Idioma): los dos idiomas deben ir siempre en el AAB.
+        // Con el reparto por idioma de Play, un móvil en español no recibiría los textos en inglés.
+        language { enableSplit = false }
+    }
 }
 
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }

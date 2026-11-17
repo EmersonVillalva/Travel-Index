@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_trips">My trips</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Common actions -->
+    <string name="action_add">Add</string>
+    <string name="action_add_file">Add file</string>
+    <string name="action_attach">Attach file</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_back">Back</string>
+    <string name="action_ok">OK</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_more">More options</string>
+    <string name="action_open">Open</string>
+    <string name="action_share">Share</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_search">Search</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_see_all">See all</string>
+    <string name="action_set_category">Change category</string>
+    <string name="action_associate">Link to an item</string>
+    <string name="action_new_trip">New trip</string>
+    <string name="action_edit_trip">Edit trip</string>
+    <string name="action_cancel_trip">Cancel trip</string>
+    <string name="action_reactivate_trip">Reactivate trip</string>
+    <string name="action_delete_trip">Delete trip</string>
+    <string name="action_cover">Choose cover</string>
+    <string name="action_remove_cover">Remove cover</string>
+    <string name="action_call">Call</string>
+    <string name="action_open_link">Open link</string>
+    <string name="action_show_sensitive">Show hidden details</string>
+    <string name="action_hide_sensitive">Hide details</string>
+    <string name="a11y_clear">Clear</string>
+    <string name="filter_all">All</string>
+    <string name="time_unknown">No time set</string>
+
+    <!-- Status and countdown -->
+    <string name="status_upcoming">Upcoming</string>
+    <string name="status_ongoing">Ongoing</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="countdown_days">In %1$d days</string>
+    <string name="countdown_tomorrow">Tomorrow</string>
+    <string name="countdown_today">Today</string>
+    <plurals name="duration_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="nights_count">
+        <item quantity="one">%1$d night</item>
+        <item quantity="other">%1$d nights</item>
+    </plurals>
+    <plurals name="people_count">
+        <item quantity="one">%1$d person</item>
+        <item quantity="other">%1$d people</item>
+    </plurals>
+    <plurals name="tile_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <plurals name="tile_events">
+        <item quantity="one">%1$d event</item>
+        <item quantity="other">%1$d events</item>
+    </plurals>
+    <plurals name="attention_flights_pending">
+        <item quantity="one">%1$d flight not confirmed</item>
+        <item quantity="other">%1$d flights not confirmed</item>
+    </plurals>
+    <plurals name="history_trips">
+        <item quantity="one">%1$d trip</item>
+        <item quantity="other">%1$d trips</item>
+    </plurals>
+    <string name="history_title">Trip history</string>
+    <string name="history_action">History</string>
+    <string name="history_empty_title">No past trips yet</string>
+    <string name="history_empty_body">When a trip ends it will show up here, along with a summary of your travels.</string>
+    <string name="history_stat_trips">Trips</string>
+    <string name="history_stat_days">Days travelled</string>
+    <string name="history_stat_countries">Countries</string>
+    <string name="history_stat_cities">Cities</string>
+    <string name="history_paid_total">Total paid across your trips</string>
+    <string name="duration_label">Duration: %1$s</string>
+    <string name="flight_paid">Paid</string>
+    <string name="flight_chip_locator">Ref. %1$s</string>
+    <string name="flight_chip_terminal">Terminal %1$s</string>
+    <string name="flight_chip_seat">Seat %1$s</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Hi, %1$s</string>
+    <string name="home_greeting_anon">Hi, traveller</string>
+    <string name="home_next_trip">Your next trip</string>
+    <string name="home_next_events">Coming up</string>
+    <string name="home_activity">Your activity</string>
+    <string name="home_empty_title">Your first trip starts here</string>
+    <string name="home_empty_body">Create a trip to keep flights, hotels, documents and expenses in one place.</string>
+    <string name="home_create_first">Create my first trip</string>
+    <string name="attention_title">Needs your attention</string>
+    <string name="attention_flight_unconfirmed">Not confirmed</string>
+    <string name="stat_trips">Trips</string>
+    <string name="stat_countries">Countries</string>
+    <string name="stat_reservations">Bookings</string>
+    <string name="stat_days">Days</string>
+    <string name="stat_travelers">Travellers</string>
+
+    <!-- My trips -->
+    <string name="group_ongoing">Ongoing</string>
+    <string name="group_upcoming">Upcoming</string>
+    <string name="group_past">Past</string>
+    <string name="group_cancelled">Cancelled</string>
+    <string name="filter_upcoming">Upcoming</string>
+    <string name="filter_past">Past</string>
+    <string name="filter_cancelled">Cancelled</string>
+    <string name="sort_smart">Upcoming first</string>
+    <string name="sort_date_asc">Date: oldest first</string>
+    <string name="sort_date_desc">Date: newest first</string>
+    <string name="sort_name">Name (A-Z)</string>
+    <string name="search_hint_global">Trips, bookings, places and files</string>
+    <string name="search_prompt">Type at least two letters: it searches every trip, its bookings, places, documents and files.</string>
+    <string name="trips_search_hint">Search by name, city or country</string>
+    <string name="trips_empty_title">No trips yet</string>
+    <string name="trips_empty_body">Create your first trip and keep flights, hotels, documents and more in it.</string>
+    <string name="trips_no_results_title">No results</string>
+    <string name="trips_no_results_body">Try a different search or change the filter.</string>
+
+    <!-- Trip form -->
+    <string name="trip_form_title_new">New trip</string>
+    <string name="trip_form_title_edit">Edit trip</string>
+    <string name="trip_saved">Trip saved</string>
+    <string name="sec_trip_basic">Trip details</string>
+    <string name="field_trip_dates">Trip dates (departure and return)</string>
+    <string name="sec_route">Route</string>
+    <string name="sec_trip_dates">Dates</string>
+    <string name="sec_trip_budget">Travellers and currency</string>
+    <string name="sec_trip_transport">Means of transport</string>
+    <string name="trip_modes_hint">Pick one or more. It\'s optional.</string>
+    <string name="field_travel_modes">Means of transport</string>
+    <string name="mode_plane">Plane</string>
+    <string name="mode_ship">Ship</string>
+    <string name="mode_train">Train</string>
+    <string name="mode_bus">Bus</string>
+    <string name="mode_car">Car</string>
+
+    <!-- Transport sections -->
+    <string name="mod_trains">Trains</string>
+    <string name="mod_buses">Buses</string>
+    <string name="mod_ships">Ships</string>
+    <string name="mod_cars">Car</string>
+    <string name="new_train">New train</string>
+    <string name="new_bus">New bus</string>
+    <string name="new_ship">New ship</string>
+    <string name="new_car">New car trip</string>
+    <string name="edit_train">Edit train</string>
+    <string name="edit_bus">Edit bus</string>
+    <string name="edit_ship">Edit ship</string>
+    <string name="edit_car">Edit car trip</string>
+    <string name="empty_trains_title">No trains</string>
+    <string name="empty_trains_body">Keep your train tickets here with stations, times, coach and seat.</string>
+    <string name="empty_buses_title">No buses</string>
+    <string name="empty_buses_body">Keep your bus tickets here with stops, times and seat.</string>
+    <string name="empty_ships_title">No ships</string>
+    <string name="empty_ships_body">Keep your boat or ferry journeys here with ports, times and cabin.</string>
+    <string name="empty_cars_title">No car trips</string>
+    <string name="empty_cars_body">Keep your car journeys here: where from, where to and when.</string>
+    <string name="sec_train">Train</string>
+    <string name="sec_bus">Bus</string>
+    <string name="sec_ship">Ship</string>
+    <string name="sec_arrival_to">Arrival</string>
+    <string name="f_carrier">Operator</string>
+    <string name="f_train_number">Train number</string>
+    <string name="f_coach_seat">Coach and seat</string>
+    <string name="f_station_origin">Departure station</string>
+    <string name="f_station_dest">Arrival station</string>
+    <string name="f_bus_line">Line or number</string>
+    <string name="f_bus_seat">Seat</string>
+    <string name="f_stop_origin">Departure station or stop</string>
+    <string name="f_stop_dest">Arrival station or stop</string>
+    <string name="f_shipping_line">Ferry company</string>
+    <string name="f_ship_name">Ship name</string>
+    <string name="f_cabin_seat">Cabin or seat</string>
+    <string name="f_port_origin">Departure port</string>
+    <string name="f_port_dest">Arrival port</string>
+    <string name="sec_trip_cover">Cover</string>
+    <string name="sec_trip_more">Description and notes</string>
+    <string name="cover_none">No cover</string>
+    <string name="field_name">Trip name</string>
+    <string name="field_city">City</string>
+    <string name="field_country">Country</string>
+    <string name="field_start">Departure date</string>
+    <string name="field_end">Return date</string>
+    <string name="field_travelers">Travellers</string>
+    <string name="field_budget">Estimated budget</string>
+    <string name="field_currency">Currency</string>
+    <string name="field_description">Description</string>
+    <string name="field_notes">General notes</string>
+    <string name="discard_title">Discard changes?</string>
+    <string name="discard_body">You have unsaved changes.</string>
+    <string name="delete_trip_title">Delete this trip?</string>
+    <string name="delete_trip_body">“%1$s” will be deleted with all its bookings, expenses, notes and files. This cannot be undone.</string>
+    <string name="cancel_trip_title">Cancel this trip?</string>
+    <string name="cancel_trip_body">The trip will be marked as cancelled, disappear from the calendar and stop sending reminders. You can reactivate it anytime.</string>
+
+    <!-- Trip panel -->
+    <string name="add_sheet_title">What do you want to add?</string>
+    <string name="add_file">File or document</string>
+    <string name="file_added">File saved</string>
+    <string name="next_event">Next on this trip</string>
+    <string name="sections_title">Trip sections</string>
+    <string name="tile_empty">Empty</string>
+
+    <!-- Sections (modules) -->
+    <string name="mod_itinerary">Itinerary</string>
+    <string name="mod_flights">Flights</string>
+    <string name="mod_lodgings">Accommodation</string>
+    <string name="mod_activities">Activities and tours</string>
+    <string name="mod_transports">Transport and car</string>
+    <string name="mod_restaurants">Restaurants</string>
+    <string name="mod_docs">Visas and travel documents</string>
+    <string name="mod_expenses">Expenses</string>
+    <string name="mod_budget">Budget and expenses</string>
+    <string name="mod_destinations">Destinations</string>
+    <string name="mod_files">Tickets and bookings</string>
+    <string name="mod_notes">Notes and lists</string>
+
+    <string name="new_flight">New flight</string>
+    <string name="new_lodging">New accommodation</string>
+    <string name="new_activity">New activity or tour</string>
+    <string name="new_transport">New transport</string>
+    <string name="new_restaurant">New restaurant</string>
+    <string name="new_doc">New travel document</string>
+    <string name="new_expense">New expense</string>
+    <string name="new_destination">New destination</string>
+    <string name="edit_flight">Edit flight</string>
+    <string name="edit_lodging">Edit accommodation</string>
+    <string name="edit_activity">Edit activity</string>
+    <string name="edit_transport">Edit transport</string>
+    <string name="edit_restaurant">Edit restaurant</string>
+    <string name="edit_doc">Edit document</string>
+    <string name="edit_expense">Edit expense</string>
+    <string name="edit_destination">Edit destination</string>
+
+    <string name="empty_flights_title">No flights</string>
+    <string name="empty_flights_body">Keep your flights here with times, booking reference and boarding passes.</string>
+    <string name="empty_lodgings_title">No accommodation</string>
+    <string name="empty_lodgings_body">Add hotels or apartments with check-in and check-out dates.</string>
+    <string name="empty_activities_title">No activities</string>
+    <string name="empty_activities_body">Add excursions, tickets, tours and plans with their schedule.</string>
+    <string name="empty_transports_title">No transport</string>
+    <string name="empty_transports_body">Keep rental cars, trains, transfers and other journeys here.</string>
+    <string name="empty_restaurants_title">No restaurants</string>
+    <string name="empty_restaurants_body">Keep your restaurant bookings here with day, time and address.</string>
+    <string name="empty_docs_title">No travel documents</string>
+    <string name="empty_docs_body">Add visas, passports and insurance. We\'ll warn you before they expire.</string>
+    <string name="empty_expenses_title">No expenses</string>
+    <string name="empty_expenses_body">Track what you spend to see how much of the budget is left.</string>
+    <string name="empty_destinations_title">No destinations</string>
+    <string name="empty_destinations_body">If the trip passes through several cities, add them here with their dates.</string>
+
+    <!-- Form sections -->
+    <string name="sec_flight">Flight</string>
+    <string name="sec_departure">Departure</string>
+    <string name="sec_arrival">Arrival (optional)</string>
+    <string name="sec_booking">Booking</string>
+    <string name="sec_price">Price</string>
+    <string name="sec_notes">Notes</string>
+    <string name="sec_lodging">Accommodation</string>
+    <string name="sec_stay">Stay</string>
+    <string name="sec_contact">Contact</string>
+    <string name="sec_activity">Activity</string>
+    <string name="sec_schedule">Schedule</string>
+    <string name="sec_transport">Transport</string>
+    <string name="sec_places">Places</string>
+    <string name="sec_car_rental">Rental car</string>
+    <string name="sec_restaurant">Restaurant</string>
+    <string name="sec_document">Document</string>
+    <string name="sec_dates">Dates</string>
+    <string name="sec_sensitive">Sensitive detail</string>
+    <string name="sec_expense">Expense</string>
+    <string name="sec_destination">Destination</string>
+    <string name="sec_attachments">Attached files</string>
+    <string name="attach_empty">No attached files yet.</string>
+    <string name="viewer_page_of">Page %1$d of %2$d</string>
+    <string name="viewer_open_external">Open with another app</string>
+    <string name="viewer_error_title">Can\'t be shown here</string>
+    <string name="viewer_error_body">The file may be password-protected or damaged. Try opening it with another app.</string>
+    <string name="file_kind_pdf">PDF document</string>
+    <string name="file_kind_image">Image</string>
+    <string name="file_kind_other">File</string>
+    <string name="attach_pending">Will be stored when you tap Save</string>
+
+    <!-- Fields -->
+    <string name="f_airline">Airline</string>
+    <string name="f_flight_number">Flight number (e.g. IB3170)</string>
+    <string name="f_status">Status</string>
+    <string name="f_dep_airport">Departure airport</string>
+    <string name="f_arr_airport">Arrival airport</string>
+    <string name="f_terminal">Terminal</string>
+    <string name="f_dep_date">Departure date</string>
+    <string name="f_dep_time">Departure time</string>
+    <string name="f_dep_zone">Departure time zone</string>
+    <string name="f_arr_date">Arrival date</string>
+    <string name="f_arr_time">Arrival time</string>
+    <string name="f_arr_zone">Arrival time zone</string>
+    <string name="f_locator">Booking reference</string>
+    <string name="f_ticket">Ticket number</string>
+    <string name="f_seat">Seat</string>
+    <string name="f_class">Class</string>
+    <string name="f_baggage">Baggage</string>
+    <string name="f_price">Price</string>
+    <string name="f_price_estimated">Estimated price</string>
+    <string name="f_currency">Currency</string>
+    <string name="f_notes">Notes</string>
+    <string name="f_hotel_name">Accommodation name</string>
+    <string name="f_address">Address</string>
+    <string name="f_checkin_date">Check-in date</string>
+    <string name="f_checkin_time">Check-in time</string>
+    <string name="f_checkout_date">Check-out date</string>
+    <string name="f_checkout_time">Check-out time</string>
+    <string name="f_timezone">Time zone</string>
+    <string name="f_guests">Guests</string>
+    <string name="f_room">Room type</string>
+    <string name="f_reservation">Booking number</string>
+    <string name="f_phone">Phone</string>
+    <string name="f_website">Website</string>
+    <string name="f_name">Name</string>
+    <string name="f_location">Place</string>
+    <string name="f_date">Date</string>
+    <string name="f_start_time">Start time</string>
+    <string name="f_duration">Duration (optional)</string>
+    <string name="duration_dialog_title">Duration</string>
+    <string name="duration_hours">Hours</string>
+    <string name="duration_minutes">Minutes</string>
+    <string name="duration_hint">If you set the start time and the duration, the app works out when it ends.</string>
+    <string name="activity_ends_at">Ends at %1$s</string>
+    <string name="f_time">Time</string>
+    <string name="f_organizer">Organiser</string>
+    <string name="f_meeting">Meeting point</string>
+    <string name="f_participants">Participants</string>
+    <string name="f_booking_url">Booking link</string>
+    <string name="f_transport_type">Transport type</string>
+    <string name="f_company">Company</string>
+    <string name="f_vehicle_model">Vehicle model</string>
+    <string name="f_plate">Number plate</string>
+    <string name="f_pickup_date">Pick-up / departure date</string>
+    <string name="f_pickup_time">Pick-up / departure time</string>
+    <string name="f_return_date">Drop-off / arrival date</string>
+    <string name="f_return_time">Drop-off / arrival time</string>
+    <string name="f_origin">From</string>
+    <string name="f_destination">To</string>
+    <string name="f_insurance">Insurance</string>
+    <string name="f_mileage">Mileage</string>
+    <string name="f_fuel">Fuel</string>
+    <string name="f_conditions">Conditions</string>
+    <string name="f_restaurant_name">Restaurant name</string>
+    <string name="f_people">People</string>
+    <string name="f_url">Link</string>
+    <string name="f_doc_type">Document type</string>
+    <string name="f_doc_title">Title</string>
+    <string name="f_issuing_country">Issuing country</string>
+    <string name="f_issue_date">Issue date</string>
+    <string name="f_expiry_date">Expiry date</string>
+    <string name="f_reference">Document number</string>
+    <string name="f_approval_date">Approval date</string>
+    <string name="f_doc_status">Application status</string>
+    <string name="f_concept">Description</string>
+    <string name="f_category">Category</string>
+    <string name="f_amount">Amount</string>
+    <string name="f_payment">Payment method</string>
+    <string name="f_dest_start">Arrival at destination</string>
+    <string name="f_dest_end">Departure from destination</string>
+
+    <!-- Dropdown options -->
+    <string name="c_other">Other</string>
+    <string name="c_cabin_economy">Economy</string>
+    <string name="c_cabin_premium">Premium economy</string>
+    <string name="c_cabin_business">Business</string>
+    <string name="c_cabin_first">First</string>
+    <string name="c_status_confirmed">Confirmed</string>
+    <string name="c_status_pending">Pending</string>
+    <string name="c_status_checked_in">Checked in</string>
+    <string name="c_status_cancelled">Cancelled</string>
+    <string name="c_tr_car">Rental car</string>
+    <string name="c_tr_train">Train</string>
+    <string name="c_tr_bus">Bus</string>
+    <string name="c_tr_ferry">Ferry</string>
+    <string name="c_tr_transfer">Transfer</string>
+    <string name="c_tr_taxi">Taxi / ride-hailing</string>
+    <string name="c_doc_visa">Visa</string>
+    <string name="c_doc_passport">Passport</string>
+    <string name="c_doc_id">ID card</string>
+    <string name="c_doc_permit">Entry permit</string>
+    <string name="c_doc_eta">Electronic authorisation (eTA / ESTA)</string>
+    <string name="c_doc_insurance">Travel insurance</string>
+    <string name="c_docst_pending">Not applied for yet</string>
+    <string name="c_docst_applied">Applied for</string>
+    <string name="c_docst_approved">Approved</string>
+    <string name="c_docst_rejected">Rejected</string>
+    <string name="c_cat_flights">Flights</string>
+    <string name="c_cat_lodging">Accommodation</string>
+    <string name="c_cat_food">Food</string>
+    <string name="c_cat_transport">Transport</string>
+    <string name="c_cat_activities">Activities</string>
+    <string name="c_cat_shopping">Shopping</string>
+    <string name="c_pay_cash">Cash</string>
+    <string name="c_pay_card">Card</string>
+    <string name="c_pay_transfer">Bank transfer</string>
+
+    <!-- Document warnings -->
+    <string name="doc_warn_pending">Application pending</string>
+    <string name="doc_warn_soon">Expires soon</string>
+    <string name="doc_warn_before_trip">Expires before you\'re back</string>
+    <string name="doc_warn_expired">Expired</string>
+    <string name="doc_warn_rejected">Rejected</string>
+    <string name="doc_expires_on">Expires on %1$s</string>
+
+    <!-- Form errors and messages -->
+    <string name="error_required">Required field</string>
+    <string name="error_date">Invalid date</string>
+    <string name="error_time">Invalid time</string>
+    <string name="error_number">Invalid number</string>
+    <string name="error_budget">Invalid amount</string>
+    <string name="error_currency">Invalid currency code</string>
+    <string name="error_zone">Invalid time zone</string>
+    <string name="error_end_before_start">The end can\'t be before the start</string>
+    <string name="error_fix_fields">Check the fields marked in red.</string>
+    <string name="error_save">Couldn\'t save. Please try again.</string>
+    <string name="error_attach">Couldn\'t store the file.</string>
+    <string name="error_share">No app available to share this file.</string>
+    <string name="error_no_app_to_open">No installed app can open this file.</string>
+    <string name="error_no_app">No app available to do that.</string>
+    <string name="delete_item_title">Delete this item?</string>
+    <string name="delete_item_body">It will be deleted along with its attached files. This cannot be undone.</string>
+    <string name="delete_file_title">Delete this file?</string>
+    <string name="delete_file_body">“%1$s” will be deleted from Travel Index. This cannot be undone.</string>
+
+    <!-- Itinerary -->
+    <string name="it_tab_overview">Overview</string>
+    <string name="it_tab_day">By day</string>
+    <string name="it_tab_chrono">Chronological</string>
+    <string name="it_day_n">Day %1$d · %2$s</string>
+    <string name="it_no_plans">No plans this day</string>
+    <string name="it_empty_title">No events yet</string>
+    <string name="it_empty_body">When you add flights, accommodation, activities, transport or restaurants they\'ll show up here sorted by date and time.</string>
+    <string name="ev_flight">Flight</string>
+    <string name="ev_check_in">Check-in</string>
+    <string name="ev_check_out">Check-out</string>
+    <string name="ev_activity">Activity</string>
+    <string name="ev_transport">Transport</string>
+    <string name="ev_transport_end">End of transport</string>
+    <string name="ev_restaurant">Restaurant</string>
+    <string name="ev_reminder">Reminder</string>
+
+    <!-- Budget -->
+
+    <!-- Files -->
+    <string name="a11y_expand_group">Show these files</string>
+    <string name="a11y_expanded">Expanded</string>
+    <string name="a11y_collapsed">Collapsed</string>
+    <string name="a11y_collapse_group">Hide these files</string>
+    <string name="files_empty_title">No tickets or bookings yet</string>
+    <string name="files_empty_body">Keep your tickets, boarding passes, bookings, insurance or visas here. Pick them from your device or take a photo. They\'re stored in the app and open offline.</string>
+    <string name="files_group_transport_other">Taxis, transfers and others</string>
+    <string name="files_group_other">Other trip files</string>
+    <string name="add_file_title">Add file</string>
+    <string name="add_file_device">Pick from device</string>
+    <string name="add_file_device_hint">PDFs, photos or other files</string>
+    <string name="add_file_scan">Scan document</string>
+    <string name="add_file_scan_hint">With automatic cropping (or a plain photo if unavailable)</string>
+    <string name="error_no_camera">Couldn\'t open the camera on this device</string>
+    <string name="file_name">File name</string>
+    <string name="owner_none">Not linked (loose document)</string>
+    <string name="cat_boarding_pass">Boarding pass</string>
+    <string name="cat_ticket">Ticket</string>
+    <string name="cat_reservation">Booking</string>
+    <string name="cat_confirmation">Confirmation</string>
+    <string name="cat_insurance">Insurance</string>
+    <string name="cat_visa">Visa</string>
+    <string name="cat_contract">Contract</string>
+    <string name="cat_photo">Photo</string>
+    <string name="cat_other">Other</string>
+
+    <!-- Notes and lists -->
+    <string name="nk_note">Notes</string>
+    <string name="nk_packing">Packing</string>
+    <string name="nk_todo">To-do</string>
+    <string name="nk_reminder">Reminders</string>
+    <string name="nk_shopping">Shopping</string>
+    <string name="nk_info">Useful info</string>
+
+    <!-- Places -->
+
+    <!-- Calendar -->
+    <string name="calendar_today">Today</string>
+    <string name="calendar_prev">Previous month</string>
+    <string name="calendar_next">Next month</string>
+    <string name="calendar_legend_trip">Trip day</string>
+    <string name="calendar_legend_events">Has events</string>
+    <string name="calendar_no_plans">No plans this day</string>
+    <string name="calendar_empty_title">The calendar is empty</string>
+    <string name="calendar_empty_body">When you create a trip, its dates and events will show up here.</string>
+    <string name="calendar_a11y_trip">there is a trip</string>
+    <string name="calendar_a11y_events">has events</string>
+
+    <!-- Documents (tab) -->
+
+    <!-- Profile -->
+    <string name="profile_no_name">No name</string>
+    <string name="profile_name">Your name</string>
+    <string name="profile_edit_name">Edit name</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_remove_photo">Remove photo</string>
+    <string name="profile_photo">Profile photo</string>
+    <string name="sec_preferences">Preferences</string>
+    <string name="pref_currency">Default currency</string>
+    <string name="pref_date_format">Date format</string>
+    <string name="pref_theme">Theme</string>
+    <string name="pref_language">Language</string>
+    <string name="lang_system">System language</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">English</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="df_system">System default</string>
+    <string name="df_dmy">Day/Month/Year</string>
+    <string name="df_mdy">Month/Day/Year</string>
+    <string name="df_ymd">Year-Month-Day</string>
+    <string name="df_long">With month name</string>
+    <string name="sec_notifications">Notifications</string>
+    <string name="notif_enable">Reminders</string>
+    <string name="notif_enable_hint">Alerts for activities, check-in and expiring documents. Each flight alerts twice: in advance (24 hours) and 1 hour before departure. If you save a flight on short notice, you get whichever alerts are still ahead.</string>
+    <string name="notif_system_off">Travel Index notifications are turned off in Android settings, so you won\'t get any alerts.</string>
+    <string name="notif_open_settings">Open Android settings</string>
+    <string name="support_title">Support the project</string>
+    <string name="support_hint">Optional · buy me a coffee</string>
+    <string name="support_dialog_title">Support Travel Index</string>
+    <string name="support_dialog_body">Travel Index is free, with no ads and no accounts. If you find it useful and want to chip in, you can give whatever you like via PayPal.
+
+It\'s entirely optional: the app works the same either way. It opens in your browser; the app itself still never connects to the internet.</string>
+    <string name="support_open">Open PayPal</string>
+    <string name="support_not_now">Not now</string>
+    <string name="sec_privacy">Privacy</string>
+    <string name="privacy_block_shots">Block screenshots</string>
+    <string name="privacy_block_shots_hint">Hides the content in screenshots and in the recent apps view.</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="sec_data">Data and backup</string>
+    <string name="backup_hint">The backup includes trips, bookings, expenses, notes and files in a single .zip that you keep wherever you want. It isn\'t encrypted: store it somewhere you trust.</string>
+    <string name="backup_export">Create backup</string>
+    <string name="backup_restore">Restore backup</string>
+    <string name="restore_confirm_title">Restore this backup?</string>
+    <string name="restore_confirm_body">ALL current trips, notes and files will be replaced by the ones in the backup, and the app will restart. This cannot be undone.</string>
+    <string name="data_delete_all">Delete all my trips and files</string>
+    <string name="data_delete_title">Delete all trips?</string>
+    <string name="data_delete_body">All trips, bookings, expenses, notes and files on this device will be deleted. Your profile and settings are kept. Create a backup first if you want to be able to get them back. This cannot be undone.</string>
+    <string name="msg_backup_ok">Backup created</string>
+    <string name="msg_backup_failed">Couldn\'t create the backup</string>
+    <string name="msg_restore_failed">Couldn\'t restore: the file isn\'t a valid Travel Index backup. Nothing was changed.</string>
+    <string name="msg_data_deleted">All trips and files have been deleted</string>
+    <string name="msg_photo_failed">Couldn\'t save the photo</string>
+    <string name="sec_about">Information</string>
+
+    <!-- About -->
+    <string name="about_title">About Travel Index</string>
+    <string name="about_version">Version</string>
+    <string name="about_package">Package</string>
+    <string name="about_author">Made by</string>
+    <string name="author_name">Emerson Villalva Labrador</string>
+    <string name="made_by">Made by Emerson Villalva Labrador</string>
+    <string name="about_description">All your trips in one place: flights, accommodation, activities, travel documents and calendar, stored on your device and available offline.</string>
+    <string name="about_highlights_title">What it includes</string>
+    <string name="about_highlights">Global search and flights with date, times, duration and what you paid at a glance; accommodation, activities with their duration (the end time is worked out for you), transport and restaurants. Visas and documents with expiry warnings. Files grouped by section, with previews and a built-in viewer: pick them from your device or scan them with automatic cropping. Itinerary and calendar. What you paid on each trip, by category, plus the history of your past trips. Export the whole trip to PDF. Share a trip as an exact copy. Backup and restore.</string>
+    <string name="about_limits_title">What it doesn\'t do</string>
+    <string name="about_limits">No accounts and no cloud sync. It never connects to the internet. It doesn\'t convert between currencies. There\'s no street map: it draws each flight\'s route. Reminders use Android\'s approximate alarms, so they can run a few minutes late. It doesn\'t check delays or cancellations: you enter the flight details yourself. The PDF summarises the trip, with document numbers masked, and doesn\'t include your attached files.</string>
+
+    <!-- Privacy policy -->
+    <string name="privacy_intro">Travel Index works without an account and without a connection. This is exactly what the app does with your data.</string>
+    <string name="privacy_h_data">Your data</string>
+    <string name="privacy_b_data">Everything you type (trips, bookings, document details) is stored only on this device, in the app\'s private storage. The developer doesn\'t receive and can\'t see that information.</string>
+    <string name="privacy_h_network">Internet connection</string>
+    <string name="privacy_b_network">The app never connects to the internet: it doesn\'t have that permission, uses no analytics, shows no ads and includes no trackers. Only when you open a link is it handled by the browser or app you choose. If you decide to support the project, the app opens a PayPal link in your browser; it\'s optional and the app receives no data about that payment.</string>
+    <string name="privacy_h_files">Files and photos</string>
+    <string name="privacy_b_files">The files you pick are copied into the app\'s private storage and other apps can\'t access them. “Scan document” uses the Google Play Services scanner, which runs on your device: the document is only stored in the app if you accept it (without Play Services, the system camera is used instead). When you open or share a file, temporary access is granted to the app you choose. If you delete a file or a trip, the copy is deleted.</string>
+    <string name="privacy_h_permissions">Permissions</string>
+    <string name="privacy_b_permissions">Notifications: to show the alerts your own device schedules. Boot: to re-schedule those alerts when the phone restarts. No internet, location, contacts, camera, microphone or storage permissions are requested: a document photo is taken by the system camera, not by the app.</string>
+    <string name="privacy_h_backup">Backups</string>
+    <string name="privacy_b_backup">Android\'s automatic backup is disabled so your data never leaves the device without your say-so. The only copies are the ones you create: the one in Profile, the “Share trip” file or the trip PDF, which you hand to whoever you choose. None of them is encrypted. The backup and the share file can include document and ticket numbers, so send them only to people you trust; the PDF shows those numbers masked.</string>
+    <string name="privacy_h_sensitive">Sensitive details</string>
+    <string name="privacy_b_sensitive">Document and ticket numbers are hidden by default. Don\'t store passwords in the app. You can block screenshots in Profile.</string>
+    <string name="privacy_h_delete">Deleting your data</string>
+    <string name="privacy_b_delete">You can delete individual trips, or all your trips and files from Profile. Uninstalling the app also deletes all its data from the device.</string>
+    <string name="privacy_h_contact">Contact</string>
+    <string name="privacy_b_contact">If you have privacy questions, you can write to the developer from the Travel Index listing on Google Play.</string>
+
+    <!-- What you paid (past trips) -->
+    <string name="cost_title">What you paid</string>
+    <string name="cost_flights">Flights</string>
+    <string name="cost_lodging">Accommodation</string>
+    <string name="cost_activities">Activities</string>
+    <string name="cost_transport">Transport</string>
+    <string name="cost_restaurants">Restaurants</string>
+    <string name="cost_other">Other expenses</string>
+    <string name="cost_total">Total</string>
+    <string name="cost_currencies_note">Different currencies aren\'t added together.</string>
+    <string name="trip_paid">Paid: %1$s</string>
+
+    <!-- Share and import trips -->
+    <string name="action_share_trip">Share trip</string>
+    <string name="action_import_trip">Import trip</string>
+    <string name="share_trip_title">Share this trip</string>
+    <string name="share_trip_body">A file will be created with an exact copy of the trip: details, travel documents and attached files (including passport or ticket numbers, if you stored them). The file isn\'t encrypted: send it only to people you trust. The other person opens it with Travel Index and the trip is added to their phone.</string>
+    <string name="share_preparing">Preparing the trip…</string>
+    <string name="action_export_pdf">Export to PDF</string>
+    <string name="pdf_generating">Creating the PDF…</string>
+    <string name="pdf_ready_title">PDF ready</string>
+    <string name="pdf_ready_body">Open it to review it, or share it and keep it wherever you like: on your phone, in the cloud or to print.</string>
+    <string name="pdf_open">Open</string>
+    <string name="pdf_share">Share or save</string>
+    <string name="error_pdf">Couldn\'t create the PDF.</string>
+    <string name="pdf_footer">Travel Index · %1$s · Page %2$d of %3$d</string>
+    <string name="pdf_cancelled">Trip cancelled</string>
+    <string name="pdf_summary">Summary</string>
+    <string name="pdf_facts_dates">Dates</string>
+    <string name="pdf_facts_destination">Destination</string>
+    <string name="pdf_facts_transport">Transport</string>
+    <string name="pdf_budget_planned">Planned budget</string>
+    <string name="pdf_docs_note">For safety, document numbers are masked in the PDF.</string>
+    <string name="pdf_activity_end">End time</string>
+    <string name="pdf_files_note">Files aren\'t embedded in the PDF: this is only their list. They stay stored in the app.</string>
+    <string name="share_trip_text">I\'m sharing my trip “%1$s” with Travel Index. Open the attached file with the app and it will be added to your phone. If you don\'t have it, install it from here: %2$s</string>
+    <string name="error_share_trip">Couldn\'t prepare the trip for sharing.</string>
+    <string name="import_working">Preparing the trip…</string>
+    <string name="import_confirm_title">Add this trip?</string>
+    <string name="import_confirm_body">It will be added as a new trip, with a copy of its details and files. None of your trips are changed.</string>
+    <string name="import_confirm_yes">Add trip</string>
+    <string name="import_count_flights">Flights: %1$d</string>
+    <string name="import_count_lodgings">Accommodation: %1$d</string>
+    <string name="import_count_others">Other items: %1$d</string>
+    <string name="import_count_files">Files: %1$d (%2$s)</string>
+    <string name="import_done_title">Trip added</string>
+    <string name="import_done_skipped">The trip was added, but %1$d items couldn\'t be read and were skipped.</string>
+    <string name="import_failed_title">Couldn\'t import</string>
+    <string name="import_err_generic">Couldn\'t add the trip. Nothing was changed.</string>
+    <string name="import_err_not_trip">This file isn\'t a Travel Index trip.</string>
+    <string name="import_err_too_big">The file is too large to import.</string>
+    <string name="import_err_too_new">This trip was created with a newer version of Travel Index. Update the app to open it.</string>
+    <string name="import_err_unreadable">Couldn\'t read the file.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">Reminders</string>
+    <string name="notif_channel_desc">Alerts for flights, check-in, activities and expiring documents.</string>
+    <string name="notif_flight_title">Flight: %1$s</string>
+    <string name="notif_checkin_title">Accommodation check-in</string>
+    <string name="notif_activity_title">Activity: %1$s</string>
+    <string name="notif_restaurant_title">Restaurant: %1$s</string>
+    <string name="notif_transport_title">Transport: %1$s</string>
+    <string name="notif_note_title">Reminder</string>
+    <string name="notif_doc_title">Document about to expire</string>
+    <string name="notif_doc_text">%1$s · expires: %2$s</string>
+    <string name="widget_label">Next event</string>
+    <string name="widget_description">Your next trip event, at a glance.</string>
+    <string name="widget_empty">No upcoming plans</string>
+    <string name="widget_trip_starts">The trip starts on %1$s</string>
+    <string name="when_today">today</string>
+    <string name="when_tomorrow">tomorrow</string>
+    <string name="when_day_time">%1$s at %2$s</string>
+</resources>

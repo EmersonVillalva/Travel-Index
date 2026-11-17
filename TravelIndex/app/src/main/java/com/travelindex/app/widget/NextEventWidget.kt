@@ -9,6 +9,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.travelindex.app.MainActivity
 import com.travelindex.app.R
+import com.travelindex.app.data.LanguageManager
 import com.travelindex.app.data.repo.TripRepository
 import com.travelindex.app.domain.TripBundle
 import com.travelindex.app.domain.WidgetPlanner
@@ -57,7 +58,8 @@ class NextEventWidget : AppWidgetProvider() {
             ids.forEach { manager.updateAppWidget(it, views) }
         }
 
-        private fun render(context: Context, bundles: List<TripBundle>): RemoteViews {
+        private fun render(base: Context, bundles: List<TripBundle>): RemoteViews {
+            val context = LanguageManager.localize(base)
             val rv = RemoteViews(context.packageName, R.layout.widget_next_event)
             val next = WidgetPlanner.next(bundles, System.currentTimeMillis(), ZoneId.systemDefault())
             if (next == null) {

@@ -161,8 +161,8 @@ if unused:
     warnings.append("textos sin usar (no es un error): " + ", ".join(unused))
 
 # ---- Paridad entre idiomas ---------------------------------------------------------------------------
-# El archivo base (values/) es inglés y values-es/ el español: deben tener exactamente las mismas claves
-# y los mismos marcadores %n$x en cada texto, o un idioma se caería al inglés (o rompería el formato).
+# El archivo base (values/) es el español (idioma por defecto) y values-en/ el inglés: deben tener exactamente las
+# mismas claves y los mismos marcadores %n$x en cada texto, o un idioma se caería al otro (o rompería el formato).
 def parse_locale(path):
     txt = read(path)
     sts = {m.group(1): m.group(2) for m in re.finditer(r'<string name="([^"]+)"[^>]*>(.*?)</string>', txt, re.S)}

@@ -2,6 +2,7 @@ package com.travelindex.app.export
 
 import android.content.Context
 import com.travelindex.app.R
+import com.travelindex.app.data.LanguageManager
 import com.travelindex.app.data.SettingsRepository
 import com.travelindex.app.data.repo.TripRepository
 import com.travelindex.app.domain.Formats
@@ -21,10 +22,12 @@ import javax.inject.Singleton
  */
 @Singleton
 class TripPdfExporter @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext private val appContext: Context,
     private val trips: TripRepository,
     private val settings: SettingsRepository,
 ) {
+    // El PDF sale en el idioma elegido en la app, no en el del móvil.
+    private val context: Context get() = LanguageManager.localize(appContext)
     private val sharedDir: File get() = File(context.cacheDir, "shared").apply { mkdirs() }
 
     /** null si el viaje ya no existe. */
