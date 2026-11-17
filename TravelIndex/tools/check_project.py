@@ -19,4 +19,28 @@ for p in root.rglob("*"):
             if w.lower() in t.lower(): print(f"[NOMBRE ANTIGUO '{w}'] {p.relative_to(root)}"); bad += 1
         for m in re.finditer(r"\b[Tt]ravel[_-][Ii]ndex\b|\bTRAVELINDEX\b|\bTravelindex\b|\bTravel index\b|\btravel Index\b", t):
             print(f"[GRAFÍA] '{m.group(0)}' en {p.relative_to(root)}"); bad += 1
+# Catalogo de versiones: Gradle aborta antes de empezar si el TOML esta mal o repite una clave
+# (tomllib tambien rechaza claves duplicadas) o si un build.gradle.kts usa un libs.* que no existe.
+try:
+    import tomllib
+except ImportError:
+    tomllib = None
+cat_path = root / "gradle" / "libs.versions.toml"
+if tomllib and cat_path.exists():
+    try:
+        cat = tomllib.loads(cat_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[CATALOGO] libs.versions.toml: {e}"); bad += 1
+        cat = None
+    if cat:
+        known = {"libs." + k.replace("-", ".") for k in cat.get("libraries", {})}
+        known |= {"libs.plugins." + k.replace("-", ".") for k in cat.get("plugins", {})}
+        known |= {"libs.versions." + k.replace("-", ".") for k in cat.get("versions", {})}
+        groups = {".".join(k.split(".")[:i]) for k in known for i in range(2, len(k.split(".")))}
+        for g in list(root.rglob("build.gradle.kts")) + list(root.rglob("settings.gradle.kts")):
+            if any(s in g.parts for s in ("build", ".gradle")): continue
+            for m in re.finditer(r"\blibs(?:\.[A-Za-z][A-Za-z0-9_]*)+", g.read_text(encoding="utf-8")):
+                ref = re.sub(r"\.(get|asProvider|asInt|asString)$", "", m.group(0))
+                if ref not in known and ref not in groups:
+                    print(f"[CATALOGO] {g.relative_to(root)}: '{ref}' no esta en libs.versions.toml"); bad += 1
 print("Sin incidencias" if not bad else f"{bad} incidencia(s)"); sys.exit(1 if bad else 0)

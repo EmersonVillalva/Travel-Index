@@ -57,7 +57,7 @@ jobs:
       - name: Los tests son obligatorios
         if: steps.tests.outcome == 'failure'
         run: |
-          echo "::error::Los tests han fallado; el APK no se genera. Mira el artefacto TravelIndex-informe-tests."
+          echo "::error::Los tests han fallado; el APK no se genera. Mira el artefacto TravelIndex-informe-tests (si no existe, Gradle no llegó a arrancar: mira el log del paso Tests)."
           exit 1
 
       # Puerta 3: Android Lint. Caza textos sin traducir, APIs mal usadas y recursos rotos.
