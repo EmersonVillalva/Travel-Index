@@ -77,7 +77,7 @@ fun FormField(
     /** Solo para fechas: el selector no deja elegir un día anterior a este. */
     minDate: LocalDate? = null,
 ) {
-    val label = stringResource(def.labelRes) + if (def.required) " *" else ""
+    val label = stringResource(def.formLabelRes ?: def.labelRes) + if (def.required) " *" else ""
     val errMsg = error?.let { errorText(it) }
     val formats = LocalFormats.current
 

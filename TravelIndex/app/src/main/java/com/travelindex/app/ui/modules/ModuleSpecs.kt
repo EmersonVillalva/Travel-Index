@@ -23,7 +23,13 @@ import com.travelindex.app.domain.forms.FieldDef
 import com.travelindex.app.domain.forms.FieldType
 
 /** [keys] = lo que muestra el detalle; [formKeys] = lo que se pide en el formulario (por defecto, lo mismo). */
-data class FormSection(@StringRes val titleRes: Int, val keys: List<String>, val formKeys: List<String> = keys)
+data class FormSection(
+    @StringRes val titleRes: Int,
+    val keys: List<String>,
+    val formKeys: List<String> = keys,
+    /** Título solo para el formulario (p. ej. con "(opcional)"); el detalle usa [titleRes]. */
+    @StringRes val formTitleRes: Int? = null,
+)
 
 data class ModuleSpec(
     val type: ModuleType,
@@ -45,8 +51,9 @@ data class ModuleSpec(
 }
 
 private fun f(key: String, @StringRes label: Int, type: FieldType = FieldType.TEXT, required: Boolean = false,
-              choices: List<Choice> = emptyList(), sensitive: Boolean = false, notBeforeKey: String? = null) =
-    FieldDef(key, label, type, required, choices, sensitive, notBeforeKey)
+              choices: List<Choice> = emptyList(), sensitive: Boolean = false, notBeforeKey: String? = null,
+              @StringRes formLabel: Int? = null) =
+    FieldDef(key, label, type, required, choices, sensitive, notBeforeKey, formLabel)
 
 object Choices {
     val cabin = listOf(
@@ -115,7 +122,7 @@ object ModuleSpecs {
             FormSection(R.string.sec_flight, listOf("flightNumber", "airline")),
             FormSection(R.string.sec_departure, listOf("departureAirport", "terminal", "depDate", "depTime", "depZone"),
                 formKeys = listOf("departureAirport", "depDate", "depTime", "depZone")),
-            FormSection(R.string.sec_arrival, listOf("arrivalAirport", "arrDate", "arrTime", "arrZone")),
+            FormSection(R.string.sec_arrival, listOf("arrivalAirport", "arrDate", "arrTime", "arrZone"), formTitleRes = R.string.sec_arrival_form),
             FormSection(R.string.sec_price, listOf("price", "currency")),
         ),
         // La zona horaria solo se pide si el aeropuerto no es de nuestra lista (si lo es, se pone sola).
@@ -169,7 +176,7 @@ object ModuleSpecs {
             f("location", R.string.f_location),
             f("date", R.string.f_date, FieldType.DATE, required = true),
             f("startTime", R.string.f_start_time, FieldType.TIME),
-            f("duration", R.string.f_duration, FieldType.DURATION),
+            f("duration", R.string.f_duration, FieldType.DURATION, formLabel = R.string.f_duration_form),
             f("timeZone", R.string.f_timezone, FieldType.ZONE, required = true),
             f("organizer", R.string.f_organizer),
             f("meetingAddress", R.string.f_meeting),

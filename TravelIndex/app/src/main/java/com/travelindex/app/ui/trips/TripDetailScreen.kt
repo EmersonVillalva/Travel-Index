@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -68,6 +69,7 @@ import com.travelindex.app.domain.DocWarnings
 import com.travelindex.app.domain.ItineraryEvent
 import com.travelindex.app.domain.forms.TravelDocCodec
 import com.travelindex.app.domain.ModuleType
+import com.travelindex.app.domain.SectionCosts
 import com.travelindex.app.domain.TravelModes
 import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.TransportSections
@@ -312,6 +314,14 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
     val now = ZonedDateTime.now()
     val next = if (trip.cancelled) null else b.events.filter { !it.start.isBefore(now) }.minByOrNull { it.start.toInstant() }
     val costs = if (b.status(today) == TripStatus.COMPLETED) CostBreakdown.of(b) else emptyList()
+    // Lo pagado en cada tarjeta: varios elementos se suman y, si ninguno tiene precio, no sale nada.
+    val transportTypes = b.transports.map { it.type }
+    val transportShown = TransportSections.shown(TravelModes.parse(trip.travelModes), transportTypes)
+    val transportPrices = transportShown.associateWith { SectionCosts.format(SectionCosts.of(b, it)) }
+    val modulePrices = listOf(ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT)
+        .associateWith { SectionCosts.format(SectionCosts.of(b, it)) }
+    // Si alguna tarjeta enseña precio, las demás reservan esa línea para que la cuadrícula quede con alturas iguales.
+    val reservePrice = transportPrices.values.any { it.isNotEmpty() } || modulePrices.values.any { it.isNotEmpty() }
 
     CenteredContent(modifier, maxWidth = 920.dp) {
         LazyVerticalGrid(
@@ -375,20 +385,23 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
             item { Tile(Icons.Outlined.Timeline, stringResource(R.string.mod_itinerary),
                 pluralText(R.plurals.tile_events, b.events.size), a.openItinerary) }
             // Transporte: solo los apartados de los medios que se eligieron al crear el viaje.
-            val transportTypes = b.transports.map { it.type }
-            TransportSections.shown(TravelModes.parse(trip.travelModes), transportTypes).forEach { s ->
+            transportShown.forEach { s ->
                 val spec = ModuleSpecs.of(s.module, s)
                 item {
                     Tile(spec.icon, stringResource(spec.titleRes),
-                        countText(TransportSections.count(s, b.flights.size, transportTypes)), { a.openSection(s) })
+                        countText(TransportSections.count(s, b.flights.size, transportTypes)), { a.openSection(s) },
+                        price = transportPrices[s].orEmpty(), reservePrice = reservePrice)
                 }
             }
             listOf(ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT).forEach { t ->
                 val spec = ModuleSpecs.of(t)
-                item { Tile(spec.icon, stringResource(spec.titleRes), countText(b.count(t)), { a.openList(t) }) }
+                item {
+                    Tile(spec.icon, stringResource(spec.titleRes), countText(b.count(t)), { a.openList(t) },
+                        price = modulePrices[t].orEmpty(), reservePrice = reservePrice)
+                }
             }
-            item { Tile(Icons.Outlined.Badge, stringResource(R.string.mod_docs), countText(b.docs.size), { a.openList(ModuleType.TRAVEL_DOC) }) }
-            item { Tile(Icons.Outlined.Folder, stringResource(R.string.mod_files), countText(b.attachments.size), a.openFiles) }
+            item { Tile(Icons.Outlined.Badge, stringResource(R.string.mod_docs), countText(b.docs.size), { a.openList(ModuleType.TRAVEL_DOC) }, reservePrice = reservePrice) }
+            item { Tile(Icons.Outlined.Folder, stringResource(R.string.mod_files), countText(b.attachments.size), a.openFiles, reservePrice = reservePrice) }
         }
     }
 }
@@ -397,7 +410,13 @@ private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
 private fun countText(n: Int): String = if (n == 0) stringResource(R.string.tile_empty) else pluralText(R.plurals.tile_count, n)
 
 @Composable
-private fun Tile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+private fun Tile(
+    icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit,
+    /** Lo pagado en este apartado ("1.234,50 €"); vacío si no hay precio y entonces no se muestra nada. */
+    price: String = "",
+    /** Reserva la línea del precio aunque esta tarjeta no tenga, para igualar alturas con las que sí. */
+    reservePrice: Boolean = false,
+) {
     Card(onClick = onClick, shape = MaterialTheme.shapes.medium, elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
         Column(Modifier.fillMaxWidth().padding(Spacing.m), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Icon(icon, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(28.dp))
@@ -405,6 +424,11 @@ private fun Tile(icon: ImageVector, title: String, subtitle: String, onClick: ()
             // («Visados y documentos de viaje»), para que la cuadrícula quede con alturas iguales.
             Text(title, style = MaterialTheme.typography.titleSmall, minLines = 2, maxLines = 2)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+            if (price.isNotEmpty()) {
+                Text(price, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, maxLines = 2)
+            } else if (reservePrice) {
+                Text("", style = MaterialTheme.typography.bodyMedium, minLines = 1)
+            }
         }
     }
 }

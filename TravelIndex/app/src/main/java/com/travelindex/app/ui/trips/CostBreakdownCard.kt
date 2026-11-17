@@ -19,7 +19,7 @@ import com.travelindex.app.R
 import com.travelindex.app.domain.CostBreakdown
 import com.travelindex.app.domain.CostCategory
 import com.travelindex.app.domain.CostLine
-import com.travelindex.app.domain.Money
+import com.travelindex.app.domain.SectionCosts
 import com.travelindex.app.ui.theme.Spacing
 
 @Composable
@@ -34,8 +34,7 @@ private fun categoryName(c: CostCategory): String = stringResource(
     }
 )
 
-private fun amounts(byCurrency: Map<String, Long>): String =
-    byCurrency.entries.joinToString(" · ") { (cur, minor) -> Money.format(minor, cur) }
+private fun amounts(byCurrency: Map<String, Long>): String = SectionCosts.format(byCurrency)
 
 /** Lo que se pagó en un viaje, separado por vuelos, alojamiento y el resto. Las monedas distintas nunca se suman entre sí. */
 @Composable

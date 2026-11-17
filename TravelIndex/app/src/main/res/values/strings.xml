@@ -269,7 +269,8 @@
     <!-- Secciones de formularios -->
     <string name="sec_flight">Vuelo</string>
     <string name="sec_departure">Salida</string>
-    <string name="sec_arrival">Llegada (opcional)</string>
+    <string name="sec_arrival">Llegada</string>
+    <string name="sec_arrival_form">Llegada (opcional)</string>
     <string name="sec_booking">Reserva</string>
     <string name="sec_price">Precio</string>
     <string name="sec_notes">Notas</string>
@@ -336,7 +337,8 @@
     <string name="f_location">Lugar</string>
     <string name="f_date">Fecha</string>
     <string name="f_start_time">Hora de inicio</string>
-    <string name="f_duration">Duración (opcional)</string>
+    <string name="f_duration">Duración</string>
+    <string name="f_duration_form">Duración (opcional)</string>
     <string name="duration_dialog_title">Duración</string>
     <string name="duration_hours">Horas</string>
     <string name="duration_minutes">Minutos</string>

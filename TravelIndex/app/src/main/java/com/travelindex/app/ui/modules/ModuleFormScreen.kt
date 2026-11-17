@@ -122,7 +122,7 @@ fun ModuleFormScreen(onClose: () -> Unit, onOpenViewer: (Long) -> Unit, vm: Modu
                 spec.sections.forEach { section ->
                     val defs = section.formKeys.mapNotNull { spec.field(it) }.filter { spec.visibleWhen(it, state.values) }
                     if (defs.isEmpty()) return@forEach
-                    SectionCard(stringResource(section.titleRes)) {
+                    SectionCard(stringResource(section.formTitleRes ?: section.titleRes)) {
                         FieldGroups(defs) { def ->
                             FormField(
                                 def = def, value = state.values[def.key].orEmpty(), error = state.errors[def.key],

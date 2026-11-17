@@ -20,6 +20,8 @@ data class FieldDef(
     val sensitive: Boolean = false,
     /** Solo para fechas: clave de otra fecha del formulario; este campo no puede ser anterior a ella (p. ej. salida del hotel). */
     val notBeforeKey: String? = null,
+    /** Etiqueta solo para el formulario (p. ej. con "(opcional)"); el detalle y el PDF usan [labelRes]. */
+    val formLabelRes: Int? = null,
 )
 
 enum class FieldError {
