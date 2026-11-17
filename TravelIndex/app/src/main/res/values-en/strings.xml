@@ -135,6 +135,11 @@
     <string name="trip_saved">Trip saved</string>
     <string name="sec_trip_basic">Trip details</string>
     <string name="field_trip_dates">Trip dates (departure and return)</string>
+    <string name="range_hint_start">Tap the departure day</string>
+    <string name="range_hint_end">Now tap the return day (or accept for a one-day trip)</string>
+    <string name="range_prev_month">Previous month</string>
+    <string name="range_next_month">Next month</string>
+    <string name="range_day_action">Pick this day</string>
     <string name="sec_route">Route</string>
     <string name="sec_trip_dates">Dates</string>
     <string name="sec_trip_budget">Travellers and currency</string>

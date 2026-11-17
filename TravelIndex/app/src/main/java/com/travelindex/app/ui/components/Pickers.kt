@@ -22,7 +22,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -94,40 +92,6 @@ fun PickerField(
         if (error != null) {
             Text(error, color = errorColor, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 16.dp, top = 4.dp))
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DateRangePickerDialogHost(
-    initialStart: LocalDate?,
-    initialEnd: LocalDate?,
-    onDismiss: () -> Unit,
-    onPick: (LocalDate, LocalDate) -> Unit,
-) {
-    val state = rememberDateRangePickerState(
-        initialSelectedStartDateMillis = initialStart?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-        initialSelectedEndDateMillis = initialEnd?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-    )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val s = state.selectedStartDateMillis ?: return@TextButton
-                    val e = state.selectedEndDateMillis ?: s   // un solo día marcado = viaje de un día
-                    onPick(
-                        Instant.ofEpochMilli(s).atZone(ZoneOffset.UTC).toLocalDate(),
-                        Instant.ofEpochMilli(e).atZone(ZoneOffset.UTC).toLocalDate(),
-                    )
-                },
-                enabled = state.selectedStartDateMillis != null,
-            ) { Text(stringResource(R.string.action_ok)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
-    ) {
-        // Sin tope de alto, el selector de rango desborda el diálogo.
-        DateRangePicker(state = state, modifier = Modifier.heightIn(max = 460.dp))
     }
 }
 

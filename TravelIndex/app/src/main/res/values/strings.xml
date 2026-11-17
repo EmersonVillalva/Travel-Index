@@ -139,6 +139,11 @@
     <string name="trip_saved">Viaje guardado</string>
     <string name="sec_trip_basic">Datos del viaje</string>
     <string name="field_trip_dates">Fechas del viaje (ida y vuelta)</string>
+    <string name="range_hint_start">Toca el día de ida</string>
+    <string name="range_hint_end">Ahora toca el día de vuelta (o acepta si es un viaje de un solo día)</string>
+    <string name="range_prev_month">Mes anterior</string>
+    <string name="range_next_month">Mes siguiente</string>
+    <string name="range_day_action">Elegir este día</string>
     <string name="sec_route">Trayecto</string>
     <string name="sec_trip_dates">Fechas</string>
     <string name="sec_trip_budget">Viajeros y moneda</string>
