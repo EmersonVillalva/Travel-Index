@@ -1,5 +1,6 @@
 package com.travelindex.app.uitest
 
+import android.app.Application
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.ui.modules.ModuleSpec
@@ -18,7 +19,8 @@ import org.robolectric.annotation.Config
  * Las comprobaciones no dependen del idioma del test (miran «opcional» y «optional»).
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+// Application vacía: solo se leen textos, y así no arranca la app real (Hilt, Room…) con consultas en segundo plano.
+@Config(sdk = [34], application = Application::class)
 class OptionalLabelsTest {
     private val context get() = RuntimeEnvironment.getApplication()
 
