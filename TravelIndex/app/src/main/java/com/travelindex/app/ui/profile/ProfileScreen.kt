@@ -78,7 +78,6 @@ import com.travelindex.app.domain.DateFormatOption
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ThemeMode
 import com.travelindex.app.ui.components.ChoiceDialog
-import com.travelindex.app.ui.components.ConfirmDialog
 import com.travelindex.app.ui.components.Option
 import com.travelindex.app.ui.components.currencyOptionsList
 import com.travelindex.app.ui.components.SectionCard
@@ -91,7 +90,7 @@ import java.time.LocalDate
 
 private enum class Picking { CURRENCY, DATE, LANGUAGE }
 
-/** Perfil y ajustes: datos personales, preferencias, notificaciones, privacidad, copia de seguridad y datos. */
+/** Perfil y ajustes: datos personales, preferencias, notificaciones, privacidad e información. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -100,14 +99,11 @@ fun ProfileScreen(
     vm: ProfileViewModel = hiltViewModel(),
 ) {
     val s by vm.settings.collectAsStateWithLifecycle()
-    val busy by vm.busy.collectAsStateWithLifecycle()
     val ctx = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
 
     var editingName by rememberSaveable { mutableStateOf(false) }
     var picking by rememberSaveable { mutableStateOf<String?>(null) }
-    var pendingRestore by rememberSaveable { mutableStateOf<String?>(null) }
-    var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var supportOpen by rememberSaveable { mutableStateOf(false) }
     var language by remember { mutableStateOf(LanguageManager.get(ctx)) }
 
@@ -119,19 +115,7 @@ fun ProfileScreen(
     }
 
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) vm.setPhoto(uri) }
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-        if (uri != null) vm.exportBackup(uri)
-    }
-    val restoreLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) pendingRestore = uri.toString()
-    }
-
     val messages = mapOf(
-        ProfileMessage.BACKUP_OK to stringResource(R.string.msg_backup_ok),
-        ProfileMessage.BACKUP_FAILED to stringResource(R.string.msg_backup_failed),
-        ProfileMessage.RESTORE_FAILED to stringResource(R.string.msg_restore_failed),
-        ProfileMessage.DATA_DELETED to stringResource(R.string.msg_data_deleted),
-        ProfileMessage.DELETE_FAILED to stringResource(R.string.error_save),
         ProfileMessage.PHOTO_FAILED to stringResource(R.string.msg_photo_failed),
     )
     LaunchedEffect(Unit) { vm.messages.collect { m -> snackbar.showSnackbar(messages[m].orEmpty()) } }
@@ -211,23 +195,6 @@ fun ProfileScreen(
                         SettingRow(stringResource(R.string.privacy_policy), "") { onOpenPrivacy() }
                     }
 
-                    // ---- Datos ----
-                    SectionCard(stringResource(R.string.sec_data)) {
-                        Text(stringResource(R.string.backup_hint), style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Button(
-                            onClick = { exportLauncher.launch("TravelIndex-backup-${LocalDate.now()}.zip") },
-                            enabled = !busy, modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.backup_export)) }
-                        OutlinedButton(
-                            onClick = { restoreLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) },
-                            enabled = !busy, modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.backup_restore)) }
-                        OutlinedButton(onClick = { confirmDelete = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
-                            Text(stringResource(R.string.data_delete_all), color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-
                     // ---- Información ----
                     SectionCard(stringResource(R.string.sec_about)) {
                         SettingRow(stringResource(R.string.about_title), "") { onOpenAbout() }
@@ -239,11 +206,6 @@ fun ProfileScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.s),
                     )
-                }
-                if (busy) {
-                    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
                 }
             }
         }
@@ -287,19 +249,6 @@ fun ProfileScreen(
         )
         null -> Unit
     }
-
-    pendingRestore?.let { uri ->
-        ConfirmDialog(
-            title = stringResource(R.string.restore_confirm_title), body = stringResource(R.string.restore_confirm_body),
-            confirmLabel = stringResource(R.string.backup_restore),
-            onConfirm = { pendingRestore = null; vm.restoreBackup(Uri.parse(uri)) }, onDismiss = { pendingRestore = null },
-        )
-    }
-    if (confirmDelete) ConfirmDialog(
-        title = stringResource(R.string.data_delete_title), body = stringResource(R.string.data_delete_body),
-        confirmLabel = stringResource(R.string.action_delete),
-        onConfirm = { confirmDelete = false; vm.deleteAllTrips() }, onDismiss = { confirmDelete = false },
-    )
 }
 
 @Composable
@@ -314,7 +263,6 @@ private fun dateFormatName(o: DateFormatOption): Int = when (o) {
 private fun languageName(l: AppLanguage): Int = when (l) {
     AppLanguage.SPANISH -> R.string.lang_spanish
     AppLanguage.ENGLISH -> R.string.lang_english
-    AppLanguage.SYSTEM -> R.string.lang_system
 }
 
 private tailrec fun Context.findHostActivity(): Activity? = when (this) {

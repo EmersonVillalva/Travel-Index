@@ -1,7 +1,6 @@
 package com.travelindex.app.domain
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class AppLanguageTest {
@@ -23,9 +22,12 @@ class AppLanguageTest {
     }
 
     @Test
-    fun `solo el sistema no fuerza una etiqueta de idioma`() {
-        assertEquals("es", AppLanguage.SPANISH.tag)
-        assertEquals("en", AppLanguage.ENGLISH.tag)
-        assertNull(AppLanguage.SYSTEM.tag)
+    fun `solo hay espanol e ingles`() {
+        assertEquals(listOf("es", "en"), AppLanguage.entries.map { it.tag })
+    }
+
+    @Test
+    fun `el valor system de la 0_7_0 vuelve al espanol`() {
+        assertEquals(AppLanguage.SPANISH, AppLanguage.fromKey("system"))
     }
 }

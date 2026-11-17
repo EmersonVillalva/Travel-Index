@@ -110,10 +110,4 @@ class TripRepository @Inject constructor(
         paths.forEach { files.delete(it) }
         trip.coverPath?.let { files.delete(it) }
     }
-
-    /** Elimina TODOS los datos de viajes y archivos. */
-    suspend fun deleteEverything() {
-        trips.deleteAll()
-        files.deleteAll()
-    }
 }

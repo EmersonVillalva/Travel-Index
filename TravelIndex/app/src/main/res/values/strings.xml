@@ -525,7 +525,6 @@
     <string name="pref_date_format">Formato de fecha</string>
     <string name="pref_theme">Tema</string>
     <string name="pref_language">Idioma</string>
-    <string name="lang_system">Idioma del sistema</string>
     <string name="lang_spanish">Español</string>
     <string name="lang_english">English</string>
     <string name="theme_light">Claro</string>
@@ -552,19 +551,6 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="privacy_block_shots">Bloquear capturas de pantalla</string>
     <string name="privacy_block_shots_hint">Oculta el contenido en capturas y en la vista de apps recientes.</string>
     <string name="privacy_policy">Política de privacidad</string>
-    <string name="sec_data">Datos y copia de seguridad</string>
-    <string name="backup_hint">La copia incluye viajes, reservas, gastos, notas y archivos en un único .zip que guardas tú donde quieras. No está cifrada: guárdala en un lugar de confianza.</string>
-    <string name="backup_export">Crear copia de seguridad</string>
-    <string name="backup_restore">Restaurar copia</string>
-    <string name="restore_confirm_title">¿Restaurar esta copia?</string>
-    <string name="restore_confirm_body">Se sustituirán TODOS los viajes, notas y archivos actuales por los de la copia, y la app se reiniciará. Esta acción no se puede deshacer.</string>
-    <string name="data_delete_all">Eliminar todos mis viajes y archivos</string>
-    <string name="data_delete_title">¿Eliminar todos los viajes?</string>
-    <string name="data_delete_body">Se borrarán todos los viajes, reservas, gastos, notas y archivos de este dispositivo. Tu perfil y tus ajustes se conservan. Crea antes una copia de seguridad si quieres poder recuperarlos. Esta acción no se puede deshacer.</string>
-    <string name="msg_backup_ok">Copia de seguridad creada</string>
-    <string name="msg_backup_failed">No se pudo crear la copia de seguridad</string>
-    <string name="msg_restore_failed">No se pudo restaurar: el archivo no es una copia válida de Travel Index. No se ha cambiado nada.</string>
-    <string name="msg_data_deleted">Todos los viajes y archivos se han eliminado</string>
     <string name="msg_photo_failed">No se pudo guardar la foto</string>
     <string name="sec_about">Información</string>
 
@@ -577,7 +563,7 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="made_by">Hecho por Emerson Villalva Labrador</string>
     <string name="about_description">Todos tus viajes en un solo lugar: vuelos, alojamientos, actividades, documentos de viaje y calendario, guardados en tu dispositivo y disponibles sin conexión.</string>
     <string name="about_highlights_title">Qué incluye</string>
-    <string name="about_highlights">Buscador global y vuelos con fecha, horas, duración y lo que pagaste a la vista; alojamientos, actividades con su duración (la hora de fin se calcula sola), transportes y restaurantes. Visados y documentos con aviso de caducidad. Archivos separados por apartado, con vista previa y visor propio: súbelos desde el dispositivo o escanéalos con recorte automático. Itinerario y calendario. Lo que pagaste en cada viaje, por categorías, y el historial de tus viajes anteriores. Exporta el viaje completo a PDF. Compartir un viaje como copia exacta. Copia de seguridad y restauración.</string>
+    <string name="about_highlights">Buscador global y vuelos con fecha, horas, duración y lo que pagaste a la vista; alojamientos, actividades con su duración (la hora de fin se calcula sola), transportes y restaurantes. Visados y documentos con aviso de caducidad. Archivos separados por apartado, con vista previa y visor propio: súbelos desde el dispositivo o escanéalos con recorte automático. Itinerario y calendario. Lo que pagaste en cada viaje, por categorías, y el historial de tus viajes anteriores. Exporta el viaje completo a PDF. Compartir un viaje como copia exacta.</string>
     <string name="about_limits_title">Qué no hace</string>
     <string name="about_limits">No tiene cuentas ni sincronización en la nube. No se conecta a internet. No convierte entre monedas. No muestra un mapa de calles: dibuja la ruta de cada vuelo. Los recordatorios usan alarmas aproximadas de Android, por lo que pueden retrasarse unos minutos. No consulta retrasos ni cancelaciones: los datos del vuelo los escribes tú. El PDF resume el viaje, con los números de documentos ocultos, y no incluye tus archivos adjuntos.</string>
 
@@ -591,12 +577,12 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="privacy_b_files">Los archivos que eliges se copian al almacenamiento privado de la app y no son accesibles para otras apps. «Escanear documento» usa el escáner de Google Play Services, que funciona en tu dispositivo: el documento solo se guarda en la app si lo aceptas (y sin Play Services se usa la cámara del sistema). Al abrir o compartir un archivo, se concede acceso temporal a la app que tú elijas. Si eliminas un archivo o un viaje, se borra la copia.</string>
     <string name="privacy_h_permissions">Permisos</string>
     <string name="privacy_b_permissions">Notificaciones: para mostrarte los avisos que programa tu propio dispositivo. Inicio del sistema: para volver a programar esos avisos al reiniciar el teléfono. No se solicitan permisos de internet, ubicación, contactos, cámara, micrófono ni almacenamiento: la foto de un documento la hace la cámara del sistema, no la app.</string>
-    <string name="privacy_h_backup">Copias de seguridad</string>
-    <string name="privacy_b_backup">La copia automática de Android está desactivada para que tus datos no salgan del dispositivo sin tu permiso. Solo existen las copias que tú creas: la de Perfil, el archivo de «Compartir viaje» o el PDF del viaje, que entregas tú a quien elijas. Ninguno está cifrado. La copia y el archivo de compartir pueden incluir números de documentos y billetes, así que envíalos solo a personas de confianza; el PDF muestra esos números ocultos.</string>
+    <string name="privacy_h_backup">Archivos que compartes</string>
+    <string name="privacy_b_backup">La copia automática de Android está desactivada para que tus datos no salgan del dispositivo sin tu permiso. Solo existen los archivos que tú creas: el de «Compartir viaje» o el PDF del viaje, que entregas tú a quien elijas. Ninguno está cifrado. El archivo de compartir puede incluir números de documentos y billetes, así que envíalo solo a personas de confianza; el PDF muestra esos números ocultos.</string>
     <string name="privacy_h_sensitive">Datos sensibles</string>
     <string name="privacy_b_sensitive">Los números de documentos y billetes se muestran ocultos por defecto. No guardes contraseñas en la app. Puedes bloquear las capturas de pantalla en Perfil.</string>
     <string name="privacy_h_delete">Borrar tus datos</string>
-    <string name="privacy_b_delete">Puedes eliminar viajes concretos, o todos tus viajes y archivos desde Perfil. Desinstalar la app borra también todos sus datos del dispositivo.</string>
+    <string name="privacy_b_delete">Puedes eliminar viajes concretos desde la app. Desinstalar la app borra también todos sus datos del dispositivo.</string>
     <string name="privacy_h_contact">Contacto</string>
     <string name="privacy_b_contact">Si tienes preguntas sobre privacidad, puedes escribir al desarrollador desde la ficha de Travel Index en Google Play.</string>
 

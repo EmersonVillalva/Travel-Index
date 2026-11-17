@@ -89,15 +89,9 @@ class FileStorage @Inject constructor(@ApplicationContext private val context: C
         if (f.canonicalPath.startsWith(root.canonicalPath + File.separator)) f.delete()
     }
 
-    /** Borra todos los archivos adjuntos (usado al eliminar todos los datos). */
-    suspend fun deleteAll() = withContext(Dispatchers.IO) {
-        root.listFiles()?.forEach { it.deleteRecursively() }
-        Unit
-    }
-
     fun resolve(relativePath: String): File = File(root, relativePath)
 
-    // ---- Foto de perfil: carpeta aparte (no forma parte de los archivos de los viajes ni de la copia de seguridad) ----
+    // ---- Foto de perfil: carpeta aparte (no forma parte de los archivos de los viajes) ----
 
     private val profileDir: File get() = File(context.filesDir, PROFILE_DIR).apply { mkdirs() }
 

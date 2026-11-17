@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Los datos de viaje y documentos NO se suben a la copia automática de Google.
-     La copia de seguridad la controla el usuario desde Perfil > Copias de seguridad. -->
+     No hay copia en la nube: los datos solo viven en el dispositivo. -->
 <data-extraction-rules>
     <cloud-backup><exclude domain="root" /></cloud-backup>
     <device-transfer><exclude domain="root" /></device-transfer>

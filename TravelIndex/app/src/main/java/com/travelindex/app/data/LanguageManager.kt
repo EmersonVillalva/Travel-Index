@@ -3,7 +3,6 @@ package com.travelindex.app.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.LocaleList
 import com.travelindex.app.domain.AppLanguage
 import java.util.Locale
@@ -33,10 +32,8 @@ object LanguageManager {
     }
 
     fun localize(base: Context): Context {
-        val language = get(base)
-        val locale = language.tag?.let { Locale.forLanguageTag(it) } ?: Resources.getSystem().configuration.locales[0]
+        val locale = Locale.forLanguageTag(get(base).tag)
         Locale.setDefault(locale)
-        if (language == AppLanguage.SYSTEM) return base
         val config = Configuration(base.resources.configuration)
         config.setLocales(LocaleList(locale))
         return base.createConfigurationContext(config)

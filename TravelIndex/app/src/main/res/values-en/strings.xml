@@ -521,7 +521,6 @@
     <string name="pref_date_format">Date format</string>
     <string name="pref_theme">Theme</string>
     <string name="pref_language">Language</string>
-    <string name="lang_system">System language</string>
     <string name="lang_spanish">Español</string>
     <string name="lang_english">English</string>
     <string name="theme_light">Light</string>
@@ -548,19 +547,6 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="privacy_block_shots">Block screenshots</string>
     <string name="privacy_block_shots_hint">Hides the content in screenshots and in the recent apps view.</string>
     <string name="privacy_policy">Privacy policy</string>
-    <string name="sec_data">Data and backup</string>
-    <string name="backup_hint">The backup includes trips, bookings, expenses, notes and files in a single .zip that you keep wherever you want. It isn\'t encrypted: store it somewhere you trust.</string>
-    <string name="backup_export">Create backup</string>
-    <string name="backup_restore">Restore backup</string>
-    <string name="restore_confirm_title">Restore this backup?</string>
-    <string name="restore_confirm_body">ALL current trips, notes and files will be replaced by the ones in the backup, and the app will restart. This cannot be undone.</string>
-    <string name="data_delete_all">Delete all my trips and files</string>
-    <string name="data_delete_title">Delete all trips?</string>
-    <string name="data_delete_body">All trips, bookings, expenses, notes and files on this device will be deleted. Your profile and settings are kept. Create a backup first if you want to be able to get them back. This cannot be undone.</string>
-    <string name="msg_backup_ok">Backup created</string>
-    <string name="msg_backup_failed">Couldn\'t create the backup</string>
-    <string name="msg_restore_failed">Couldn\'t restore: the file isn\'t a valid Travel Index backup. Nothing was changed.</string>
-    <string name="msg_data_deleted">All trips and files have been deleted</string>
     <string name="msg_photo_failed">Couldn\'t save the photo</string>
     <string name="sec_about">Information</string>
 
@@ -573,7 +559,7 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="made_by">Made by Emerson Villalva Labrador</string>
     <string name="about_description">All your trips in one place: flights, accommodation, activities, travel documents and calendar, stored on your device and available offline.</string>
     <string name="about_highlights_title">What it includes</string>
-    <string name="about_highlights">Global search and flights with date, times, duration and what you paid at a glance; accommodation, activities with their duration (the end time is worked out for you), transport and restaurants. Visas and documents with expiry warnings. Files grouped by section, with previews and a built-in viewer: pick them from your device or scan them with automatic cropping. Itinerary and calendar. What you paid on each trip, by category, plus the history of your past trips. Export the whole trip to PDF. Share a trip as an exact copy. Backup and restore.</string>
+    <string name="about_highlights">Global search and flights with date, times, duration and what you paid at a glance; accommodation, activities with their duration (the end time is worked out for you), transport and restaurants. Visas and documents with expiry warnings. Files grouped by section, with previews and a built-in viewer: pick them from your device or scan them with automatic cropping. Itinerary and calendar. What you paid on each trip, by category, plus the history of your past trips. Export the whole trip to PDF. Share a trip as an exact copy.</string>
     <string name="about_limits_title">What it doesn\'t do</string>
     <string name="about_limits">No accounts and no cloud sync. It never connects to the internet. It doesn\'t convert between currencies. There\'s no street map: it draws each flight\'s route. Reminders use Android\'s approximate alarms, so they can run a few minutes late. It doesn\'t check delays or cancellations: you enter the flight details yourself. The PDF summarises the trip, with document numbers masked, and doesn\'t include your attached files.</string>
 
@@ -587,12 +573,12 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="privacy_b_files">The files you pick are copied into the app\'s private storage and other apps can\'t access them. “Scan document” uses the Google Play Services scanner, which runs on your device: the document is only stored in the app if you accept it (without Play Services, the system camera is used instead). When you open or share a file, temporary access is granted to the app you choose. If you delete a file or a trip, the copy is deleted.</string>
     <string name="privacy_h_permissions">Permissions</string>
     <string name="privacy_b_permissions">Notifications: to show the alerts your own device schedules. Boot: to re-schedule those alerts when the phone restarts. No internet, location, contacts, camera, microphone or storage permissions are requested: a document photo is taken by the system camera, not by the app.</string>
-    <string name="privacy_h_backup">Backups</string>
-    <string name="privacy_b_backup">Android\'s automatic backup is disabled so your data never leaves the device without your say-so. The only copies are the ones you create: the one in Profile, the “Share trip” file or the trip PDF, which you hand to whoever you choose. None of them is encrypted. The backup and the share file can include document and ticket numbers, so send them only to people you trust; the PDF shows those numbers masked.</string>
+    <string name="privacy_h_backup">Files you share</string>
+    <string name="privacy_b_backup">Android\'s automatic backup is disabled so your data never leaves the device without your say-so. The only files are the ones you create: the “Share trip” file or the trip PDF, which you hand to whoever you choose. Neither is encrypted. The share file can include document and ticket numbers, so send it only to people you trust; the PDF shows those numbers masked.</string>
     <string name="privacy_h_sensitive">Sensitive details</string>
     <string name="privacy_b_sensitive">Document and ticket numbers are hidden by default. Don\'t store passwords in the app. You can block screenshots in Profile.</string>
     <string name="privacy_h_delete">Deleting your data</string>
-    <string name="privacy_b_delete">You can delete individual trips, or all your trips and files from Profile. Uninstalling the app also deletes all its data from the device.</string>
+    <string name="privacy_b_delete">You can delete individual trips from the app. Uninstalling the app also deletes all its data from the device.</string>
     <string name="privacy_h_contact">Contact</string>
     <string name="privacy_b_contact">If you have privacy questions, you can write to the developer from the Travel Index listing on Google Play.</string>
 

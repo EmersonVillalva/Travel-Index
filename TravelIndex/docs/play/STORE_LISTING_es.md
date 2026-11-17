@@ -12,7 +12,6 @@ Travel Index reúne todo lo de tus viajes en un solo lugar, sin cuenta.
 • Archivos separados por apartado: súbelos desde el dispositivo o fotografía el documento.
 • Exporta el viaje completo a PDF y consulta el historial de tus viajes anteriores.
 • Comparte un viaje y la otra persona lo recibe como una copia exacta.
-• Copia de seguridad y restauración desde tu propio dispositivo.
 • Tus datos se guardan en tu dispositivo y funcionan sin conexión. Sin cuenta, sin anuncios.
 
 **Categoría:** Viajes y información local · **Etiquetas:** viajes, itinerario, organizador
