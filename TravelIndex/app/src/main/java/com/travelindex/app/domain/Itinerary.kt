@@ -44,6 +44,8 @@ data class ItineraryEvent(
     val timeKnown: Boolean,
     /** Clave del subtipo (p. ej. tipo de transporte) para que la interfaz ponga la etiqueta traducida. */
     val kind: String? = null,
+    /** Instante con el que se ORDENA dentro del día cuando no coincide con la hora que se muestra (check-in: va tras la llegada). */
+    val sortAt: ZonedDateTime? = null,
 )
 
 data class ItineraryDay(val date: LocalDate, val events: List<ItineraryEvent>)
@@ -62,10 +64,10 @@ object ItineraryBuilder {
     ): List<ItineraryEvent> {
         val out = mutableListOf<ItineraryEvent>()
 
-        // Movimientos del viaje (vuelos y transportes), para colocar el alojamiento sin hora en su sitio:
-        // el día de llegada primero viajas y luego te instalas, así que el check-in sin hora va después del
-        // último movimiento de ese día; el último día dejas la habitación y luego viajas, así que el
-        // check-out sin hora va antes del primer movimiento. Con hora puesta, manda la hora.
+        // Movimientos del viaje (vuelos y transportes), para colocar el alojamiento en su sitio:
+        // el día de llegada primero viajas y luego te instalas, así que el check-in va justo después de la
+        // llegada y antes del resto del día (actividades, comidas...), tenga hora o no; el último día dejas la
+        // habitación y luego viajas, así que el check-out sin hora va antes del primer movimiento.
         val movements = buildList {
             flights.forEach { f ->
                 add(Instant.ofEpochMilli(f.departureEpochMs).atZone(ZoneId.of(f.departureZoneId)))
@@ -77,8 +79,18 @@ object ItineraryBuilder {
                 t.endDate?.let { add(it.atTime(t.endTime ?: t.startTime ?: LocalTime.MIN).atZone(zone)) }
             }
         }
-        fun lastMovementOn(d: LocalDate, zone: ZoneId): ZonedDateTime? =
-            movements.filter { it.withZoneSameInstant(zone).toLocalDate() == d }.maxByOrNull { it.toInstant() }
+        // Llegadas: aterrizaje de un vuelo, fin de un transporte (o su hora de salida si no tiene fin).
+        val arrivals = buildList {
+            flights.forEach { f -> add(Instant.ofEpochMilli(f.arrivalEpochMs).atZone(ZoneId.of(f.arrivalZoneId))) }
+            transports.forEach { t ->
+                val zone = ZoneId.of(t.timeZoneId)
+                val end = t.endDate
+                if (end != null) add(end.atTime(t.endTime ?: t.startTime ?: LocalTime.MIN).atZone(zone))
+                else add(t.startDate.atTime(t.startTime ?: LocalTime.MIN).atZone(zone))
+            }
+        }
+        fun lastArrivalOn(d: LocalDate, zone: ZoneId): ZonedDateTime? =
+            arrivals.filter { it.withZoneSameInstant(zone).toLocalDate() == d }.maxByOrNull { it.toInstant() }
         fun firstMovementOn(d: LocalDate, zone: ZoneId): ZonedDateTime? =
             movements.filter { it.withZoneSameInstant(zone).toLocalDate() == d }.minByOrNull { it.toInstant() }
 
@@ -93,33 +105,43 @@ object ItineraryBuilder {
             )
         }
 
+        fun checkOutStart(l: LodgingEntity): ZonedDateTime {
+            val zone = ZoneId.of(l.timeZoneId)
+            val outTime = l.checkOutTime
+            if (outTime != null) return l.checkOutDate.atTime(outTime).atZone(zone)
+            val base = l.checkOutDate.atTime(DEFAULT_CHECK_OUT).atZone(zone)
+            val first = firstMovementOn(l.checkOutDate, zone)
+            if (first == null || first.isAfter(base)) return base
+            val cand = first.minusMinutes(1)
+            val floor = l.checkOutDate.atStartOfDay(zone)
+            return if (cand.isBefore(floor)) floor else cand
+        }
+
+        // Orden del check-in dentro de su día: justo después de la última llegada (o de la salida de otro
+        // alojamiento ese mismo día) y antes de todo lo demás; sin nada de eso, el primero del día.
+        // La hora que se muestra no cambia: solo cambia dónde se coloca en la lista.
+        fun checkInSortAt(l: LodgingEntity): ZonedDateTime {
+            val zone = ZoneId.of(l.timeZoneId)
+            val day = l.checkInDate
+            val anchor = (
+                listOfNotNull(lastArrivalOn(day, zone)) +
+                    lodgings.filter { it.id != l.id && it.checkOutDate == day }.map { checkOutStart(it) }
+                ).maxByOrNull { it.toInstant() }
+            return anchor?.withZoneSameInstant(zone)?.plusNanos(1_000_000) ?: day.atStartOfDay(zone)
+        }
+
         lodgings.forEach { l ->
             val zone = ZoneId.of(l.timeZoneId)
             val inTime = l.checkInTime
             val outTime = l.checkOutTime
-            val inStart = if (inTime != null) l.checkInDate.atTime(inTime).atZone(zone) else {
-                val base = l.checkInDate.atTime(DEFAULT_CHECK_IN).atZone(zone)
-                val last = lastMovementOn(l.checkInDate, zone)
-                if (last == null || last.isBefore(base)) base else {
-                    val cand = last.plusMinutes(1)
-                    val cap = l.checkInDate.atTime(LocalTime.of(23, 59)).atZone(zone)
-                    if (cand.isAfter(cap)) cap else cand
-                }
-            }
-            val outStart = if (outTime != null) l.checkOutDate.atTime(outTime).atZone(zone) else {
-                val base = l.checkOutDate.atTime(DEFAULT_CHECK_OUT).atZone(zone)
-                val first = firstMovementOn(l.checkOutDate, zone)
-                if (first == null || first.isAfter(base)) base else {
-                    val cand = first.minusMinutes(1)
-                    val floor = l.checkOutDate.atStartOfDay(zone)
-                    if (cand.isBefore(floor)) floor else cand
-                }
-            }
+            val inStart = l.checkInDate.atTime(inTime ?: DEFAULT_CHECK_IN).atZone(zone)
+            val outStart = checkOutStart(l)
             out += ItineraryEvent(
                 key = "LODGING_IN:${l.id}", type = EventType.LODGING_CHECK_IN, sourceId = l.id, tripId = l.tripId,
                 title = l.name, subtitle = l.address.ifBlank { null },
                 start = inStart,
                 end = null, timeKnown = inTime != null,
+                sortAt = checkInSortAt(l),
             )
             out += ItineraryEvent(
                 key = "LODGING_OUT:${l.id}", type = EventType.LODGING_CHECK_OUT, sourceId = l.id, tripId = l.tripId,
@@ -199,9 +221,16 @@ object ItineraryBuilder {
         notes: List<NoteItemEntity> = emptyList(),
     ): List<ItineraryDay> = group(events(flights, lodgings, activities, transports, restaurants, notes))
 
+    /** Orden único del itinerario (lista del día, calendario, PDF): por instante, el check-in primero si empatan. */
+    val ORDER: Comparator<ItineraryEvent> = compareBy<ItineraryEvent>(
+        { (it.sortAt ?: it.start).toInstant() },
+        { if (it.type == EventType.LODGING_CHECK_IN) 0 else 1 },
+        { it.key },
+    )
+
     fun group(events: List<ItineraryEvent>): List<ItineraryDay> =
         events
-            .sortedWith(compareBy({ it.start.toInstant() }, { it.key }))
+            .sortedWith(ORDER)
             .groupBy { it.start.toLocalDate() }
             .map { (date, list) -> ItineraryDay(date, list) }
             .sortedBy { it.date }

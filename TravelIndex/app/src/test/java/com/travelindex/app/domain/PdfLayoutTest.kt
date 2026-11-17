@@ -138,6 +138,48 @@ class PdfLayoutTest {
         assertFalse(entry.blocks.any { it is PdfBlock.Paragraph && it.style == PdfStyle.BODY })   // sin resumen no hay línea vacía
         assertNotEquals(0, entry.blocks.size)
     }
+
+    // ---- Saltos de página e imágenes (archivos adjuntos) ----
+
+    private fun pictures(p: PdfPage) = p.ops.filterIsInstance<DrawOp.Picture>()
+
+    @Test fun `un salto de pagina empieza otra pagina pero nunca deja una vacia`() {
+        assertEquals(2, lay(PdfBlock.Paragraph("a"), PdfBlock.PageBreak, PdfBlock.Paragraph("b")).size)
+        assertEquals(1, lay(PdfBlock.PageBreak, PdfBlock.Paragraph("a")).size)
+        assertEquals(2, lay(PdfBlock.Paragraph("a"), PdfBlock.PageBreak, PdfBlock.PageBreak, PdfBlock.Paragraph("b")).size)
+    }
+
+    @Test fun `una imagen apaisada ocupa todo el ancho util`() {
+        val pic = pictures(lay(PdfBlock.Picture("p1", 2f))[0]).single()
+        assertEquals("p1", pic.key)
+        assertEquals(260f, pic.width, 0.001f); assertEquals(130f, pic.height, 0.001f)
+        assertEquals(20f, pic.x, 0.001f); assertEquals(20f, pic.y, 0.001f)
+    }
+
+    @Test fun `una imagen alta se reduce al alto de la pagina y se centra sin deformarse`() {
+        val pic = pictures(lay(PdfBlock.Picture("p", 0.5f))[0]).single()
+        assertEquals(150f, pic.height, 0.001f); assertEquals(75f, pic.width, 0.001f)
+        assertEquals(0.5f, pic.width / pic.height, 0.001f)
+        assertEquals(112.5f, pic.x, 0.001f)   // (260 - 75) / 2 + 20
+    }
+
+    @Test fun `con poco sitio la imagen pasa a la pagina siguiente`() {
+        // 10 lineas de 12 = 120 puntos usados: quedan 30, menos del minimo.
+        val text = PdfBlock.Paragraph((1..10).joinToString("\n") { "linea $it" })
+        val pages = lay(text, PdfBlock.Picture("p", 1f))
+        assertEquals(2, pages.size)
+        assertTrue(pictures(pages[0]).isEmpty())
+        assertEquals(20f, pictures(pages[1]).single().y, 0.001f)
+    }
+
+    @Test fun `con sitio suficiente la imagen se reduce al hueco que queda`() {
+        val pages = lay(PdfBlock.Paragraph("titulo"), PdfBlock.Picture("p", 0.5f))
+        assertEquals(1, pages.size)
+        val pic = pictures(pages[0]).single()
+        assertEquals(32f, pic.y, 0.001f)          // justo debajo de la linea de 12
+        assertEquals(138f, pic.height, 0.001f)    // lo que queda hasta el pie
+        assertEquals(69f, pic.width, 0.001f)
+    }
 }
 
 class TripPdfNameTest {

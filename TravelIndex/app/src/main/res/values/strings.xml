@@ -578,7 +578,7 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="privacy_h_permissions">Permisos</string>
     <string name="privacy_b_permissions">Notificaciones: para mostrarte los avisos que programa tu propio dispositivo. Inicio del sistema: para volver a programar esos avisos al reiniciar el teléfono. No se solicitan permisos de internet, ubicación, contactos, cámara, micrófono ni almacenamiento: la foto de un documento la hace la cámara del sistema, no la app.</string>
     <string name="privacy_h_backup">Archivos que compartes</string>
-    <string name="privacy_b_backup">La copia automática de Android está desactivada para que tus datos no salgan del dispositivo sin tu permiso. Solo existen los archivos que tú creas: el de «Compartir viaje» o el PDF del viaje, que entregas tú a quien elijas. Ninguno está cifrado. El archivo de compartir puede incluir números de documentos y billetes, así que envíalo solo a personas de confianza; el PDF muestra esos números ocultos.</string>
+    <string name="privacy_b_backup">La copia automática de Android está desactivada para que tus datos no salgan del dispositivo sin tu permiso. Solo existen los archivos que tú creas: el de «Compartir viaje» o el PDF del viaje, que entregas tú a quien elijas. Ninguno está cifrado. El archivo de compartir puede incluir números de documentos y billetes, así que envíalo solo a personas de confianza. El PDF oculta los números de visados y documentos de viaje y no incluye sus archivos, pero sí lleva abiertos tus billetes y reservas adjuntos (con sus códigos y datos), así que compártelo con quien de verdad lo necesite.</string>
     <string name="privacy_h_sensitive">Datos sensibles</string>
     <string name="privacy_b_sensitive">Los números de documentos y billetes se muestran ocultos por defecto. No guardes contraseñas en la app. Puedes bloquear las capturas de pantalla en Perfil.</string>
     <string name="privacy_h_delete">Borrar tus datos</string>
@@ -613,6 +613,20 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="error_pdf">No se pudo crear el PDF.</string>
     <string name="pdf_footer">Travel Index · %1$s · Página %2$d de %3$d</string>
     <string name="pdf_cancelled">Viaje cancelado</string>
+    <string name="pdf_files_private">Los visados y documentos de viaje no se incluyen en este PDF por privacidad.</string>
+    <string name="pdf_files_no_memory">Los archivos no se han podido incluir en el PDF porque el móvil se quedó sin memoria. Siguen guardados en la app.</string>
+    <string name="pdf_file_page">Página %1$d de %2$d</string>
+    <string name="pdf_files_not_shown">No se pueden mostrar aquí</string>
+    <string name="pdf_file_unsupported">formato no compatible con el PDF</string>
+    <string name="pdf_file_failed">no se ha podido leer el archivo</string>
+    <string name="pdf_owner_flight">Vuelo</string>
+    <string name="pdf_owner_lodging">Alojamiento</string>
+    <string name="pdf_owner_activity">Actividad</string>
+    <string name="pdf_owner_restaurant">Restaurante</string>
+    <plurals name="pdf_files_omitted">
+        <item quantity="one">Se ha omitido %1$d página por el límite de tamaño del PDF.</item>
+        <item quantity="other">Se han omitido %1$d páginas por el límite de tamaño del PDF.</item>
+    </plurals>
     <string name="pdf_summary">Resumen</string>
     <string name="pdf_facts_dates">Fechas</string>
     <string name="pdf_facts_destination">Destino</string>
@@ -620,7 +634,6 @@ Es totalmente opcional: la app funciona igual. Se abrirá en tu navegador; la ap
     <string name="pdf_budget_planned">Presupuesto previsto</string>
     <string name="pdf_docs_note">Por seguridad, los números de los documentos salen ocultos en el PDF.</string>
     <string name="pdf_activity_end">Hora de fin</string>
-    <string name="pdf_files_note">Los archivos no van dentro del PDF: aquí solo ves su lista. Siguen guardados en la app.</string>
     <string name="share_trip_text">Te comparto mi viaje «%1$s» con Travel Index. Abre el archivo adjunto con la app y se añadirá a tu móvil. Si no la tienes, instálala desde aquí: %2$s</string>
     <string name="error_share_trip">No se pudo preparar el viaje para compartirlo.</string>
     <string name="import_working">Preparando el viaje…</string>

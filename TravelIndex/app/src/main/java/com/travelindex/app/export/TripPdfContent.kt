@@ -3,11 +3,14 @@ package com.travelindex.app.export
 import android.content.Context
 import androidx.annotation.StringRes
 import com.travelindex.app.R
+import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.AttachmentCategory
 import com.travelindex.app.domain.CostBreakdown
 import com.travelindex.app.domain.CostCategory
 import com.travelindex.app.domain.DocWarnings
 import com.travelindex.app.domain.EventType
+import com.travelindex.app.domain.FileGroup
 import com.travelindex.app.domain.FileGroups
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ItineraryBuilder
@@ -27,10 +30,10 @@ import com.travelindex.app.domain.forms.ModuleItems
 import com.travelindex.app.domain.pdf.PdfBlock
 import com.travelindex.app.domain.pdf.PdfBlocks
 import com.travelindex.app.domain.pdf.PdfStyle
+import com.travelindex.app.domain.pdf.TripPdf
 import com.travelindex.app.domain.tripDurationDays
 import com.travelindex.app.ui.components.formatMoneyValue
 import com.travelindex.app.ui.components.labelRes
-import com.travelindex.app.ui.files.fileGroupTitleRes
 import com.travelindex.app.ui.modules.Choices
 import com.travelindex.app.ui.modules.ModuleSpec
 import com.travelindex.app.ui.modules.ModuleSpecs
@@ -40,11 +43,19 @@ import java.time.LocalTime
 
 /**
  * Contenido del PDF de un viaje, en este orden: resumen, destinos, itinerario día a día, vuelos, trenes, autobuses, barcos,
- * coche, alojamientos, actividades, restaurantes, documentos, gastos, notas y lista de archivos. Los datos salen de las mismas
- * especificaciones que los formularios (mismas etiquetas y mismo formato que en la app). Los números de documentos
- * (pasaporte, visado...) salen ocultos, como en la pantalla, porque el PDF se puede compartir.
+ * coche, alojamientos, actividades, restaurantes, documentos, gastos, notas y, al final, los archivos adjuntos abiertos (una
+ * página por página del archivo, con su tipo y de qué reserva es). Los datos salen de las mismas especificaciones que los
+ * formularios (mismas etiquetas y mismo formato que en la app). Los números de documentos (pasaporte, visado...) salen
+ * ocultos, como en la pantalla, porque el PDF se puede compartir; por lo mismo, los archivos de visados y documentos de viaje
+ * (pasaportes escaneados...) no se meten en el PDF.
  */
-class TripPdfContent(private val context: Context, private val f: Formats) {
+class TripPdfContent(
+    private val context: Context,
+    private val f: Formats,
+    private val pages: AttachmentPages,
+    /** false si el móvil se quedó sin memoria al meter los archivos: el PDF lleva solo un aviso en su lugar. */
+    private val includeFiles: Boolean = true,
+) {
 
     private fun s(@StringRes id: Int): String = context.getString(id)
     private fun days(n: Int): String = context.resources.getQuantityString(R.plurals.duration_days, n, n)
@@ -311,15 +322,88 @@ class TripPdfContent(private val context: Context, private val f: Formats) {
 
     private fun MutableList<PdfBlock>.files(b: TripBundle) {
         val groups = FileGroups.group(b.attachments, b.transports.associate { it.id to it.type })
-        if (groups.isEmpty()) return
-        val entries = ArrayList<PdfBlock>()
-        entries += PdfBlock.Keep(listOf(PdfBlock.Paragraph(s(R.string.pdf_files_note), PdfStyle.SMALL), PdfBlock.Gap(6f)))
-        groups.forEach { g ->
-            entries += PdfBlock.Keep(
-                listOf<PdfBlock>(PdfBlock.Paragraph(s(fileGroupTitleRes(g.group)), PdfStyle.ENTRY_TITLE)) +
-                    g.files.map { PdfBlock.Paragraph("• " + it.displayName, PdfStyle.BODY, indent = 8f) } + PdfBlock.Gap(8f),
-            )
+        val shown = groups.filter { it.group != FileGroup.DOCUMENTS }.flatMap { it.files }
+        if (shown.isEmpty()) return
+        add(PdfBlock.PageBreak)
+        add(PdfBlock.Paragraph(s(R.string.mod_files), PdfStyle.HEADING))
+        add(PdfBlock.Rule)
+        if (groups.any { it.group == FileGroup.DOCUMENTS }) add(PdfBlock.Paragraph(s(R.string.pdf_files_private), PdfStyle.SMALL))
+        if (!includeFiles) {
+            add(PdfBlock.Paragraph(s(R.string.pdf_files_no_memory), PdfStyle.BODY))
+            return
         }
-        addAll(PdfBlocks.section(s(R.string.mod_files), entries))
+        add(PdfBlock.Gap(6f))
+
+        var budget = TripPdf.MAX_ATTACHMENT_PAGES
+        var omittedPages = 0
+        var first = true
+        val notShown = ArrayList<String>()
+        for (att in shown) {
+            val title = attachmentTitle(att)
+            val owner = ownerLine(b, att)
+            when (val plan = pages.plan(att, budget)) {
+                AttachmentPages.Plan.Unsupported -> notShown += join(" · ", title, owner) + " — " + s(R.string.pdf_file_unsupported)
+                AttachmentPages.Plan.Failed -> notShown += join(" · ", title, owner) + " — " + s(R.string.pdf_file_failed)
+                is AttachmentPages.Plan.Pages -> {
+                    budget -= plan.pages.size
+                    omittedPages += plan.total - plan.pages.size
+                    plan.pages.forEachIndexed { i, ref ->
+                        if (!first) add(PdfBlock.PageBreak)
+                        first = false
+                        add(PdfBlock.Paragraph(title, PdfStyle.ENTRY_TITLE))
+                        if (owner.isNotBlank()) add(PdfBlock.Paragraph(owner, PdfStyle.BODY))
+                        if (plan.total > 1) add(PdfBlock.Paragraph(context.getString(R.string.pdf_file_page, i + 1, plan.total), PdfStyle.SMALL))
+                        add(PdfBlock.Gap(6f))
+                        add(PdfBlock.Picture(ref.key, ref.aspect))
+                    }
+                }
+            }
+        }
+        if (notShown.isNotEmpty() || omittedPages > 0) {
+            val notes = ArrayList<PdfBlock>()
+            notes += PdfBlock.Gap(10f)
+            notes += PdfBlock.Paragraph(s(R.string.pdf_files_not_shown), PdfStyle.ENTRY_TITLE)
+            notShown.forEach { notes += PdfBlock.Paragraph("• $it", PdfStyle.BODY, indent = 8f) }
+            if (omittedPages > 0) {
+                notes += PdfBlock.Paragraph(context.resources.getQuantityString(R.plurals.pdf_files_omitted, omittedPages, omittedPages), PdfStyle.BODY, indent = 8f)
+            }
+            add(PdfBlock.Keep(notes))
+        }
+    }
+
+    /** Qué es el archivo ("Reserva", "Tarjeta de embarque"...); sin categoría, qué clase de archivo es. Nunca su nombre (xxx.pdf). */
+    private fun attachmentTitle(att: AttachmentEntity): String = when (AttachmentCategory.fromName(att.category)) {
+        AttachmentCategory.BOARDING_PASS -> s(R.string.cat_boarding_pass)
+        AttachmentCategory.TICKET -> s(R.string.cat_ticket)
+        AttachmentCategory.RESERVATION -> s(R.string.cat_reservation)
+        AttachmentCategory.CONFIRMATION -> s(R.string.cat_confirmation)
+        AttachmentCategory.INSURANCE -> s(R.string.cat_insurance)
+        AttachmentCategory.VISA -> s(R.string.cat_visa)
+        AttachmentCategory.CONTRACT -> s(R.string.cat_contract)
+        AttachmentCategory.PHOTO -> s(R.string.cat_photo)
+        AttachmentCategory.OTHER -> when {
+            att.mimeType == "application/pdf" -> s(R.string.file_kind_pdf)
+            att.mimeType.startsWith("image/") -> s(R.string.file_kind_image)
+            else -> s(R.string.file_kind_other)
+        }
+    }
+
+    /** De qué reserva es el archivo: "Alojamiento · Hotel Roma", "Vuelo · IB 3250"... Vacío si no está asociado a ninguna. */
+    private fun ownerLine(b: TripBundle, att: AttachmentEntity): String {
+        val type = att.ownerType?.let { ModuleType.fromName(it) } ?: return ""
+        val id = att.ownerId ?: return ""
+        val v = ModuleItems.of(type, b).firstOrNull { it.id == id }?.values ?: return ""
+        val spec = ModuleSpecs.of(type)
+        return when (type) {
+            ModuleType.FLIGHT -> join(" · ", s(R.string.pdf_owner_flight), titleOf(spec, v))
+            ModuleType.LODGING -> join(" · ", s(R.string.pdf_owner_lodging), titleOf(spec, v))
+            ModuleType.ACTIVITY -> join(" · ", s(R.string.pdf_owner_activity), titleOf(spec, v))
+            ModuleType.RESTAURANT -> join(" · ", s(R.string.pdf_owner_restaurant), titleOf(spec, v))
+            ModuleType.TRANSPORT -> join(
+                " · ", choice(spec.field("type"), v["type"].orEmpty()),
+                join(" ", v["company"], v["model"]).ifBlank { subtitleOf(type, v) },
+            )
+            else -> titleOf(spec, v)
+        }
     }
 }

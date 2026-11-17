@@ -574,7 +574,7 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="privacy_h_permissions">Permissions</string>
     <string name="privacy_b_permissions">Notifications: to show the alerts your own device schedules. Boot: to re-schedule those alerts when the phone restarts. No internet, location, contacts, camera, microphone or storage permissions are requested: a document photo is taken by the system camera, not by the app.</string>
     <string name="privacy_h_backup">Files you share</string>
-    <string name="privacy_b_backup">Android\'s automatic backup is disabled so your data never leaves the device without your say-so. The only files are the ones you create: the “Share trip” file or the trip PDF, which you hand to whoever you choose. Neither is encrypted. The share file can include document and ticket numbers, so send it only to people you trust; the PDF shows those numbers masked.</string>
+    <string name="privacy_b_backup">Android\'s automatic backup is disabled so your data never leaves the device without your say-so. The only files are the ones you create: the “Share trip” file or the trip PDF, which you hand to whoever you choose. Neither is encrypted. The share file can include document and ticket numbers, so send it only to people you trust. The PDF masks visa and travel-document numbers and leaves out their files, but it does include your attached tickets and bookings (with their codes and details), so share it only with whoever really needs it.</string>
     <string name="privacy_h_sensitive">Sensitive details</string>
     <string name="privacy_b_sensitive">Document and ticket numbers are hidden by default. Don\'t store passwords in the app. You can block screenshots in Profile.</string>
     <string name="privacy_h_delete">Deleting your data</string>
@@ -609,6 +609,20 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="error_pdf">Couldn\'t create the PDF.</string>
     <string name="pdf_footer">Travel Index · %1$s · Page %2$d of %3$d</string>
     <string name="pdf_cancelled">Trip cancelled</string>
+    <string name="pdf_files_private">Visas and travel documents are not included in this PDF, for privacy.</string>
+    <string name="pdf_files_no_memory">The files could not be included in the PDF because the device ran out of memory. They are still saved in the app.</string>
+    <string name="pdf_file_page">Page %1$d of %2$d</string>
+    <string name="pdf_files_not_shown">Cannot be shown here</string>
+    <string name="pdf_file_unsupported">format not supported in the PDF</string>
+    <string name="pdf_file_failed">the file could not be read</string>
+    <string name="pdf_owner_flight">Flight</string>
+    <string name="pdf_owner_lodging">Accommodation</string>
+    <string name="pdf_owner_activity">Activity</string>
+    <string name="pdf_owner_restaurant">Restaurant</string>
+    <plurals name="pdf_files_omitted">
+        <item quantity="one">%1$d page was left out because of the PDF size limit.</item>
+        <item quantity="other">%1$d pages were left out because of the PDF size limit.</item>
+    </plurals>
     <string name="pdf_summary">Summary</string>
     <string name="pdf_facts_dates">Dates</string>
     <string name="pdf_facts_destination">Destination</string>
@@ -616,7 +630,6 @@ It\'s entirely optional: the app works the same either way. It opens in your bro
     <string name="pdf_budget_planned">Planned budget</string>
     <string name="pdf_docs_note">For safety, document numbers are masked in the PDF.</string>
     <string name="pdf_activity_end">End time</string>
-    <string name="pdf_files_note">Files aren\'t embedded in the PDF: this is only their list. They stay stored in the app.</string>
     <string name="share_trip_text">I\'m sharing my trip “%1$s” with Travel Index. Open the attached file with the app and it will be added to your phone. If you don\'t have it, install it from here: %2$s</string>
     <string name="error_share_trip">Couldn\'t prepare the trip for sharing.</string>
     <string name="import_working">Preparing the trip…</string>

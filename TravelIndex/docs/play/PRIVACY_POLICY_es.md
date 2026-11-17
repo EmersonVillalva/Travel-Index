@@ -10,7 +10,7 @@ Responsable: Emerson Villalva Labrador (o la entidad con la que publiques) · Co
 
 **Compartir un viaje.** Si compartes un viaje, la app crea un archivo `.travelindex` con una copia exacta del viaje (incluye los datos y los archivos adjuntos, y puede incluir números de documentos o billetes). Ese archivo **no está cifrado** y lo entregas tú, con la aplicación que elijas, a la persona que elijas. Travel Index no lo sube a ningún servidor.
 
-**Exportar a PDF.** El PDF del viaje se crea en tu dispositivo y lo guardas o compartes tú. Muestra ocultos los números de documentos y no incluye tus archivos adjuntos; tampoco está cifrado.
+**Exportar a PDF.** El PDF del viaje se crea en tu dispositivo y lo guardas o compartes tú. Muestra ocultos los números de documentos escritos en la app y deja fuera los archivos de visados y documentos de viaje, pero incluye abiertos tus billetes y reservas adjuntos (con sus códigos y datos); tampoco está cifrado, así que compártelo solo con quien lo necesite.
 
 **Copias de seguridad.** La copia automática de Android está desactivada para esta app: tus datos no salen del dispositivo salvo que tú compartas un viaje o un PDF.
 

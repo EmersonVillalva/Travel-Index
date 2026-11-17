@@ -25,6 +25,16 @@ sealed interface PdfBlock {
      * Si no caben en una página entera, se reparten igualmente.
      */
     data class Keep(val blocks: List<PdfBlock>) : PdfBlock
+
+    /** Empieza una página nueva (si la actual ya tiene contenido; nunca deja una página vacía). */
+    data object PageBreak : PdfBlock
+
+    /**
+     * Una imagen (p. ej. una página de un archivo adjunto) a todo el ancho útil, con la proporción [aspect] = ancho / alto.
+     * Si no cabe en lo que queda de página se reduce para caber; si queda muy poco sitio, pasa a una página nueva.
+     * [key] la identifica cuando quien dibuja la pide.
+     */
+    data class Picture(val key: String, val aspect: Float) : PdfBlock
 }
 
 interface TextMeasurer {
@@ -39,6 +49,8 @@ sealed interface DrawOp {
     /** [baseline] es la línea sobre la que se apoya el texto. */
     data class Text(val x: Float, val baseline: Float, val text: String, val style: PdfStyle) : DrawOp
     data class Line(val x1: Float, val x2: Float, val y: Float) : DrawOp
+    /** Imagen [key] dentro del rectángulo (x, y, ancho, alto), ya reducida y centrada. */
+    data class Picture(val key: String, val x: Float, val y: Float, val width: Float, val height: Float) : DrawOp
 }
 
 data class PdfPage(val ops: List<DrawOp>)
@@ -51,6 +63,8 @@ object PdfLayout {
     private const val RULE_HEIGHT = 8f
     /** Dónde cae la línea base dentro de una línea de texto (fracción de su altura). */
     private const val BASELINE = 0.78f
+    /** Si a una imagen le quedan menos puntos que estos en la página, empieza otra en vez de salir diminuta. */
+    private const val MIN_PICTURE_SPACE = 120f
 
     /**
      * Reparte [blocks] en páginas. [footer] da el texto del pie de cada página (número de página y total); null = sin pie.
@@ -113,6 +127,11 @@ object PdfLayout {
         fun finish(): List<List<DrawOp>> = pages
 
         fun place(block: PdfBlock) {
+            when (block) {
+                PdfBlock.PageBreak -> { if (y > top) breakPage(); return }
+                is PdfBlock.Picture -> { placePicture(block); return }
+                else -> Unit
+            }
             val pieces = pieces(block)
             if (block is PdfBlock.Keep) {
                 val total = pieces.sumOf { it.height.toDouble() }.toFloat()
@@ -120,6 +139,19 @@ object PdfLayout {
                 if (total <= bottom - top && y + total > bottom && y > top) breakPage()
             }
             pieces.forEach { put(it) }
+        }
+
+        /** La imagen ocupa todo el ancho; si no cabe a lo alto, se reduce (sin deformarse) y se centra. */
+        private fun placePicture(pic: PdfBlock.Picture) {
+            val aspect = if (pic.aspect > 0.01f) pic.aspect else 1f
+            var available = bottom - y
+            if (y > top && available < MIN_PICTURE_SPACE) { breakPage(); available = bottom - y }
+            val maxWidth = right - left
+            var w = maxWidth
+            var h = w / aspect
+            if (h > available) { h = available; w = h * aspect }
+            ops.add(DrawOp.Picture(pic.key, left + (maxWidth - w) / 2, y, w, h))
+            y += h
         }
 
         private fun put(p: Piece) {
@@ -147,6 +179,16 @@ object PdfLayout {
                 }
             }
             is PdfBlock.Row -> listOf(row(block))
+            PdfBlock.PageBreak -> emptyList()
+            // Dentro de un Keep una imagen no se reduce al hueco de la página: ocupa su alto natural (como mucho una página).
+            is PdfBlock.Picture -> {
+                val maxWidth = right - left
+                val aspect = if (block.aspect > 0.01f) block.aspect else 1f
+                var w = maxWidth
+                var h = w / aspect
+                if (h > bottom - top) { h = bottom - top; w = h * aspect }
+                listOf(Piece(h, false) { t, out -> out += DrawOp.Picture(block.key, left + (maxWidth - w) / 2, t, w, h) })
+            }
         }
 
         private fun row(r: PdfBlock.Row): Piece {

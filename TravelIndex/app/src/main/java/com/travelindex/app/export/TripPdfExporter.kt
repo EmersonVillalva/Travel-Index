@@ -2,6 +2,7 @@ package com.travelindex.app.export
 
 import android.content.Context
 import com.travelindex.app.R
+import com.travelindex.app.data.FileStorage
 import com.travelindex.app.data.LanguageManager
 import com.travelindex.app.data.SettingsRepository
 import com.travelindex.app.data.repo.TripRepository
@@ -25,6 +26,7 @@ class TripPdfExporter @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val trips: TripRepository,
     private val settings: SettingsRepository,
+    private val files: FileStorage,
 ) {
     // El PDF sale en el idioma elegido en la app, no en el del móvil.
     private val context: Context get() = LanguageManager.localize(appContext)
@@ -34,16 +36,30 @@ class TripPdfExporter @Inject constructor(
     suspend fun export(tripId: Long): File? = withContext(Dispatchers.IO) {
         val bundle = trips.bundles.filterNotNull().first().firstOrNull { it.trip.id == tripId } ?: return@withContext null
         val formats = Formats(settings.settings.first().dateFormat)
-        val blocks = TripPdfContent(context, formats).build(bundle)
         // Solo se conserva el último PDF. El archivo de «Compartir viaje» vive en la misma carpeta y no se toca.
         sharedDir.listFiles()?.filter { it.name.endsWith("." + TripPdf.EXTENSION) }?.forEach { it.delete() }
         val file = File(sharedDir, TripPdf.fileNameFor(bundle.trip.name))
         val name = bundle.trip.name.take(40)
         try {
-            PdfWriter.write(blocks, file) { page, total -> context.getString(R.string.pdf_footer, name, page, total) }
+            try {
+                write(bundle, formats, file, name, withFiles = true)
+            } catch (_: OutOfMemoryError) {
+                // Demasiados archivos grandes para este móvil: mejor un PDF sin ellos (con un aviso) que ninguno.
+                write(bundle, formats, file, name, withFiles = false)
+            }
         } catch (t: Throwable) {
             file.delete(); throw t
         }
         file
+    }
+
+    private fun write(bundle: com.travelindex.app.domain.TripBundle, formats: Formats, file: File, name: String, withFiles: Boolean) {
+        val pages = AttachmentPages(files)
+        try {
+            val blocks = TripPdfContent(context, formats, pages, includeFiles = withFiles).build(bundle)
+            PdfWriter.write(blocks, file, pages) { page, total -> context.getString(R.string.pdf_footer, name, page, total) }
+        } finally {
+            pages.close()
+        }
     }
 }

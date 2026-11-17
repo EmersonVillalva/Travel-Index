@@ -52,7 +52,7 @@ object CalendarBuilder {
     fun eventsOn(date: LocalDate, bundles: List<TripBundle>): List<DayEntry> =
         bundles.filter { !it.trip.cancelled }
             .flatMap { b -> b.events.filter { it.start.toLocalDate() == date }.map { DayEntry(b.trip, it) } }
-            .sortedWith(compareBy({ it.event.start.toInstant() }, { it.event.key }))
+            .sortedWith(compareBy(ItineraryBuilder.ORDER) { it.event })
 
     /** Viajes cuyas fechas incluyen el día (incluye los cancelados para poder mostrarlos tachados si se quiere). */
     fun tripsOn(date: LocalDate, bundles: List<TripBundle>): List<TripEntity> =

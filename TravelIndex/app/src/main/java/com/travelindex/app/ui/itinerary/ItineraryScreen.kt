@@ -166,7 +166,7 @@ private fun ByDay(b: TripBundle, onOpen: (ItineraryEvent) -> Unit) {
 
 @Composable
 private fun Chronological(b: TripBundle, onOpen: (ItineraryEvent) -> Unit) {
-    val sorted = remember(b.events) { b.events.sortedWith(compareBy({ it.start.toInstant() }, { it.key })) }
+    val sorted = remember(b.events) { b.events.sortedWith(ItineraryBuilder.ORDER) }
     LazyColumn(
         contentPadding = PaddingValues(Spacing.m), verticalArrangement = Arrangement.spacedBy(Spacing.s),
     ) {
