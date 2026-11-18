@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.Train
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.travelindex.app.R
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TransportSection
 import com.travelindex.app.domain.forms.Choice
@@ -48,6 +49,9 @@ data class ModuleSpec(
     val visibleWhen: (FieldDef, Map<String, String>) -> Boolean = { _, _ -> true },
 ) {
     fun field(key: String): FieldDef? = fields.firstOrNull { it.key == key }
+
+    /** Los campos que se ven con estos valores (los ocultos por [visibleWhen] no se piden ni se validan). */
+    fun visibleFields(values: Map<String, String>): List<FieldDef> = fields.filter { visibleWhen(it, values) }
 }
 
 private fun f(key: String, @StringRes label: Int, type: FieldType = FieldType.TEXT, required: Boolean = false,
@@ -92,6 +96,33 @@ object Choices {
 }
 
 object ModuleSpecs {
+    /**
+     * Escalas de un vuelo: cada una es un bloque del formulario entre la salida y la llegada (aeropuerto, cuándo llega el vuelo
+     * anterior, cuándo sale el siguiente y su aerolínea y número). Solo se ven tantos bloques como escalas se hayan pedido.
+     */
+    private val stopTitles = listOf(
+        R.string.sec_stop_1, R.string.sec_stop_2, R.string.sec_stop_3,
+        R.string.sec_stop_4, R.string.sec_stop_5, R.string.sec_stop_6,
+    )
+    private val stopOrder = listOf("airport", "zone", "arrDate", "arrTime", "depDate", "depTime", "airline", "flightNumber")
+    private val flightStopFields: List<FieldDef> = (1..FlightConnections.MAX_STOPS).flatMap { i ->
+        fun key(name: String) = FlightConnections.stopKey(i, name)
+        listOf(
+            f(key("airport"), R.string.f_stop_airport, FieldType.AIRPORT, required = true),
+            f(key("zone"), R.string.f_stop_zone, FieldType.ZONE),
+            f(key("arrDate"), R.string.f_arr_date, FieldType.DATE),
+            f(key("arrTime"), R.string.f_arr_time, FieldType.TIME),
+            f(key("depDate"), R.string.f_dep_date, FieldType.DATE, required = true),
+            f(key("depTime"), R.string.f_dep_time, FieldType.TIME, required = true),
+            f(key("airline"), R.string.f_next_airline, required = true),
+            f(key("flightNumber"), R.string.f_next_flight_number, required = true),
+        )
+    }
+    // El detalle y el PDF no las usan (cada tramo se ve como su propio vuelo): por eso `keys` va vacío.
+    private val flightStopSections: List<FormSection> = stopTitles.mapIndexed { index, title ->
+        FormSection(title, keys = emptyList(), formKeys = stopOrder.map { FlightConnections.stopKey(index + 1, it) })
+    }
+
     private val flight = ModuleSpec(
         type = ModuleType.FLIGHT, titleRes = R.string.mod_flights, newTitleRes = R.string.new_flight, editTitleRes = R.string.edit_flight,
         emptyTitleRes = R.string.empty_flights_title, emptyBodyRes = R.string.empty_flights_body, icon = Icons.Outlined.Flight,
@@ -117,19 +148,27 @@ object ModuleSpecs {
             f("price", R.string.f_price, FieldType.MONEY),
             f("currency", R.string.f_currency, FieldType.CURRENCY, required = true),
             f("notes", R.string.f_notes, FieldType.MULTILINE),
-        ),
+        ) + flightStopFields,
         sections = listOf(
             FormSection(R.string.sec_flight, listOf("flightNumber", "airline")),
             FormSection(R.string.sec_departure, listOf("departureAirport", "terminal", "depDate", "depTime", "depZone"),
                 formKeys = listOf("departureAirport", "depDate", "depTime", "depZone")),
+        ) + flightStopSections + listOf(
             FormSection(R.string.sec_arrival, listOf("arrivalAirport", "arrDate", "arrTime", "arrZone"), formTitleRes = R.string.sec_arrival_form),
             FormSection(R.string.sec_price, listOf("price", "currency")),
         ),
-        // La zona horaria solo se pide si el aeropuerto no es de nuestra lista (si lo es, se pone sola).
+        // La zona horaria solo se pide si el aeropuerto no es de nuestra lista (si lo es, se pone sola),
+        // y de las escalas solo se ven las que se han pedido.
         visibleWhen = { def, v ->
-            when (def.key) {
-                "depZone" -> v["departureAirport"].orEmpty().isNotBlank() && Airports.zoneFor(v["departureAirport"].orEmpty()) == null
-                "arrZone" -> v["arrivalAirport"].orEmpty().isNotBlank() && Airports.zoneFor(v["arrivalAirport"].orEmpty()) == null
+            val stop = FlightConnections.parseStopKey(def.key)
+            when {
+                stop != null -> {
+                    val (index, name) = stop
+                    val airport = v[FlightConnections.stopKey(index, "airport")].orEmpty()
+                    index <= FlightConnections.stopsOf(v) && (name != "zone" || (airport.isNotBlank() && Airports.zoneFor(airport) == null))
+                }
+                def.key == "depZone" -> v["departureAirport"].orEmpty().isNotBlank() && Airports.zoneFor(v["departureAirport"].orEmpty()) == null
+                def.key == "arrZone" -> v["arrivalAirport"].orEmpty().isNotBlank() && Airports.zoneFor(v["arrivalAirport"].orEmpty()) == null
                 else -> true
             }
         },

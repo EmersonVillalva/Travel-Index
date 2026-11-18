@@ -12,13 +12,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Flight
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +49,7 @@ import com.travelindex.app.domain.forms.FlightCodec
 import com.travelindex.app.ui.components.Pill
 import com.travelindex.app.ui.components.SectionCard
 import com.travelindex.app.ui.components.formatMoneyValue
+import com.travelindex.app.ui.components.pluralText
 import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
 import com.travelindex.app.ui.theme.StatusDanger
@@ -223,6 +230,52 @@ fun FlightConnectionCard(legs: List<FlightEntity>, currentId: Long, modifier: Mo
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+    }
+}
+
+/**
+ * Escalas de un vuelo, dentro del mismo formulario: un interruptor y, al activarlo, cuántas escalas tiene el viaje. Los bloques de
+ * cada escala salen debajo, entre la salida y la llegada, tanto si ya están rellenados como si no.
+ * [savedLegs] son los vuelos que el viaje tiene guardados: si se piden menos, se avisa de que se borrarán.
+ */
+@Composable
+fun FlightStopsCard(stops: Int, savedLegs: Int, onStops: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val on = stops > 0
+    SectionCard(stringResource(R.string.sec_flight_stops), modifier) {
+        Row(
+            Modifier.fillMaxWidth().toggleable(
+                value = on, role = Role.Switch,
+                onValueChange = { onStops(if (it) 1 else 0) },
+            ),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.m),
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.flight_has_stops), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(R.string.flight_has_stops_hint), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(checked = on, onCheckedChange = null)
+        }
+        if (on) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                IconButton(onClick = { onStops(stops - 1) }) {
+                    Icon(Icons.Outlined.Remove, stringResource(R.string.flight_stops_less))
+                }
+                Text(pluralText(R.plurals.flight_stops_count, stops), style = MaterialTheme.typography.titleMedium)
+                IconButton(onClick = { onStops(stops + 1) }, enabled = stops < FlightConnections.MAX_STOPS) {
+                    Icon(Icons.Outlined.Add, stringResource(R.string.flight_stops_more))
+                }
+            }
+        }
+        val removed = savedLegs - (stops + 1)
+        if (removed > 0) {
+            Text(
+                pluralText(R.plurals.flight_legs_removed, removed), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
         }
     }
 }

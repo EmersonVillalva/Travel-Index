@@ -43,6 +43,7 @@ fun errorText(e: FieldError): String = stringResource(
         FieldError.INVALID_CURRENCY -> R.string.error_currency
         FieldError.INVALID_ZONE -> R.string.error_zone
         FieldError.END_BEFORE_START -> R.string.error_end_before_start
+        FieldError.DEPARTS_BEFORE_ARRIVAL -> R.string.error_departs_before_arrival
     }
 )
 

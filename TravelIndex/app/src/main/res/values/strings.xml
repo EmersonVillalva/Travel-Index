@@ -97,15 +97,31 @@
     <string name="flight_chip_seat">Asiento %1$s</string>
     <string name="sec_flight_stops">Escalas</string>
     <string name="flight_has_stops">Vuelo con escalas</string>
-    <string name="flight_has_stops_hint">Al guardar, se abre el siguiente tramo ya rellenado con este aeropuerto de llegada. Repítelo con tantas escalas como tenga el viaje.</string>
-    <string name="action_save_add_leg">Guardar y añadir otro tramo</string>
-    <string name="flight_new_leg_title">Nuevo vuelo · tramo %1$d</string>
-    <string name="flight_leg_saved">Tramo guardado. Ahora, el tramo %1$d</string>
-    <string name="flight_leg_hint">Sale de donde llegó el tramo anterior y los datos de la reserva se han copiado. Rellena la aerolínea, el número y las horas de este tramo.</string>
+    <string name="flight_has_stops_hint">Se abre un bloque por cada escala, entre la salida y la llegada.</string>
     <string name="flight_chip_leg">Tramo %1$d de %2$d</string>
     <string name="flight_chip_layover">Escala en %1$s · %2$s</string>
     <string name="sec_flight_connection">Vuelo con escalas</string>
     <string name="flight_connection_leg">%1$d. %2$s</string>
+    <string name="sec_stop_1">Escala 1</string>
+    <string name="sec_stop_2">Escala 2</string>
+    <string name="sec_stop_3">Escala 3</string>
+    <string name="sec_stop_4">Escala 4</string>
+    <string name="sec_stop_5">Escala 5</string>
+    <string name="sec_stop_6">Escala 6</string>
+    <string name="f_stop_airport">Aeropuerto de la escala</string>
+    <string name="f_stop_zone">Zona horaria de la escala</string>
+    <string name="f_next_airline">Aerolínea del siguiente vuelo</string>
+    <string name="f_next_flight_number">Número del siguiente vuelo</string>
+    <string name="flight_stops_less">Una escala menos</string>
+    <string name="flight_stops_more">Una escala más</string>
+    <plurals name="flight_stops_count">
+        <item quantity="one">%1$d escala</item>
+        <item quantity="other">%1$d escalas</item>
+    </plurals>
+    <plurals name="flight_legs_removed">
+        <item quantity="one">Al guardar se borrará %1$d vuelo guardado de este viaje, con sus archivos adjuntos.</item>
+        <item quantity="other">Al guardar se borrarán %1$d vuelos guardados de este viaje, con sus archivos adjuntos.</item>
+    </plurals>
 
     <!-- Inicio -->
     <string name="home_greeting">Hola, %1$s</string>
@@ -450,6 +466,7 @@
     <string name="error_currency">Código de moneda no válido</string>
     <string name="error_zone">Zona horaria no válida</string>
     <string name="error_end_before_start">El final no puede ser anterior al inicio</string>
+    <string name="error_departs_before_arrival">No puede salir antes de que llegue el vuelo anterior</string>
     <string name="error_fix_fields">Revisa los campos marcados en rojo.</string>
     <string name="error_save">No se pudo guardar. Inténtalo de nuevo.</string>
     <string name="error_attach">No se pudo guardar el archivo.</string>

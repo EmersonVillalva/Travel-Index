@@ -8,6 +8,7 @@ import com.travelindex.app.data.db.LodgingEntity
 import com.travelindex.app.data.db.RestaurantEntity
 import com.travelindex.app.data.db.TransportEntity
 import com.travelindex.app.data.db.TravelDocEntity
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.Money
 import com.travelindex.app.domain.formatPlain
@@ -94,6 +95,13 @@ object FlightCodec {
         val dep = instant(dd, dt, v.zone("depZone")); val arr = instant(ad, at, v.zone("arrZone"))
         return if (arr < dep) mapOf("arrDate" to FieldError.END_BEFORE_START) else emptyMap()
     }
+
+    /** Instante de salida o de llegada que describen los valores del formulario; null si falta la fecha o la hora. */
+    fun departureMs(v: FormValues): Long? = instantOrNull(v.date("depDate"), v.time("depTime"), v.zone("depZone"))
+    fun arrivalMs(v: FormValues): Long? = instantOrNull(v.date("arrDate"), v.time("arrTime"), v.zone("arrZone"))
+
+    private fun instantOrNull(date: LocalDate?, time: LocalTime?, zone: ZoneId): Long? =
+        if (date != null && time != null) instant(date, time, zone) else null
 
     /** Duración real del vuelo en minutos (independiente de las zonas horarias). */
     fun durationMinutes(f: FlightEntity): Long = ((f.arrivalEpochMs - f.departureEpochMs) / 60_000L).coerceAtLeast(0)
@@ -271,7 +279,7 @@ object DestinationCodec {
 
 object ModuleCodecs {
     fun cross(type: ModuleType, v: FormValues): Map<String, FieldError> = when (type) {
-        ModuleType.FLIGHT -> FlightCodec.cross(v)
+        ModuleType.FLIGHT -> FlightConnections.cross(v)
         ModuleType.LODGING -> LodgingCodec.cross(v)
         ModuleType.ACTIVITY -> ActivityCodec.cross(v)
         ModuleType.TRANSPORT -> TransportCodec.cross(v)

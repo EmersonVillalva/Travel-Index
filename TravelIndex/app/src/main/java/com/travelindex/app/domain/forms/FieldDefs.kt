@@ -25,7 +25,9 @@ data class FieldDef(
 )
 
 enum class FieldError {
-    REQUIRED, INVALID_DATE, INVALID_TIME, INVALID_NUMBER, INVALID_MONEY, INVALID_CURRENCY, INVALID_ZONE, END_BEFORE_START
+    REQUIRED, INVALID_DATE, INVALID_TIME, INVALID_NUMBER, INVALID_MONEY, INVALID_CURRENCY, INVALID_ZONE, END_BEFORE_START,
+    /** Un vuelo con escalas sale antes de que llegue el anterior. */
+    DEPARTS_BEFORE_ARRIVAL,
 }
 
 typealias FormValues = Map<String, String>

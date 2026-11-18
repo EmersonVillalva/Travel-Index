@@ -50,8 +50,6 @@ data class PendingFile(val uri: Uri, val name: String)
 
 sealed interface FormEvent {
     data class Saved(val failedFiles: Int) : FormEvent
-    /** Se guardó un tramo de un vuelo con escalas y el formulario queda listo para el siguiente (número de tramo). */
-    data class NextLeg(val leg: Int) : FormEvent
     data object ValidationFailed : FormEvent
     data object SaveFailed : FormEvent
     data object FileFailed : FormEvent
@@ -67,10 +65,8 @@ data class FormState(
     val existing: List<AttachmentEntity> = emptyList(),
     /** true cuando el usuario ya ha cambiado algo (para avisar antes de descartar). */
     val dirty: Boolean = false,
-    /** Vuelo con escalas: número del tramo que se está rellenando (2 o más); 0 si es un vuelo normal. */
-    val leg: Int = 0,
-    /** Vuelo: se puede añadir otro tramo a continuación (no si se edita un tramo que ya tiene otros después). */
-    val canAddLeg: Boolean = true,
+    /** Vuelo: cuántos vuelos tiene ya guardados este viaje (con escalas son varios); sirve para avisar si se quitan escalas. */
+    val savedLegs: Int = 0,
 )
 
 @HiltViewModel
@@ -94,9 +90,10 @@ class ModuleFormViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     private var initialized = false
-    /** El elemento que se edita ahora: pasa a 0 (nuevo) al seguir con el siguiente tramo de un vuelo con escalas. */
-    private var editingId: Long = itemId
+    private val editingId: Long = itemId
     private var knownFlights: List<FlightEntity> = emptyList()
+    /** Vuelo: los tramos que ya estaban guardados al abrir el formulario, por orden (un vuelo con escalas son varios). */
+    private var legIds: List<Long> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -109,12 +106,16 @@ class ModuleFormViewModel @Inject constructor(
                     val existingItem = if (itemId != 0L) ModuleItems.of(type, b).firstOrNull { it.id == itemId } else null
                     if (itemId != 0L && existingItem == null) {
                         _state.update { it.copy(loaded = true, notFound = true) }
+                    } else if (type == ModuleType.FLIGHT && existingItem != null) {
+                        // Un vuelo con escalas se edita entero, sea cual sea el tramo que se abrió.
+                        val legs = FlightConnections.legsOf(b.flights.first { it.id == itemId }, b.flights)
+                        legIds = legs.map { it.id }
+                        _state.update {
+                            it.copy(loaded = true, values = FlightConnections.formValues(legs), existing = owned, savedLegs = legs.size)
+                        }
                     } else {
                         val values = existingItem?.values ?: FormDefaults.forNew(type, b, LocalDate.now(), transportType = target.section?.transportType)
-                        // Editando un tramo que ya tiene otros después, no se ofrece añadir uno a continuación.
-                        val canAddLeg = type != ModuleType.FLIGHT ||
-                            (b.flights.firstOrNull { it.id == itemId }?.let { FlightConnections.isLastLeg(it, b.flights) } ?: true)
-                        _state.update { it.copy(loaded = true, values = values, existing = owned, canAddLeg = canAddLeg) }
+                        _state.update { it.copy(loaded = true, values = values, existing = owned) }
                     }
                 } else {
                     _state.update { it.copy(existing = owned) }
@@ -131,8 +132,21 @@ class ModuleFormViewModel @Inject constructor(
             if (type == ModuleType.FLIGHT) {
                 if (key == "departureAirport") Airports.zoneFor(value)?.let { next["depZone"] = it }
                 if (key == "arrivalAirport") Airports.zoneFor(value)?.let { next["arrZone"] = it }
+                FlightConnections.parseStopKey(key)?.let { (index, name) ->
+                    if (name == "airport") Airports.zoneFor(value)?.let { next[FlightConnections.stopKey(index, "zone")] = it }
+                }
             }
             s.copy(values = next, errors = s.errors - key, dirty = true)
+        }
+    }
+
+    /** Vuelo: cuántas escalas tiene (0 = directo). Los bloques de cada escala aparecen entre la salida y la llegada. */
+    fun setStops(count: Int) {
+        _state.update { s ->
+            val next = FlightConnections.withStops(s.values, count)
+            // Los errores de escalas que ya no se ven dejan de tener sentido.
+            val errors = s.errors.filterKeys { k -> FlightConnections.parseStopKey(k)?.let { it.first <= count } ?: true }
+            s.copy(values = next, errors = errors, dirty = true)
         }
     }
 
@@ -156,7 +170,8 @@ class ModuleFormViewModel @Inject constructor(
     fun save() {
         val s = _state.value
         if (s.saving) return
-        val fieldErrors = FormValidator.validate(spec.fields, s.values)
+        // Solo se valida lo que se ve: las escalas ocultas no cuentan.
+        val fieldErrors = FormValidator.validate(spec.visibleFields(s.values), s.values)
         val errors = if (fieldErrors.isEmpty()) ModuleCodecs.cross(type, s.values) else fieldErrors
         if (errors.isNotEmpty()) {
             _state.update { it.copy(errors = errors) }
@@ -166,36 +181,19 @@ class ModuleFormViewModel @Inject constructor(
         _state.update { it.copy(saving = true, errors = emptyMap()) }
         viewModelScope.launch {
             try {
-                // Se guardan nombres de aeropuerto, no códigos ("MAD" → "Madrid").
-                // Vuelo con escalas: este tramo y los siguientes comparten un identificador de conexión.
-                val chain = type == ModuleType.FLIGHT && s.values["nextLeg"] == "1"
-                val connectionId = s.values["connectionId"].orEmpty()
-                    .let { if (chain && it.isBlank()) FlightConnections.newConnectionId() else it }
-                val values = if (type == ModuleType.FLIGHT) s.values + mapOf(
-                    "departureAirport" to Airports.displayName(s.values["departureAirport"].orEmpty()),
-                    "arrivalAirport" to Airports.displayName(s.values["arrivalAirport"].orEmpty()),
-                    "connectionId" to connectionId,
-                ) else s.values
-                val id = modules.save(type, tripId, editingId, values)
+                val id = if (type == ModuleType.FLIGHT) {
+                    // Un vuelo con escalas son varios vuelos enlazados por un mismo identificador de conexión.
+                    val existing = legIds.mapNotNull { id -> knownFlights.firstOrNull { it.id == id } }
+                    val connectionId = s.values["connectionId"].orEmpty().ifBlank { FlightConnections.newConnectionId() }
+                    modules.saveFlightLegs(existing, FlightConnections.buildLegs(tripId, connectionId, s.values, existing))
+                } else {
+                    modules.save(type, tripId, editingId, s.values)
+                }
                 var failed = 0
                 s.pending.forEach { p ->
                     runCatching { attachments.add(tripId, p.uri, type.name, id) }.onFailure { failed++ }
                 }
-                if (chain) {
-                    // Los demás tramos de la conexión que ya están guardados, más este y el que viene.
-                    val leg = knownFlights.count { it.connectionId == connectionId && it.id != id } + 2
-                    editingId = 0
-                    _state.update {
-                        FormState(
-                            loaded = true, values = FlightConnections.nextLegValues(values, connectionId), leg = leg,
-                            canAddLeg = true,
-                        )
-                    }
-                    if (failed > 0) _events.send(FormEvent.FileFailed)
-                    _events.send(FormEvent.NextLeg(leg))
-                } else {
-                    _events.send(FormEvent.Saved(failed))
-                }
+                _events.send(FormEvent.Saved(failed))
             } catch (t: Throwable) {
                 _state.update { it.copy(saving = false) }
                 _events.send(FormEvent.SaveFailed)
