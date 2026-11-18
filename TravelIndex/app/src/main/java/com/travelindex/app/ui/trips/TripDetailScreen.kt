@@ -2,6 +2,7 @@ package com.travelindex.app.ui.trips
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -120,8 +121,6 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
     val scope = rememberCoroutineScope()
     var menuOpen by remember { mutableStateOf(false) }
     var showAdd by rememberSaveable { mutableStateOf(false) }
-    // El mismo menú de «Agregar», pero solo con los tipos de transporte (lo abre la tarjeta común de transporte).
-    var showAddTransport by rememberSaveable { mutableStateOf(false) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var confirmCancel by rememberSaveable { mutableStateOf(false) }
     var confirmShare by rememberSaveable { mutableStateOf(false) }
@@ -197,17 +196,15 @@ fun TripDetailScreen(actions: TripActions, vm: TripDetailViewModel = hiltViewMod
         },
     ) { pad ->
         if (bundle == null) { LoadingBox(Modifier.padding(pad)); return@Scaffold }
-        Dashboard(bundle, actions, onAddTransport = { showAddTransport = true }, modifier = Modifier.padding(pad))
+        Dashboard(bundle, actions, Modifier.padding(pad))
     }
 
-    if ((showAdd || showAddTransport) && bundle != null) {
+    if (showAdd && bundle != null) {
         AddSheet(
             sections = TransportSections.offered(TravelModes.parse(bundle.trip.travelModes)),
-            transportOnly = showAddTransport,
-            onDismiss = { showAdd = false; showAddTransport = false },
+            onDismiss = { showAdd = false },
             onPick = { choice ->
                 showAdd = false
-                showAddTransport = false
                 when (choice) {
                     is AddChoice.Section -> actions.addSection(choice.section)
                     is AddChoice.Module -> actions.addItem(choice.type)
@@ -270,9 +267,7 @@ private sealed interface AddChoice {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddSheet(
-    sections: List<TransportSection>, transportOnly: Boolean, onDismiss: () -> Unit, onPick: (AddChoice) -> Unit,
-) {
+private fun AddSheet(sections: List<TransportSection>, onDismiss: () -> Unit, onPick: (AddChoice) -> Unit) {
     val sheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     fun pick(c: AddChoice) { scope.launch { sheet.hide() }.invokeOnCompletion { onPick(c) } }
@@ -285,15 +280,13 @@ private fun AddSheet(
                 val spec = ModuleSpecs.of(s.module, s)
                 SheetRow(spec.icon, stringResource(spec.newTitleRes)) { pick(AddChoice.Section(s)) }
             }
-            if (!transportOnly) {
-                listOf(
-                    ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT, ModuleType.TRAVEL_DOC,
-                ).forEach { t ->
-                    val spec = ModuleSpecs.of(t)
-                    SheetRow(spec.icon, stringResource(spec.newTitleRes)) { pick(AddChoice.Module(t)) }
-                }
-                SheetRow(Icons.Outlined.AttachFile, stringResource(R.string.add_file)) { pick(AddChoice.File) }
+            listOf(
+                ModuleType.LODGING, ModuleType.ACTIVITY, ModuleType.RESTAURANT, ModuleType.TRAVEL_DOC,
+            ).forEach { t ->
+                val spec = ModuleSpecs.of(t)
+                SheetRow(spec.icon, stringResource(spec.newTitleRes)) { pick(AddChoice.Module(t)) }
             }
+            SheetRow(Icons.Outlined.AttachFile, stringResource(R.string.add_file)) { pick(AddChoice.File) }
         }
     }
 }
@@ -310,7 +303,7 @@ private fun SheetRow(icon: ImageVector, label: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Dashboard(b: TripBundle, a: TripActions, onAddTransport: () -> Unit, modifier: Modifier) {
+private fun Dashboard(b: TripBundle, a: TripActions, modifier: Modifier) {
     val today = LocalDate.now()
     val f = LocalFormats.current
     val trip = b.trip
@@ -393,10 +386,24 @@ private fun Dashboard(b: TripBundle, a: TripActions, onAddTransport: () -> Unit,
             item { Tile(Icons.Outlined.Timeline, stringResource(R.string.mod_itinerary),
                 pluralText(R.plurals.tile_events, b.events.size), a.openItinerary) }
             // Transporte: solo los apartados de los medios que se eligieron al crear el viaje. Si no se eligió ninguno y
-            // todavía no hay nada guardado, una sola tarjeta común (en vez de una vacía por cada tipo).
+            // todavía no hay nada guardado, una sola tarjeta común (en vez de una vacía por cada tipo) que despliega
+            // todo lo que se puede añadir: vuelo, tren, autobús, barco, coche u otro transporte.
             if (transportShown.isEmpty()) item {
-                Tile(ModuleSpecs.of(ModuleType.TRANSPORT).icon, stringResource(R.string.sec_transport), countText(0), onAddTransport,
-                    reservePrice = reservePrice)
+                var open by remember { mutableStateOf(false) }
+                Box {
+                    Tile(ModuleSpecs.of(ModuleType.TRANSPORT).icon, stringResource(R.string.sec_transport), countText(0), { open = true },
+                        reservePrice = reservePrice)
+                    DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                        TransportSections.addable.forEach { s ->
+                            val spec = ModuleSpecs.of(s.module, s)
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (s == TransportSection.TRANSPORT_ALL) R.string.new_transport_other else spec.newTitleRes)) },
+                                leadingIcon = { Icon(spec.icon, null, tint = MaterialTheme.colorScheme.secondary) },
+                                onClick = { open = false; a.addSection(s) },
+                            )
+                        }
+                    }
+                }
             }
             transportShown.forEach { s ->
                 val spec = ModuleSpecs.of(s.module, s)

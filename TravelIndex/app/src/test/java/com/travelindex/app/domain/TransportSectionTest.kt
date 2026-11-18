@@ -30,6 +30,17 @@ class TripSectionsTest {
         )
     }
 
+    @Test fun `la tarjeta comun ofrece cada medio y otro transporte al final`() {
+        assertEquals(
+            listOf(
+                TransportSection.FLIGHTS, TransportSection.TRAINS, TransportSection.BUSES, TransportSection.SHIPS,
+                TransportSection.CARS, TransportSection.TRANSPORT_ALL,
+            ),
+            TransportSections.addable,
+        )
+        assertFalse(TransportSection.TRANSPORT_OTHER in TransportSections.addable)
+    }
+
     @Test fun `si solo eliges tren no sale vuelos`() {
         val shown = TransportSections.shown(listOf(TravelMode.TRAIN), none, 0)
         assertEquals(listOf(TransportSection.TRAINS), shown)

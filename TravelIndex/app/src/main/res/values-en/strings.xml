@@ -263,6 +263,7 @@
     <string name="new_lodging">New accommodation</string>
     <string name="new_activity">New activity or tour</string>
     <string name="new_transport">New transport</string>
+    <string name="new_transport_other">Other transport (taxi, transfer…)</string>
     <string name="new_restaurant">New restaurant</string>
     <string name="new_doc">New travel document</string>
     <string name="new_expense">New expense</string>

@@ -79,6 +79,12 @@ object TransportSections {
     fun offered(modes: List<TravelMode>): List<TransportSection> =
         if (modes.isEmpty()) FIXED_SECTIONS else TransportSection.entries.filter { it.mode != null && it.mode in modes }
 
+    /**
+     * Todo lo que se puede añadir desde la tarjeta común de transporte (viajes sin medios elegidos): un apartado por cada
+     * medio y, al final, "otro transporte" (taxi, traslado...) con su selector de tipo.
+     */
+    val addable: List<TransportSection> = TransportSection.entries.filter { it != TransportSection.TRANSPORT_OTHER }
+
     fun count(section: TransportSection, flightCount: Int, transportTypes: List<String>): Int =
         if (section == TransportSection.FLIGHTS) flightCount else transportTypes.count { section.matches(it) }
 }
