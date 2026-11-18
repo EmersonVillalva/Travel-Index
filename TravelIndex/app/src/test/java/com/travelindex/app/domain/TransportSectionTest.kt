@@ -13,13 +13,25 @@ import java.time.LocalTime
 class TripSectionsTest {
     private val none = emptyList<String>()
 
-    @Test fun `sin medios elegidos salen los apartados de siempre`() {
-        assertEquals(listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL), TransportSections.shown(emptyList(), none))
+    @Test fun `sin medios elegidos y sin nada guardado no sale ningun apartado vacio`() {
+        // El panel pone entonces una sola tarjeta común de transporte.
+        assertEquals(emptyList<TransportSection>(), TransportSections.shown(emptyList(), none, 0))
+        // Pero se sigue pudiendo añadir vuelos y transporte.
         assertEquals(listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL), TransportSections.offered(emptyList()))
     }
 
+    @Test fun `sin medios elegidos solo salen los apartados que ya tienen algo`() {
+        assertEquals(listOf(TransportSection.FLIGHTS), TransportSections.shown(emptyList(), none, 2))
+        assertEquals(listOf(TransportSection.TRANSPORT_ALL), TransportSections.shown(emptyList(), listOf("TRAIN"), 0))
+        assertEquals(listOf(TransportSection.TRANSPORT_ALL), TransportSections.shown(emptyList(), listOf("TAXI", "CAR_RENTAL"), 0))
+        assertEquals(
+            listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL),
+            TransportSections.shown(emptyList(), listOf("BUS"), 1),
+        )
+    }
+
     @Test fun `si solo eliges tren no sale vuelos`() {
-        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), none)
+        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), none, 0)
         assertEquals(listOf(TransportSection.TRAINS), shown)
         assertFalse(TransportSection.FLIGHTS in TransportSections.offered(listOf(TravelMode.TRAIN)))
         assertEquals(listOf(TransportSection.TRAINS), TransportSections.offered(listOf(TravelMode.TRAIN)))
@@ -28,7 +40,7 @@ class TripSectionsTest {
     @Test fun `con dos medios salen los dos`() {
         assertEquals(
             listOf(TransportSection.FLIGHTS, TransportSection.TRAINS),
-            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.PLANE), none),
+            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.PLANE), none, 0),
         )
         assertEquals(
             listOf(TransportSection.FLIGHTS, TransportSection.TRAINS),
@@ -47,22 +59,22 @@ class TripSectionsTest {
     @Test fun `al desmarcar un medio su apartado desaparece aunque tenga reservas`() {
         // Viaje que ahora solo dice tren, con un autobús guardado: el autobús ya no se ve ni se ofrece.
         val types = listOf("BUS", "TRAIN")
-        assertEquals(listOf(TransportSection.TRAINS), TransportSections.shown(listOf(TravelMode.TRAIN), types))
+        assertEquals(listOf(TransportSection.TRAINS), TransportSections.shown(listOf(TravelMode.TRAIN), types, 0))
         assertEquals(listOf(TransportSection.TRAINS), TransportSections.offered(listOf(TravelMode.TRAIN)))
         // Al volver a marcarlo, vuelve el apartado con su reserva.
         assertEquals(
             listOf(TransportSection.TRAINS, TransportSection.BUSES),
-            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.BUS), types),
+            TransportSections.shown(listOf(TravelMode.TRAIN, TravelMode.BUS), types, 0),
         )
         assertEquals(1, TransportSections.count(TransportSection.BUSES, 0, types))
     }
 
     @Test fun `un medio marcado sin reservas sigue saliendo`() {
-        assertEquals(listOf(TransportSection.BUSES), TransportSections.shown(listOf(TravelMode.BUS), none))
+        assertEquals(listOf(TransportSection.BUSES), TransportSections.shown(listOf(TravelMode.BUS), none, 0))
     }
 
     @Test fun `un taxi guardado sigue siendo alcanzable en un viaje con medios`() {
-        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), listOf("TAXI", "TRAIN"))
+        val shown = TransportSections.shown(listOf(TravelMode.TRAIN), listOf("TAXI", "TRAIN"), 0)
         assertEquals(listOf(TransportSection.TRAINS, TransportSection.TRANSPORT_OTHER), shown)
     }
 

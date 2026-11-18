@@ -56,13 +56,16 @@ object TransportSections {
     private val FIXED_SECTIONS = listOf(TransportSection.FLIGHTS, TransportSection.TRANSPORT_ALL)
 
     /**
-     * Apartados de transporte que se ven en el panel del viaje. Sin medios elegidos (viajes antiguos o sin rellenar)
-     * salen los de siempre: vuelos y transporte. Con medios elegidos, solo esos: si desmarcas uno, su apartado
+     * Apartados de transporte que se ven en el panel del viaje. Con medios elegidos, solo esos: si desmarcas uno, su apartado
      * desaparece aunque tenga reservas (siguen guardadas y vuelven al marcarlo otra vez). La excepción son los
      * transportes sin medio propio (taxi, traslado, otros): no hay casilla que marcar, así que se ven si existen.
+     *
+     * Sin medios elegidos (viajes antiguos o sin rellenar) no se enseñan apartados vacíos: salen solo los que ya tienen
+     * algo (vuelos y/o transporte) y, si no hay nada, la lista queda vacía y el panel pone una única tarjeta común de
+     * transporte en vez de una vacía por cada tipo.
      */
-    fun shown(modes: List<TravelMode>, transportTypes: List<String>): List<TransportSection> {
-        if (modes.isEmpty()) return FIXED_SECTIONS
+    fun shown(modes: List<TravelMode>, transportTypes: List<String>, flightCount: Int): List<TransportSection> {
+        if (modes.isEmpty()) return FIXED_SECTIONS.filter { count(it, flightCount, transportTypes) > 0 }
         return TransportSection.entries.filter { s ->
             when (s) {
                 TransportSection.TRANSPORT_ALL -> false
