@@ -250,13 +250,7 @@ fun FlightStopsCard(stops: Int, savedLegs: Int, onStops: (Int) -> Unit, modifier
             ),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.m),
         ) {
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.flight_has_stops), style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    stringResource(R.string.flight_has_stops_hint), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Text(stringResource(R.string.flight_has_stops), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
             Switch(checked = on, onCheckedChange = null)
         }
         if (on) {

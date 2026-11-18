@@ -97,7 +97,6 @@
     <string name="flight_chip_seat">Asiento %1$s</string>
     <string name="sec_flight_stops">Escalas</string>
     <string name="flight_has_stops">Vuelo con escalas</string>
-    <string name="flight_has_stops_hint">Se abre un bloque por cada escala, entre la salida y la llegada.</string>
     <string name="flight_chip_leg">Tramo %1$d de %2$d</string>
     <string name="flight_chip_layover">Escala en %1$s · %2$s</string>
     <string name="sec_flight_connection">Vuelo con escalas</string>

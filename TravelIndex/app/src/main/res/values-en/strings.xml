@@ -93,7 +93,6 @@
     <string name="flight_chip_seat">Seat %1$s</string>
     <string name="sec_flight_stops">Stopovers</string>
     <string name="flight_has_stops">Flight with stopovers</string>
-    <string name="flight_has_stops_hint">One block opens for each stopover, between departure and arrival.</string>
     <string name="flight_chip_leg">Leg %1$d of %2$d</string>
     <string name="flight_chip_layover">Layover in %1$s · %2$s</string>
     <string name="sec_flight_connection">Flight with stopovers</string>
