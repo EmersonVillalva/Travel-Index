@@ -78,6 +78,13 @@ object FlightConnections {
         return stops.joinToString(" → ")
     }
 
+    /**
+     * Ruta corta de un vuelo, "Madrid-Barajas - Mánchester": cómo se rotulan sus archivos (tarjetas de embarque, billetes...).
+     * Se nombran los aeropuertos, no los códigos. Vacío si el vuelo no tiene aeropuertos.
+     */
+    fun shortRoute(flight: FlightEntity): String =
+        listOf(flight.departureAirport, flight.arrivalAirport).map { Airports.displayName(it).trim() }.filter { it.isNotEmpty() }.joinToString(" - ")
+
     /** Minutos de espera entre dos tramos; null si no se conoce la llegada del primero o las horas no cuadran. */
     fun layoverMinutes(previous: FlightEntity, next: FlightEntity): Long? {
         if (!FlightCodec.hasArrival(previous)) return null

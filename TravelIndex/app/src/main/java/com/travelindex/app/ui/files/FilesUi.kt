@@ -53,6 +53,7 @@ import com.travelindex.app.R
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.AttachmentCategory
 import com.travelindex.app.domain.FileGroup
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TripBundle
 import com.travelindex.app.domain.forms.ModuleItems
@@ -141,6 +142,10 @@ fun ownerTitles(b: TripBundle): Map<String, String> {
         val spec = ModuleSpecs.of(t)
         ModuleItems.of(t, b).forEach { out["${t.name}:${it.id}"] = moduleTitle(spec, it.values) }
     }
+    // Los archivos de un vuelo (tarjeta de embarque, billete...) llevan su ruta, "Madrid-Barajas - Mánchester", y no el número de vuelo.
+    b.flights.forEach { f ->
+        FlightConnections.shortRoute(f).takeIf { it.isNotEmpty() }?.let { out["${ModuleType.FLIGHT.name}:${f.id}"] = it }
+    }
     return out
 }
 
@@ -162,7 +167,12 @@ fun ownerOptions(b: TripBundle): List<Option> {
     val items = ModuleType.entries.filter { it.attachable }.flatMap { t ->
         val spec = ModuleSpecs.of(t)
         val typeLabel = stringResource(spec.titleRes)
-        ModuleItems.of(t, b).map { Option("${t.name}:${it.id}", "$typeLabel · ${moduleTitle(spec, it.values)}") }
+        ModuleItems.of(t, b).map { item ->
+            // En los vuelos, primero la ruta (como se rotulan sus archivos) y luego la aerolínea y el número.
+            val route = if (t == ModuleType.FLIGHT) b.flights.firstOrNull { it.id == item.id }?.let { FlightConnections.shortRoute(it) }.orEmpty() else ""
+            val title = moduleTitle(spec, item.values)
+            Option("${t.name}:${item.id}", "$typeLabel · " + listOf(route, title).filter { it.isNotEmpty() }.joinToString(" · "))
+        }
     }
     return listOf(none) + items
 }

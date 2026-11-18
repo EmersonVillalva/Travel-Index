@@ -81,6 +81,17 @@ class FlightConnectionsTest {
         assertEquals("", FlightCodec.build(1, 1, values - "connectionId").connectionId)
     }
 
+    @Test fun `los archivos de un vuelo se rotulan con su ruta`() {
+        assertEquals("Madrid-Barajas - Mánchester", FlightConnections.shortRoute(madMan))
+        assertEquals("Mánchester - Pekín Capital", FlightConnections.shortRoute(manPek))
+        // Cada tramo de un viaje con escalas lleva su propia ruta.
+        assertEquals(listOf("Madrid-Barajas - Mánchester", "Mánchester - Pekín Capital"), listOf(madMan, manPek).map { FlightConnections.shortRoute(it) })
+        // Un aeropuerto que no está en la lista se queda como se escribió, y sin aeropuertos no hay ruta.
+        assertEquals("Madrid-Barajas - Aeródromo de Villa Nada", FlightConnections.shortRoute(madMan.copy(arrivalAirport = "Aeródromo de Villa Nada")))
+        assertEquals("Mánchester", FlightConnections.shortRoute(madMan.copy(departureAirport = "")))
+        assertEquals("", FlightConnections.shortRoute(madMan.copy(departureAirport = "", arrivalAirport = " ")))
+    }
+
     // ---- Formulario con escalas: Madrid → Mánchester → Pekín dentro de un solo formulario ----------------------------------
 
     /** Lo que el usuario rellena: primer vuelo, una escala en Mánchester (llega 09:30, sale 13:40) y la llegada a Pekín. */

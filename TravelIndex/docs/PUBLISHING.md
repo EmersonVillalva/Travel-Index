@@ -3,7 +3,7 @@
 2. **Clave de firma**: genera tu keystore (`keytool -genkeypair -v -keystore release-keystore.jks -alias travelindex -keyalg RSA -keysize 2048 -validity 10000`), guárdala en un lugar seguro (y una copia aparte) y rellena `keystore.properties`. Recomendado: activar *Play App Signing*. La clave y las contraseñas nunca van al repositorio ni se comparten en chats.
 3. **Firma de debug**: las builds de prueba (CI) firman con `debug.keystore`, una clave fija de pruebas incluida en el repositorio (contraseña estándar «android», sin secretos). Gracias a ella el APK de debug se actualiza sin desinstalar. No tiene nada que ver con la clave de release.
 4. **Paquete definitivo**: confirma `travelindex.applicationId`. No se puede cambiar tras publicar.
-4. **Versionado**: sube `travelindex.versionCode` en cada subida (esta versión: 37 / 0.8.5).
+4. **Versionado**: sube `travelindex.versionCode` en cada subida (esta versión: 38 / 0.8.6).
 5. **Política de privacidad**: URL pública obligatoria. Hay un borrador en `docs/play/PRIVACY_POLICY_es.md`: sustituye los campos entre corchetes y publícala (por ejemplo, GitHub Pages).
 6. **Formulario "Seguridad de los datos"** y clasificación de contenido en Play Console. Borrador: la app no recopila ni comparte datos y no tiene permiso de internet; todo queda en el dispositivo.
 7. **Ficha**: texto en `docs/play/STORE_LISTING_es.md`; faltan capturas (teléfono y, si procede, tablet), icono 512×512 y gráfico de funciones 1024×500 (hay que exportarlos a PNG).
