@@ -115,7 +115,7 @@ object ModuleSpecs {
             f(key("depDate"), R.string.f_dep_date, FieldType.DATE, required = true),
             f(key("depTime"), R.string.f_dep_time, FieldType.TIME, required = true),
             f(key("airline"), R.string.f_next_airline, required = true),
-            f(key("flightNumber"), R.string.f_next_flight_number, required = true),
+            f(key("flightNumber"), R.string.f_next_flight_number),
         )
     }
     // El detalle y el PDF no las usan (cada tramo se ve como su propio vuelo): por eso `keys` va vacío.
@@ -128,7 +128,7 @@ object ModuleSpecs {
         emptyTitleRes = R.string.empty_flights_title, emptyBodyRes = R.string.empty_flights_body, icon = Icons.Outlined.Flight,
         fields = listOf(
             f("airline", R.string.f_airline, required = true),
-            f("flightNumber", R.string.f_flight_number, required = true),
+            f("flightNumber", R.string.f_flight_number),
             f("status", R.string.f_status, FieldType.CHOICE, choices = Choices.flightStatus),
             f("departureAirport", R.string.f_dep_airport, FieldType.AIRPORT, required = true),
             f("terminal", R.string.f_terminal),

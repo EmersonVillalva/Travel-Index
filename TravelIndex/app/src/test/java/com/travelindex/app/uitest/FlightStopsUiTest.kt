@@ -169,12 +169,24 @@ class FlightStopsUiTest {
         )
         fun errors(v: Map<String, String>) = FormValidator.validate(spec.visibleFields(v), v)
         assertTrue(errors(direct).isEmpty())
-        // Con una escala pedida y sin rellenar, faltan sus datos obligatorios (no los de la llegada del tramo, que son opcionales).
+        // Con una escala pedida y sin rellenar, faltan sus datos obligatorios (la hora de llegada y el número de vuelo son opcionales).
         assertEquals(
-            setOf("s1_airport", "s1_depDate", "s1_depTime", "s1_airline", "s1_flightNumber"),
+            setOf("s1_airport", "s1_depDate", "s1_depTime", "s1_airline"),
             errors(direct + ("stops" to "1")).keys,
         )
         // Con una sola pedida, las demás escritas o no escritas no cuentan.
-        assertEquals(5, errors(direct + ("stops" to "1") + ("s2_airline" to "")).size)
+        assertEquals(4, errors(direct + ("stops" to "1") + ("s2_airline" to "")).size)
+    }
+
+    @Test
+    fun elNumeroDeVueloNoEsObligatorioNiEnElVueloNiEnLasEscalas() {
+        val direct = mapOf(
+            "airline" to "IB", "departureAirport" to "MAD", "depDate" to "2027-03-01", "depTime" to "08:00",
+            "arrivalAirport" to "PEK", "currency" to "EUR",
+        )
+        fun errors(v: Map<String, String>) = FormValidator.validate(spec.visibleFields(v), v)
+        assertTrue(errors(direct).isEmpty())
+        val withStop = direct + mapOf("stops" to "1", "s1_airport" to "MAN", "s1_depDate" to "2027-03-01", "s1_depTime" to "13:40", "s1_airline" to "CA")
+        assertTrue(errors(withStop).isEmpty())
     }
 }

@@ -283,6 +283,17 @@ class FlightConnectionsTest {
         assertFalse("stops" in FlightConnections.withStops(two, -1))
     }
 
+    @Test fun `el numero de vuelo es opcional en el vuelo y en las escalas`() {
+        val noNumbers = form - "flightNumber" - "s1_flightNumber"
+        assertTrue(FlightConnections.cross(noNumbers).isEmpty())
+        val (first, second) = FlightConnections.buildLegs(7, "C9", noNumbers, emptyList())
+        assertEquals("IB", first.airline); assertEquals("", first.flightNumber)
+        assertEquals("CA", second.airline); assertEquals("", second.flightNumber)
+        // Al volver a abrirlo sigue sin número.
+        val reopened = FlightConnections.formValues(listOf(first.copy(id = 1), second.copy(id = 2)))
+        assertEquals("", reopened["flightNumber"]); assertEquals("", reopened["s1_flightNumber"])
+    }
+
     @Test fun `un vuelo no puede salir antes de que llegue el anterior`() {
         assertTrue(FlightConnections.cross(form).isEmpty())
         val early = form + ("s1_depTime" to "09:00")   // el anterior llega a las 09:30
