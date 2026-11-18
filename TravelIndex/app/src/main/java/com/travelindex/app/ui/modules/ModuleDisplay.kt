@@ -23,10 +23,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
+import com.travelindex.app.data.db.FlightEntity
 import com.travelindex.app.ui.components.pluralText
 import com.travelindex.app.domain.Airports
 import com.travelindex.app.domain.DocWarning
 import com.travelindex.app.domain.DocWarnings
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.Formats
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.forms.ActivityCodec
@@ -198,8 +200,16 @@ private fun rowTexts(spec: ModuleSpec, v: Map<String, String>, today: LocalDate,
 
 /** Tarjeta de un elemento en las listas de cada módulo. */
 @Composable
-fun ModuleItemCard(spec: ModuleSpec, item: ModuleItem, today: LocalDate, tripEnd: LocalDate?, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    if (spec.type == ModuleType.FLIGHT) { FlightItemCard(item.values, onClick, modifier); return }
+fun ModuleItemCard(
+    spec: ModuleSpec, item: ModuleItem, today: LocalDate, tripEnd: LocalDate?, onClick: () -> Unit, modifier: Modifier = Modifier,
+    /** Todos los vuelos del viaje: sirven para saber si este es un tramo de un vuelo con escalas. */
+    flights: List<FlightEntity> = emptyList(),
+) {
+    if (spec.type == ModuleType.FLIGHT) {
+        val leg = flights.firstOrNull { it.id == item.id }?.let { FlightConnections.infoFor(it, flights) }
+        FlightItemCard(item.values, onClick, modifier, leg)
+        return
+    }
     val t = rowTexts(spec, item.values, today, tripEnd)
     Card(
         onClick = onClick, modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium,

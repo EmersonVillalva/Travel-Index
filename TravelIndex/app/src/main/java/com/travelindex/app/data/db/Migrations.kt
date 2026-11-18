@@ -70,3 +70,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("ALTER TABLE `activities` ADD COLUMN `durationMinutes` INTEGER")
     }
 }
+
+/**
+ * v4 -> v5: los vuelos con escalas enlazan sus tramos con un identificador de conexión.
+ * Solo AÑADE una columna con valor por defecto vacío; los vuelos que ya existen quedan como vuelos sueltos.
+ */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `flights` ADD COLUMN `connectionId` TEXT NOT NULL DEFAULT ''")
+    }
+}

@@ -59,7 +59,7 @@ object FlightCodec {
             "arrZone" to f.arrivalZoneId,
             "locator" to f.locator, "ticketNumber" to f.ticketNumber, "seat" to f.seat, "cabinClass" to f.cabinClass,
             "baggage" to f.baggage, "price" to f.priceMinor.money(f.currency), "currency" to f.currency,
-            "status" to f.status, "notes" to f.notes,
+            "status" to f.status, "notes" to f.notes, "connectionId" to f.connectionId,
         )
     }
 
@@ -79,7 +79,7 @@ object FlightCodec {
         locator = v.str("locator"), ticketNumber = v.str("ticketNumber"), seat = v.str("seat"),
         cabinClass = v.str("cabinClass"), baggage = v.str("baggage"),
         priceMinor = v.minor("price"), currency = v.currency(),
-        status = v.str("status").ifEmpty { "CONFIRMED" }, notes = v.str("notes"),
+        status = v.str("status").ifEmpty { "CONFIRMED" }, notes = v.str("notes"), connectionId = v.str("connectionId"),
     )
 
     /** Hay hora de llegada guardada. Si es igual a la salida, el usuario no la puso y no se pudo buscar: se desconoce. */

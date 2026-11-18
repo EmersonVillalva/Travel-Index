@@ -30,14 +30,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.travelindex.app.R
+import com.travelindex.app.data.db.FlightEntity
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.forms.FlightCodec
 import com.travelindex.app.ui.components.Pill
+import com.travelindex.app.ui.components.SectionCard
 import com.travelindex.app.ui.components.formatMoneyValue
 import com.travelindex.app.ui.theme.LocalFormats
 import com.travelindex.app.ui.theme.Spacing
@@ -104,7 +108,11 @@ fun FlightRouteCard(
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FlightItemCard(values: Map<String, String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun FlightItemCard(
+    values: Map<String, String>, onClick: () -> Unit, modifier: Modifier = Modifier,
+    /** Si el vuelo es un tramo de un viaje con escalas: su posición y la espera desde el tramo anterior. */
+    leg: FlightConnections.LegInfo? = null,
+) {
     val f = LocalFormats.current
     val flight = remember(values) { runCatching { FlightCodec.build(0, 0, values) }.getOrNull() }
     val title = listOf(values["airline"].orEmpty().trim(), values["flightNumber"].orEmpty().trim()).filter { it.isNotEmpty() }.joinToString(" ")
@@ -121,6 +129,10 @@ fun FlightItemCard(values: Map<String, String>, onClick: () -> Unit, modifier: M
     val status = values["status"].orEmpty().trim()
     val statusLabel = if (status.isEmpty() || status == "CONFIRMED") null
         else choiceText(ModuleSpecs.of(ModuleType.FLIGHT).field("status"), status)
+    val legChips = if (leg == null) emptyList() else listOfNotNull(
+        stringResource(R.string.flight_chip_leg, leg.number, leg.count),
+        leg.layoverMinutes?.let { stringResource(R.string.flight_chip_layover, leg.layoverAt.orEmpty(), durationText(it)) },
+    )
     val extras = listOfNotNull(
         values["locator"]?.trim()?.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.flight_chip_locator, it) },
         values["terminal"]?.trim()?.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.flight_chip_terminal, it) },
@@ -168,11 +180,48 @@ fun FlightItemCard(values: Map<String, String>, onClick: () -> Unit, modifier: M
                 }
             }
 
-            if (statusLabel != null || extras.isNotEmpty()) {
+            if (statusLabel != null || extras.isNotEmpty() || legChips.isNotEmpty()) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.s), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                     if (statusLabel != null) Pill(statusLabel, if (status == "CANCELLED") StatusDanger else StatusWarn)
+                    legChips.forEach { Pill(it, StatusNeutral) }
                     extras.forEach { Pill(it, StatusNeutral) }
                 }
+            }
+        }
+    }
+}
+
+/** Un vuelo con escalas: la ruta completa y, tramo a tramo, sus vuelos y lo que se espera entre uno y otro. */
+@Composable
+fun FlightConnectionCard(legs: List<FlightEntity>, currentId: Long, modifier: Modifier = Modifier) {
+    val f = LocalFormats.current
+    SectionCard(stringResource(R.string.sec_flight_connection), modifier) {
+        Text(FlightConnections.routeText(legs), style = MaterialTheme.typography.titleMedium)
+        legs.forEachIndexed { i, leg ->
+            val previous = legs.getOrNull(i - 1)
+            val layover = previous?.let { FlightConnections.layoverMinutes(it, leg) }
+            if (previous != null && layover != null) {
+                Text(
+                    stringResource(R.string.flight_chip_layover, Airports.displayName(previous.arrivalAirport), durationText(layover)),
+                    style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            val dep = Instant.ofEpochMilli(leg.departureEpochMs).atZone(ZoneId.of(leg.departureZoneId))
+            val arr = if (FlightCodec.hasArrival(leg)) Instant.ofEpochMilli(leg.arrivalEpochMs).atZone(ZoneId.of(leg.arrivalZoneId)) else null
+            val name = listOf(leg.airline.trim(), leg.flightNumber.trim()).filter { it.isNotEmpty() }.joinToString(" ")
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    stringResource(R.string.flight_connection_leg, i + 1, name),
+                    style = MaterialTheme.typography.bodyLarge, fontWeight = if (leg.id == currentId) FontWeight.Bold else FontWeight.Normal,
+                )
+                Text(
+                    Airports.displayName(leg.departureAirport) + " → " + Airports.displayName(leg.arrivalAirport),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    f.date(dep.toLocalDate()) + " · " + f.time(dep) + (arr?.let { " → " + f.time(it) } ?: ""),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }

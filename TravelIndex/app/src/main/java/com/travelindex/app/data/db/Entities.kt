@@ -74,6 +74,8 @@ data class FlightEntity(
     val currency: String = "EUR",
     val status: String = "CONFIRMED",
     val notes: String = "",
+    /** Vacío = vuelo suelto. Los tramos de un mismo viaje con escalas comparten este identificador. */
+    val connectionId: String = "",
 )
 
 @Entity(

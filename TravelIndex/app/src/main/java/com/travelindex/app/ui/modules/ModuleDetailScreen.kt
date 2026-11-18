@@ -46,6 +46,7 @@ import com.travelindex.app.R
 import com.travelindex.app.data.FileActions
 import com.travelindex.app.data.db.AttachmentEntity
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.ViewerSupport
 import com.travelindex.app.domain.forms.ActivityCodec
@@ -124,6 +125,13 @@ fun ModuleDetailScreen(onBack: () -> Unit, onEdit: (Long) -> Unit, onOpenViewer:
                         arrClock = LocalFormats.current.let { f -> listOf(v["arrDate"]?.let { d -> runCatching { f.date(LocalDate.parse(d)) }.getOrNull() }, v["arrTime"]).filter { !it.isNullOrBlank() }.joinToString(" ") },
                         duration = duration?.let { durationText(it) },
                     )
+                }
+                if (spec.type == ModuleType.FLIGHT) {
+                    // Vuelo con escalas: la ruta completa con todos sus tramos (el actual, en negrita).
+                    val flights = state.bundle?.flights.orEmpty()
+                    val current = flights.firstOrNull { it.id == item.id }
+                    val legs = if (current != null) FlightConnections.legsOf(current, flights) else emptyList()
+                    if (legs.size >= 2) FlightConnectionCard(legs, item.id)
                 }
                 if ((duration != null && spec.type != ModuleType.FLIGHT) || activityEnd != null || phone.isNotEmpty() || url.isNotEmpty()) {
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {

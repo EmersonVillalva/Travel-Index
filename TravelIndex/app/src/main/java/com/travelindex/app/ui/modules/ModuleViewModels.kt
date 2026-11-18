@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.travelindex.app.data.FileStorage
 import com.travelindex.app.data.db.AttachmentEntity
+import com.travelindex.app.data.db.FlightEntity
 import com.travelindex.app.data.repo.AttachmentRepository
 import com.travelindex.app.data.repo.ModuleRepository
 import com.travelindex.app.data.repo.TripRepository
 import com.travelindex.app.domain.Airports
+import com.travelindex.app.domain.FlightConnections
 import com.travelindex.app.domain.ModuleTarget
 import com.travelindex.app.domain.ModuleType
 import com.travelindex.app.domain.TripBundle
@@ -48,6 +50,8 @@ data class PendingFile(val uri: Uri, val name: String)
 
 sealed interface FormEvent {
     data class Saved(val failedFiles: Int) : FormEvent
+    /** Se guardó un tramo de un vuelo con escalas y el formulario queda listo para el siguiente (número de tramo). */
+    data class NextLeg(val leg: Int) : FormEvent
     data object ValidationFailed : FormEvent
     data object SaveFailed : FormEvent
     data object FileFailed : FormEvent
@@ -63,6 +67,10 @@ data class FormState(
     val existing: List<AttachmentEntity> = emptyList(),
     /** true cuando el usuario ya ha cambiado algo (para avisar antes de descartar). */
     val dirty: Boolean = false,
+    /** Vuelo con escalas: número del tramo que se está rellenando (2 o más); 0 si es un vuelo normal. */
+    val leg: Int = 0,
+    /** Vuelo: se puede añadir otro tramo a continuación (no si se edita un tramo que ya tiene otros después). */
+    val canAddLeg: Boolean = true,
 )
 
 @HiltViewModel
@@ -86,12 +94,16 @@ class ModuleFormViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     private var initialized = false
+    /** El elemento que se edita ahora: pasa a 0 (nuevo) al seguir con el siguiente tramo de un vuelo con escalas. */
+    private var editingId: Long = itemId
+    private var knownFlights: List<FlightEntity> = emptyList()
 
     init {
         viewModelScope.launch {
             trips.observeBundle(tripId).collect { b ->
                 if (b == null) { _state.update { it.copy(loaded = true, notFound = true) }; return@collect }
-                val owned = b.attachments.filter { it.ownerType == type.name && it.ownerId == itemId && itemId != 0L }
+                knownFlights = b.flights
+                val owned = b.attachments.filter { it.ownerType == type.name && it.ownerId == editingId && editingId != 0L }
                 if (!initialized) {
                     initialized = true
                     val existingItem = if (itemId != 0L) ModuleItems.of(type, b).firstOrNull { it.id == itemId } else null
@@ -99,7 +111,10 @@ class ModuleFormViewModel @Inject constructor(
                         _state.update { it.copy(loaded = true, notFound = true) }
                     } else {
                         val values = existingItem?.values ?: FormDefaults.forNew(type, b, LocalDate.now(), transportType = target.section?.transportType)
-                        _state.update { it.copy(loaded = true, values = values, existing = owned) }
+                        // Editando un tramo que ya tiene otros después, no se ofrece añadir uno a continuación.
+                        val canAddLeg = type != ModuleType.FLIGHT ||
+                            (b.flights.firstOrNull { it.id == itemId }?.let { FlightConnections.isLastLeg(it, b.flights) } ?: true)
+                        _state.update { it.copy(loaded = true, values = values, existing = owned, canAddLeg = canAddLeg) }
                     }
                 } else {
                     _state.update { it.copy(existing = owned) }
@@ -122,9 +137,9 @@ class ModuleFormViewModel @Inject constructor(
     }
 
     fun addFile(uri: Uri) {
-        if (itemId != 0L) {
+        if (editingId != 0L) {
             viewModelScope.launch {
-                runCatching { attachments.add(tripId, uri, type.name, itemId) }
+                runCatching { attachments.add(tripId, uri, type.name, editingId) }
                     .onFailure { _events.send(FormEvent.FileFailed) }
             }
         } else {
@@ -152,16 +167,35 @@ class ModuleFormViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // Se guardan nombres de aeropuerto, no códigos ("MAD" → "Madrid").
+                // Vuelo con escalas: este tramo y los siguientes comparten un identificador de conexión.
+                val chain = type == ModuleType.FLIGHT && s.values["nextLeg"] == "1"
+                val connectionId = s.values["connectionId"].orEmpty()
+                    .let { if (chain && it.isBlank()) FlightConnections.newConnectionId() else it }
                 val values = if (type == ModuleType.FLIGHT) s.values + mapOf(
                     "departureAirport" to Airports.displayName(s.values["departureAirport"].orEmpty()),
                     "arrivalAirport" to Airports.displayName(s.values["arrivalAirport"].orEmpty()),
+                    "connectionId" to connectionId,
                 ) else s.values
-                val id = modules.save(type, tripId, itemId, values)
+                val id = modules.save(type, tripId, editingId, values)
                 var failed = 0
                 s.pending.forEach { p ->
                     runCatching { attachments.add(tripId, p.uri, type.name, id) }.onFailure { failed++ }
                 }
-                _events.send(FormEvent.Saved(failed))
+                if (chain) {
+                    // Los demás tramos de la conexión que ya están guardados, más este y el que viene.
+                    val leg = knownFlights.count { it.connectionId == connectionId && it.id != id } + 2
+                    editingId = 0
+                    _state.update {
+                        FormState(
+                            loaded = true, values = FlightConnections.nextLegValues(values, connectionId), leg = leg,
+                            canAddLeg = true,
+                        )
+                    }
+                    if (failed > 0) _events.send(FormEvent.FileFailed)
+                    _events.send(FormEvent.NextLeg(leg))
+                } else {
+                    _events.send(FormEvent.Saved(failed))
+                }
             } catch (t: Throwable) {
                 _state.update { it.copy(saving = false) }
                 _events.send(FormEvent.SaveFailed)

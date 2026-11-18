@@ -46,6 +46,9 @@ con.execute("CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)"
 # La tabla de actividades existe desde la versión 1 (no la crea ninguna migración): se parte de su forma en la versión 3.
 con.execute(table_ddl("activities", expected["activities"], skip=("durationMinutes",)))
 con.execute("CREATE INDEX index_activities_tripId ON activities (tripId)")
+# Igual con los vuelos: existen desde la versión 1; se parte de su forma en la versión 4 (sin connectionId).
+con.execute(table_ddl("flights", expected["flights"], skip=("connectionId",)))
+con.execute("CREATE INDEX index_flights_tripId ON flights (tripId)")
 for s in sql: con.execute(s)
 bad = 0
 for table in ["transports", "restaurants", "travel_docs", "note_items"]:
@@ -108,6 +111,27 @@ else:
     sim.execute(stmt)
     row = sim.execute("SELECT travelModes FROM trips").fetchone()
     if row != ("",): print(f"[X] el viaje existente quedó con travelModes={row}"); bad += 1
+
+# --- v4 -> v5: columna connectionId del vuelo (tramos de un vuelo con escalas) ---
+fl_exp = expected.get("flights", {})
+if fl_exp.get("connectionId") != ("TEXT", 1, 0):
+    print(f"[X] flights.connectionId en la entidad: {fl_exp.get('connectionId')}"); bad += 1
+sim4 = sqlite3.connect(":memory:")
+sim4.execute("CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+sim4.execute(table_ddl("flights", fl_exp, skip=("connectionId",)))
+v4_cols = [c for c in fl_exp if c not in ("connectionId", "id")]
+v4_vals = ", ".join("'x'" if fl_exp[c][0] == "TEXT" else "1" for c in v4_cols)
+sim4.execute(f"INSERT INTO flights ({', '.join(v4_cols)}) VALUES ({v4_vals})")
+m45 = re.search(r"MIGRATION_4_5.*?db\.execSQL\((.*?)\)\n", mig, flags=re.S)
+if not m45: print("[X] MIGRATION_4_5 no encontrada"); bad += 1
+else:
+    sim4.execute("".join(re.findall(r'"((?:\\.|[^"\\])*)"', m45.group(1))))
+    got = {r[1]: (r[2].upper(), r[3], 1 if r[5] > 0 else 0) for r in sim4.execute("PRAGMA table_info(flights)")}
+    if got != fl_exp:
+        print(f"[X] flights tras la migración: sobran {set(got)-set(fl_exp)}, faltan {set(fl_exp)-set(got)}, distintas "
+              f"{[k for k in fl_exp if k in got and got[k] != fl_exp[k]]}"); bad += 1
+    row = sim4.execute("SELECT airline, connectionId FROM flights").fetchone()
+    if row != ("x", ""): print(f"[X] el vuelo existente quedó como {row}"); bad += 1
 
 # La versión de la base de datos y las migraciones registradas deben encajar.
 dbsrc = (root / "app/src/main/java/com/travelindex/app/data/db/TravelIndexDatabase.kt").read_text(encoding="utf-8")

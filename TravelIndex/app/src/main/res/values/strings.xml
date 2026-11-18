@@ -95,6 +95,17 @@
     <string name="flight_chip_locator">Loc. %1$s</string>
     <string name="flight_chip_terminal">Terminal %1$s</string>
     <string name="flight_chip_seat">Asiento %1$s</string>
+    <string name="sec_flight_stops">Escalas</string>
+    <string name="flight_has_stops">Vuelo con escalas</string>
+    <string name="flight_has_stops_hint">Al guardar, se abre el siguiente tramo ya rellenado con este aeropuerto de llegada. Repítelo con tantas escalas como tenga el viaje.</string>
+    <string name="action_save_add_leg">Guardar y añadir otro tramo</string>
+    <string name="flight_new_leg_title">Nuevo vuelo · tramo %1$d</string>
+    <string name="flight_leg_saved">Tramo guardado. Ahora, el tramo %1$d</string>
+    <string name="flight_leg_hint">Sale de donde llegó el tramo anterior y los datos de la reserva se han copiado. Rellena la aerolínea, el número y las horas de este tramo.</string>
+    <string name="flight_chip_leg">Tramo %1$d de %2$d</string>
+    <string name="flight_chip_layover">Escala en %1$s · %2$s</string>
+    <string name="sec_flight_connection">Vuelo con escalas</string>
+    <string name="flight_connection_leg">%1$d. %2$s</string>
 
     <!-- Inicio -->
     <string name="home_greeting">Hola, %1$s</string>

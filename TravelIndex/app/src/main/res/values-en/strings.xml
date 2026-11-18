@@ -91,6 +91,17 @@
     <string name="flight_chip_locator">Ref. %1$s</string>
     <string name="flight_chip_terminal">Terminal %1$s</string>
     <string name="flight_chip_seat">Seat %1$s</string>
+    <string name="sec_flight_stops">Stopovers</string>
+    <string name="flight_has_stops">Flight with stopovers</string>
+    <string name="flight_has_stops_hint">When you save, the next leg opens already filled in with this arrival airport. Repeat it for as many stopovers as the trip has.</string>
+    <string name="action_save_add_leg">Save and add another leg</string>
+    <string name="flight_new_leg_title">New flight · leg %1$d</string>
+    <string name="flight_leg_saved">Leg saved. Now, leg %1$d</string>
+    <string name="flight_leg_hint">It departs from where the previous leg arrived and the booking details have been copied. Fill in the airline, number and times for this leg.</string>
+    <string name="flight_chip_leg">Leg %1$d of %2$d</string>
+    <string name="flight_chip_layover">Layover in %1$s · %2$s</string>
+    <string name="sec_flight_connection">Flight with stopovers</string>
+    <string name="flight_connection_leg">%1$d. %2$s</string>
 
     <!-- Home -->
     <string name="home_greeting">Hi, %1$s</string>

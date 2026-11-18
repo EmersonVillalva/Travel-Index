@@ -80,7 +80,10 @@ fun ModuleListScreen(
                 }
             }
             items(list, key = { it.id }) { item ->
-                ModuleItemCard(spec, item, today, bundle?.trip?.endDate, onClick = { onOpen(item.id) }, modifier = Modifier.animateItem())
+                ModuleItemCard(
+                    spec, item, today, bundle?.trip?.endDate, onClick = { onOpen(item.id) }, modifier = Modifier.animateItem(),
+                    flights = bundle?.flights.orEmpty(),
+                )
             }
         }
     }
