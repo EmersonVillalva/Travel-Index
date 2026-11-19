@@ -1,6 +1,6 @@
 # Política de privacidad de Travel Index
-Última actualización: [FECHA]
-Responsable: Emerson Villalva Labrador (o la entidad con la que publiques) · Contacto: [TU EMAIL]
+Última actualización: 19 de noviembre de 2026
+Responsable: Emerson Villalva Labrador · Contacto: emersonvillalvalabrador@gmail.com
 
 **Qué datos trata la app.** Los viajes, reservas, documentos de viaje y archivos que tú introduces (incluidas fotografías y PDF) y tu nombre y foto de perfil si decides indicarlos.
 
@@ -16,7 +16,7 @@ Responsable: Emerson Villalva Labrador (o la entidad con la que publiques) · Co
 
 **Permisos.** Notificaciones (avisos de vuelos, reservas y caducidades) y el aviso de arranque del dispositivo (solo para volver a programar esos avisos tras reiniciar). Las fotos y archivos se importan con el selector del sistema, sin acceso general al almacenamiento. Para fotografiar un documento, la app abre la cámara del propio sistema y solo guarda la foto si la aceptas. No se solicitan internet, ubicación, contactos, cámara ni micrófono.
 
-**Tus derechos y eliminación.** Puedes borrar cualquier dato desde la app o eliminar todo desinstalándola. Para consultas: [TU EMAIL].
+**Tus derechos y eliminación.** Puedes borrar cualquier dato desde la app o eliminar todo desinstalándola. Para consultas: emersonvillalvalabrador@gmail.com.
 
 **Menores.** La app no está dirigida a menores de 13 años.
 
