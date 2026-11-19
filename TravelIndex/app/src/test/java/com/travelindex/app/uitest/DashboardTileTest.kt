@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Flight
 import androidx.compose.material.icons.outlined.Timeline
@@ -44,7 +46,8 @@ class DashboardTileTest {
     @Composable
     private fun Tiles() {
         MaterialTheme {
-            Column {
+            // Con scroll la columna no recorta a las últimas tarjetas por falta de alto en la ventana del test.
+            Column(Modifier.verticalScroll(rememberScrollState())) {
                 cases.forEachIndexed { i, (title, subtitle, price) ->
                     Box(Modifier.width(160.dp).testTag("tile$i")) {
                         Tile(if (i % 2 == 0) Icons.Outlined.Timeline else Icons.Outlined.Flight, title, subtitle, {}, price = price)
