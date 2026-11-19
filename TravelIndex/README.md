@@ -5,7 +5,8 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.8.8)
+> ## Estado real de esta versión (0.8.9)
+> - **La app apunta a Android 16 (API 36) (0.8.9)**, requisito de Google Play desde el 31 de agosto de 2026. Compila y pasa los tests en el CI, pero no está probada en un móvil con Android 16. El CI comprueba además que las librerías nativas cumplan el requisito de páginas de 16 KB.
 > - **Los ejemplos de los campos solo salen al editar (0.8.8)**: «Número de vuelo (ej. IB3170)» ahora se ve como «Número de vuelo» en el detalle del vuelo y en el PDF; el ejemplo solo aparece en el formulario.
 > - **Todas las tarjetas de secciones del panel del viaje miden lo mismo (0.8.7)**, tengan o no precio, con títulos largos o con la letra grande: título de dos líneas, subtítulo de una y una línea reservada para lo pagado (si un total con varias monedas no cabe, termina en «…»). Antes la tarjeta con precio (p. ej. «Vuelos») salía más alta que otras como «Itinerario».
 > - **Archivos de un vuelo rotulados con su ruta (0.8.6):** en Archivos (y en la lista para asociar un archivo), la tarjeta de embarque u otro archivo de un vuelo se llama «Madrid-Barajas - Mánchester» en vez de «Iberia IB3250»; cada tramo de un viaje con escalas lleva la suya.

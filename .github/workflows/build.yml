@@ -87,6 +87,10 @@ jobs:
           name: TravelIndex-debug-apk
           path: TravelIndex/app/build/outputs/apk/debug/*.apk
 
+      # Google Play: las librerías nativas de 64 bits deben soportar páginas de 16 KB (apps que apuntan a Android 15+).
+      - name: Librerías nativas (16 KB)
+        run: python3 tools/check_native_libs.py app/build/outputs/apk/debug/*.apk
+
       - name: Falta la firma
         if: env.WANT_RELEASE == 'true' && env.HAS_KEYSTORE != 'true'
         run: |

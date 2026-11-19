@@ -16,12 +16,13 @@ val keystoreProps = Properties().apply {
 
 android {
     namespace = "com.travelindex.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = providers.gradleProperty("travelindex.applicationId").get()
         minSdk = 26
-        targetSdk = 35
+        // Google Play exige apuntar a Android 16 (API 36) en apps nuevas y actualizaciones desde el 31 de agosto de 2026.
+        targetSdk = 36
         versionCode = providers.gradleProperty("travelindex.versionCode").get().toInt()
         versionName = providers.gradleProperty("travelindex.versionName").get()
         // Idiomas de la app: el APK solo empaqueta estos (las librerías traen docenas que no usamos).

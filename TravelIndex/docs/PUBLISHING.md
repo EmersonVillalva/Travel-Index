@@ -3,7 +3,7 @@
 2. **Clave de firma**: genera tu keystore (`keytool -genkeypair -v -keystore release-keystore.jks -alias travelindex -keyalg RSA -keysize 2048 -validity 10000`), guárdala en un lugar seguro (y una copia aparte) y rellena `keystore.properties`. Recomendado: activar *Play App Signing*. La clave y las contraseñas nunca van al repositorio ni se comparten en chats.
 3. **Firma de debug**: las builds de prueba (CI) firman con `debug.keystore`, una clave fija de pruebas incluida en el repositorio (contraseña estándar «android», sin secretos). Gracias a ella el APK de debug se actualiza sin desinstalar. No tiene nada que ver con la clave de release.
 4. **Paquete definitivo**: confirma `travelindex.applicationId`. No se puede cambiar tras publicar.
-4. **Versionado**: sube `travelindex.versionCode` en cada subida (esta versión: 40 / 0.8.8).
+4. **Versionado**: sube `travelindex.versionCode` en cada subida (esta versión: 41 / 0.8.9).
 5. **Política de privacidad**: URL pública obligatoria. Hay un borrador en `docs/play/PRIVACY_POLICY_es.md`: sustituye los campos entre corchetes y publícala (por ejemplo, GitHub Pages).
 6. **Formulario "Seguridad de los datos"** y clasificación de contenido en Play Console. Borrador: la app no recopila ni comparte datos y no tiene permiso de internet; todo queda en el dispositivo.
 7. **Ficha**: texto en `docs/play/STORE_LISTING_es.md`; faltan capturas (teléfono y, si procede, tablet), icono 512×512 y gráfico de funciones 1024×500 (hay que exportarlos a PNG).
@@ -20,6 +20,8 @@ El workflow debe estar en la **raíz del repositorio** como `.github/workflows/b
 Si el workflow falla, copia las últimas líneas del paso en rojo.
 
 ## Antes de producción
+- **API objetivo**: desde el 31 de agosto de 2026 Google Play solo acepta apps nuevas y actualizaciones que apunten a Android 16 (API 36). Travel Index apunta a la 36 desde la 0.8.9.
+- **Páginas de 16 KB**: desde el 1 de febrero de 2027 las actualizaciones de apps que apuntan a Android 15 o superior deben soportarlas si llevan librerías nativas. El CI lo comprueba en cada build (`tools/check_native_libs.py`).
 - Las cuentas personales nuevas suelen exigir una prueba cerrada con un mínimo de testers durante un periodo antes de poder publicar. Comprueba el requisito vigente en Play Console.
 - Prueba la app en un móvil real (y a ser posible una tablet o emulador) con el APK debug antes de subir el AAB: crear un viaje, agregar elementos y archivos, calendario, perfil (cambiar el idioma a English y volver a Español).
 
