@@ -71,6 +71,13 @@ android {
     testOptions {
         // Robolectric necesita los recursos reales de la app (textos, temas).
         unitTests.isIncludeAndroidResources = true
+        // Si un test falla, el log de CI enseña el mensaje y no solo la línea (sin el informe HTML no se sabría por qué).
+        unitTests.all { test ->
+            test.testLogging {
+                events("failed")
+                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+            }
+        }
     }
 
     lint {
