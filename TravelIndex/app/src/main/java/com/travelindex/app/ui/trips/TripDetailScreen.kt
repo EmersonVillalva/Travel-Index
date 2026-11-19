@@ -440,12 +440,14 @@ internal fun Tile(
             // título de dos líneas, subtítulo de una y una línea para lo pagado. Con minLines = maxLines la altura de cada
             // texto no depende de lo que diga; si no cabe, termina en «…».
             Text(title, style = MaterialTheme.typography.titleSmall, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            // Un texto vacío mide menos que uno con letras (a la línea vacía no se le aplica la altura de línea del estilo),
+            // así que lo vacío se sustituye por un espacio fijo: la tarjeta sin precio mide igual que la que lo tiene.
             Text(
-                subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                subtitle.ifEmpty { "\u00A0" }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 minLines = 1, maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                price, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold,
+                price.ifEmpty { "\u00A0" }, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold,
                 minLines = 1, maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
