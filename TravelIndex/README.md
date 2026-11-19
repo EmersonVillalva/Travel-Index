@@ -5,7 +5,8 @@ Hecho por Emerson Villalva Labrador.
 
 Aplicación Android nativa (Kotlin · Jetpack Compose · Material 3 · Room · DataStore · Hilt · MVVM) para organizar viajes. Funciona sin cuenta, sin servidor y **sin internet** (la app ni siquiera tiene ese permiso): todo se guarda en el dispositivo. (El nombre visible es «Travel Index»; el identificador técnico del paquete sigue siendo `com.travelindex.app`.)
 
-> ## Estado real de esta versión (0.8.7)
+> ## Estado real de esta versión (0.8.8)
+> - **Los ejemplos de los campos solo salen al editar (0.8.8)**: «Número de vuelo (ej. IB3170)» ahora se ve como «Número de vuelo» en el detalle del vuelo y en el PDF; el ejemplo solo aparece en el formulario.
 > - **Todas las tarjetas de secciones del panel del viaje miden lo mismo (0.8.7)**, tengan o no precio, con títulos largos o con la letra grande: título de dos líneas, subtítulo de una y una línea reservada para lo pagado (si un total con varias monedas no cabe, termina en «…»). Antes la tarjeta con precio (p. ej. «Vuelos») salía más alta que otras como «Itinerario».
 > - **Archivos de un vuelo rotulados con su ruta (0.8.6):** en Archivos (y en la lista para asociar un archivo), la tarjeta de embarque u otro archivo de un vuelo se llama «Madrid-Barajas - Mánchester» en vez de «Iberia IB3250»; cada tramo de un viaje con escalas lleva la suya.
 > - **Viajes sin medio de transporte marcado (0.8.4-0.8.5):** el panel ya no enseña una tarjeta vacía de «Vuelos» y otra de «Transporte y coche»; sale una sola tarjeta común «Transporte» (vacía) que, al tocarla, despliega un menú con todo lo que se puede añadir (vuelo, tren, autobús, barco, coche u otro transporte). El menú de «Agregar» (+) no cambia. En cuanto hay vuelos o transportes guardados, salen sus tarjetas con su número, como antes.

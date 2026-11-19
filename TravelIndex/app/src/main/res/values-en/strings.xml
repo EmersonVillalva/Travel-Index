@@ -329,7 +329,8 @@
 
     <!-- Fields -->
     <string name="f_airline">Airline</string>
-    <string name="f_flight_number">Flight number (e.g. IB3170)</string>
+    <string name="f_flight_number">Flight number</string>
+    <string name="f_flight_number_form">Flight number (e.g. IB3170)</string>
     <string name="f_status">Status</string>
     <string name="f_dep_airport">Departure airport</string>
     <string name="f_arr_airport">Arrival airport</string>

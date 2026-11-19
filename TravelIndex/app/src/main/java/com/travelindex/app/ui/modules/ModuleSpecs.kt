@@ -128,7 +128,7 @@ object ModuleSpecs {
         emptyTitleRes = R.string.empty_flights_title, emptyBodyRes = R.string.empty_flights_body, icon = Icons.Outlined.Flight,
         fields = listOf(
             f("airline", R.string.f_airline, required = true),
-            f("flightNumber", R.string.f_flight_number),
+            f("flightNumber", R.string.f_flight_number, formLabel = R.string.f_flight_number_form),
             f("status", R.string.f_status, FieldType.CHOICE, choices = Choices.flightStatus),
             f("departureAirport", R.string.f_dep_airport, FieldType.AIRPORT, required = true),
             f("terminal", R.string.f_terminal),

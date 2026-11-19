@@ -333,7 +333,9 @@
 
     <!-- Campos -->
     <string name="f_airline">Aerolínea</string>
-    <string name="f_flight_number">Número de vuelo (ej. IB3170)</string>
+    <string name="f_flight_number">Número de vuelo</string>
+    <!-- El ejemplo solo se enseña al editar el campo; al ver el vuelo y en el PDF se usa f_flight_number. -->
+    <string name="f_flight_number_form">Número de vuelo (ej. IB3170)</string>
     <string name="f_status">Estado</string>
     <string name="f_dep_airport">Aeropuerto de salida</string>
     <string name="f_arr_airport">Aeropuerto de llegada</string>
